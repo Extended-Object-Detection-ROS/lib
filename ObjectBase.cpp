@@ -30,12 +30,32 @@ namespace eod{
     vector<int> ObjectBase::getIntVectorAttribute(TiXmlElement * attr, const char * at_name){
         vector<int> vint;
         
-        istringstream iss(attr->Attribute(at_name));
+        //istringstream iss(attr->Attribute(at_name));
+        istringstream iss(getStringAttribute(attr, at_name));
+        
         string item;
         while( getline(iss, item, ' ')){
-            vint.push_back(stoi(item));
+            if( item.find("-") != string::npos ){
+                string start, end;
+                istringstream sub_iss(item);
+                getline(sub_iss, start, '-');
+                getline(sub_iss, end, '-');
+                int starti = stoi(start);
+                int endi = stoi(end);
+                for( int i = starti ; i <= endi; i++)
+                    vint.push_back(i);
+            }
+            else
+                vint.push_back(stoi(item));
         }
         return vint;
+    }
+    
+    string ObjectBase::getStringAttribute(TiXmlElement * attr, const char * at_name, string default_value){
+        const char* value = attr->Attribute(at_name);        
+        if(!value)
+            return default_value;
+        return string(value);
     }
     
     //

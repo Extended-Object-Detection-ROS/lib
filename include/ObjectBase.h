@@ -198,6 +198,7 @@ namespace eod{
 	
         std::string getPathAttribute(TiXmlElement * attr, const char * at_name);
         std::vector<int> getIntVectorAttribute(TiXmlElement * attr, const char * at_name);
+        std::string getStringAttribute(TiXmlElement * attr, const char * at_name, std::string default_value = "");
         
         /*
         /// <summary>
