@@ -45,6 +45,7 @@ File: Class realises loading simple_simple_objects parameters from XML file
 #if (USE_DLIB)
 #include "FaceDlibDetector.h"
 #endif
+#include "ExtractedInfoIdChecker.h"
 
 
 #include "ComplexObject.h"
@@ -196,6 +197,7 @@ namespace eod{
         SimpleObject* getByName(std::string objectname);
 	
         std::string getPathAttribute(TiXmlElement * attr, const char * at_name);
+        std::vector<int> getIntVectorAttribute(TiXmlElement * attr, const char * at_name);
         
         /*
         /// <summary>

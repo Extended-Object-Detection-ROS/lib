@@ -11,6 +11,10 @@ namespace eod{
         relation_counter = 1;
     }
     
+    //
+    // UTILS
+    //
+    
     string ObjectBase::getPathAttribute(TiXmlElement * attr, const char * at_name){
         const char* path = attr->Attribute(at_name);
         if( path == NULL or strlen(path) == 0)
@@ -19,6 +23,24 @@ namespace eod{
             return object_base_path + "/" + string(path);
         return string(path);            
     }
+    
+    /*
+     * format "1 2 4-6 8" -> [1,2,4,5,6,8]
+     */
+    vector<int> ObjectBase::getIntVectorAttribute(TiXmlElement * attr, const char * at_name){
+        vector<int> vint;
+        
+        istringstream iss(attr->Attribute(at_name));
+        string item;
+        while( getline(iss, item, ' ')){
+            vint.push_back(stoi(item));
+        }
+        return vint;
+    }
+    
+    //
+    // LOADERS
+    //
     
     bool ObjectBase::loadFromXML(string filename){
         
@@ -418,6 +440,18 @@ namespace eod{
                 break;
             }
 #endif
+            
+            case EI_ID_CHECK_A:
+            {
+                string field = attr->Attribute("field");
+                
+                vector<int> allowed =  getIntVectorAttribute(attr, "allowed");
+                vector<int> forbidden =  getIntVectorAttribute(attr, "forbidden");
+                
+                tmpA = new ExtractedInfoIdChecker(field, allowed, forbidden);
+                break;
+            }
+            
             default:
             {
                 attr = attr->NextSiblingElement("Attribute");

@@ -1,5 +1,5 @@
 /*
-Project: Object detection Library
+Project: Extended Object Detection Library
 Author: Moscowsky Anton
 File: Header file describes class for Pose detection
 */

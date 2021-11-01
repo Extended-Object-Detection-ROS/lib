@@ -20,7 +20,7 @@ namespace eod{
         Probability = prob;
     }
     
-    
+    //TODO should not return array but take it as pointer\link
     vector<ExtendedObjectInfo> Attribute::Detect(const Mat& image, int seq){
         //TODO: check that all detectors cares about 'inited' param
         /*
@@ -119,6 +119,8 @@ namespace eod{
             return DIST_A;
         if(name == "facedlib")
             return FACE_DLIB_A;
+        if(name == "extractedinfoid")
+            return EI_ID_CHECK_A;
         
         printf("Unknown attribute type %s!",name.c_str());
         return UNK_A;

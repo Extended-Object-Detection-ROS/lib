@@ -50,13 +50,14 @@ namespace eod{
         ROUGH_DIST_A,
         DIST_A,
         FACE_DLIB_A,
+        EI_ID_CHECK_A,
     };
     
     AttributeTypes getAttributeTypeFromName(std::string name);
     
     class Attribute{
         public:
-            Attribute();
+            Attribute();                        
 
             int Type;
             int ID;
@@ -104,6 +105,8 @@ namespace eod{
             void set_extracted_info(ExtendedObjectInfo &eoi, std::string key, std::string value);
             void set_extracted_info(ExtendedObjectInfo &eoi, std::string key, int value);
             void set_extracted_info(ExtendedObjectInfo &eoi, std::string key, double value);
+            
+            
                                 
         protected:    
             int prev_seq;
