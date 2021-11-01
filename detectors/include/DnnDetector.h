@@ -12,7 +12,7 @@ namespace eod{
     };
     
     // GLOBAL DNN DETECTOR
-    
+    /*
     class GlobalDnnDetector{
     public:
         GlobalDnnDetector();
@@ -34,11 +34,10 @@ namespace eod{
         std::vector<ExtendedObjectInfo> saved_answer;
         int prev_seq;
         std::map<int, std::string> labelMap;
-        bool isLabelMap;
-        //bool forceCuda;
+        bool isLabelMap;        
     };
     
-    extern std::vector <GlobalDnnDetector*> GDNNDS;
+    extern std::vector <GlobalDnnDetector*> GDNNDS;*/
     // EXTENDED OBJECT DETECTION LIB INTERFACE
     
     class DnnAttribute : public Attribute{
@@ -66,9 +65,24 @@ namespace eod{
         
         void Extract2(const cv::Mat& image, ExtendedObjectInfo& rect);
         
+        std::string framework_name;
+        std::string weights_file;
+        std::string config_file;
+        std::string label_file;
+        int inpWidth;
+        int inpHeight;
+        
     private:
-        GlobalDnnDetector* GDNND;
-        int object_id;
+        //GlobalDnnDetector* GDNND;
+        //int object_id;
+        
+        DNN_FRMWRK framework;
+        cv::dnn::Net net;
+        
+        std::vector<ExtendedObjectInfo> saved_answer;
+        int prev_seq;
+        std::map<int, std::string> labelMap;
+        bool isLabelMap;
         
     };
     
