@@ -99,9 +99,8 @@ namespace eod{
                 result = base_face_d.first;
             }
             //printf("%s - %f\n",base_face_d.first.c_str(), l);
-        }
-        //rect.extracted_info.back() = result;
-        set_extracted_info(&rect, 'label', result);
+        }        
+        set_extracted_info(rect, "face_label", result);
         
         if( result == "Unknown")
             rect.setScoreWeight(0, Weight);

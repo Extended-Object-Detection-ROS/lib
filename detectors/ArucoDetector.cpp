@@ -12,7 +12,7 @@ namespace eod{
         inited = false;
     }
     
-    ArucoAttribute::ArucoAttribute(int dictionary_, int IDmarker_, double markerLen_){
+    ArucoAttribute::ArucoAttribute(int dictionary_, double markerLen_){
         if( dictionary_ < 0 ){
             dict = cv::aruco::DICT_4X4_50;
             printf("Aruco dictionary didin't suport negative values, dictionary is set to  default 4x4_50\n");

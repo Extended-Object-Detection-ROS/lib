@@ -18,7 +18,7 @@ namespace eod{
         /// <summary>
         /// Constructor with ID
         /// </summary>
-        ArucoAttribute(int dictionary, int IDmarker, double markerLen = 0);
+        ArucoAttribute(int dictionary, double markerLen = 0);
         
         /// <summary>
         /// Detects aruco markers with 

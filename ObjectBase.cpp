@@ -224,13 +224,13 @@ namespace eod{
                 break;                            
             case ARUCO_A:
             {
-                int IDmarker = -1;
-                attr->Attribute("IDmarker", &IDmarker);
+//                 int IDmarker = -1;
+//                 attr->Attribute("IDmarker", &IDmarker);
                 int dictionary = 0;
                 attr->Attribute("Dict", &dictionary);
                 double markerLen = 0;
                 attr->Attribute("Lenght", &markerLen);                                
-                tmpA = new ArucoAttribute(dictionary, IDmarker, markerLen);
+                tmpA = new ArucoAttribute(dictionary, markerLen);
                 break;            
             }   
             case POSE_A:
