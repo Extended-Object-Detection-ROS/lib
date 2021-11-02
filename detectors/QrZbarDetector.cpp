@@ -68,7 +68,7 @@ namespace eod{
                 tmp.contour.push_back(contour);
             tmp.setScoreWeight(1, Weight);
             //tmp.extracted_info[0] = symbol->get_data();
-            set_extracted_info(&tmp, 'info', symbol->get_data());
+            set_extracted_info(tmp, "info", symbol->get_data());
             
             if( real_len > 0){
                 if( symbol->get_location_size() != 4 ){
