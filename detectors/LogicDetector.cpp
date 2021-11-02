@@ -170,7 +170,9 @@ namespace eod{
     }
     
     bool OrAttribute::Check2(const cv::Mat& image, ExtendedObjectInfo& rect){
-        return attributeA->Check2(image, rect) || attributeB->Check2(image, rect);
+        bool val = attributeA->Check2(image, rect) || attributeB->Check2(image, rect);
+        rect.setScoreWeight(1, Weight);
+        return val;
     }
     
     void OrAttribute::Extract2(const cv::Mat& image, ExtendedObjectInfo& rect){

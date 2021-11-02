@@ -11,35 +11,6 @@ namespace eod{
         DN_DNN_FW,// darknet
     };
     
-    // GLOBAL DNN DETECTOR
-    /*
-    class GlobalDnnDetector{
-    public:
-        GlobalDnnDetector();
-        GlobalDnnDetector(std::string framework_name, std::string weights_file, std::string config_file, int inpWidth, int inpHeight, std::string labelMap, bool forceCuda);                        
-        std::vector<ExtendedObjectInfo> detect(const cv::Mat& image, int seq, double Weight);
-        
-        bool inited;
-        std::string framework_name;
-        std::string weights_file;
-        std::string config_file;
-        std::string label_file;
-        int inpWidth;
-        int inpHeight;
-        
-    private:
-        DNN_FRMWRK framework;
-        cv::dnn::Net net;
-        
-        std::vector<ExtendedObjectInfo> saved_answer;
-        int prev_seq;
-        std::map<int, std::string> labelMap;
-        bool isLabelMap;        
-    };
-    
-    extern std::vector <GlobalDnnDetector*> GDNNDS;*/
-    // EXTENDED OBJECT DETECTION LIB INTERFACE
-    
     class DnnAttribute : public Attribute{
     public:	    
         /// <summary>
@@ -47,7 +18,7 @@ namespace eod{
         /// </summary>
         DnnAttribute();
         
-        DnnAttribute(int object_id, std::string framework_name, std::string weights_file, std::string config_file, int inpWidth, int inpHeight, std::string labelMap, bool forceCuda =false);
+        DnnAttribute(std::string framework_name, std::string weights_file, std::string config_file, int inpWidth, int inpHeight, std::string labelMap, bool forceCuda =false);
         
         /// <summary>
         /// Detects aruco markers with 
@@ -72,9 +43,7 @@ namespace eod{
         int inpWidth;
         int inpHeight;
         
-    private:
-        //GlobalDnnDetector* GDNND;
-        //int object_id;
+    private:        
         
         DNN_FRMWRK framework;
         cv::dnn::Net net;

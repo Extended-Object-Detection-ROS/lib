@@ -53,9 +53,7 @@ namespace eod{
             if( !Check2(image, *it) ){                
                 it = rects->erase(it);
             }
-            else {
-                //it->sub_id.push_back(-1);
-                //it->extracted_info.push_back("");
+            else {                
                 ++it;                
             }
         }                        
