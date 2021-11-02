@@ -46,7 +46,7 @@ File: Class realises loading simple_simple_objects parameters from XML file
 #include "FaceDlibDetector.h"
 #endif
 #include "ExtractedInfoIdChecker.h"
-
+#include "ExtractedInfoStringChecker.h"
 
 #include "ComplexObject.h"
 #ifdef USE_IGRAPH
@@ -196,18 +196,13 @@ namespace eod{
         /// <returns>Pointer to object, or NULL if is not successful</returns>
         SimpleObject* getByName(std::string objectname);
 	
+        
+        // XML read utils
         std::string getPathAttribute(TiXmlElement * attr, const char * at_name);
         std::vector<int> getIntVectorAttribute(TiXmlElement * attr, const char * at_name);
         std::string getStringAttribute(TiXmlElement * attr, const char * at_name, std::string default_value = "");
+        std::vector<std::string> getStringVectorAttribute(TiXmlElement * attr, const char * at_name);
         
-        /*
-        /// <summary>
-        /// Gets pointer to scene from list by its name
-        /// </summary>
-        /// <param name="objectname">Name of scene</param>
-        /// <returns>Pointer to scene, or NULL if is not successful</returns>
-        Scene* getByNameS(std::string scenename);
-        */
         
         ComplexObject* getByNameNS(std::string scenename);
 	

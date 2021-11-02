@@ -121,6 +121,8 @@ namespace eod{
             return FACE_DLIB_A;
         if(name == "extractedinfoid")
             return EI_ID_CHECK_A;
+        if(name == "extractedinfostring")
+            return EI_STR_CHECK_A;
         
         printf("Unknown attribute type %s!",name.c_str());
         return UNK_A;

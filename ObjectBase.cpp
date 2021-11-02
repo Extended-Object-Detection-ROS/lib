@@ -58,6 +58,16 @@ namespace eod{
         return string(value);
     }
     
+    vector<string> ObjectBase::getStringVectorAttribute(TiXmlElement * attr, const char * at_name){
+        vector<string> vstr;
+        
+        istringstream iss(getStringAttribute(attr, at_name));
+        string item;
+        while( getline(iss, item, ' ')){
+            vstr.push_back(item);
+        }
+        return vstr;        
+    }
     //
     // LOADERS
     //
@@ -291,6 +301,7 @@ namespace eod{
 #if (CV_MAJOR_VERSION > 3)
             case DNN_A:
             {
+                // TODO rewrite with new function helpers
                 string framework = attr->Attribute("framework");
                 
                 string weights = attr->Attribute("weights");
@@ -469,6 +480,17 @@ namespace eod{
                 vector<int> forbidden =  getIntVectorAttribute(attr, "forbidden");
                 
                 tmpA = new ExtractedInfoIdChecker(field, allowed, forbidden);
+                break;
+            }
+            case EI_STR_CHECK_A:
+            {
+                string field = attr->Attribute("field");
+                int partially = 0;
+                attr->Attribute("partially", &partially);
+                
+                vector<string> allowed = getStringVectorAttribute(attr, "allowed");
+                
+                tmpA = new ExtractedInfoStringChecker(field, allowed, (partially != 0));
                 break;
             }
             
