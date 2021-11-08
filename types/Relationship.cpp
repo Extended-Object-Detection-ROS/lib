@@ -29,6 +29,8 @@ namespace eod{
             return SPACE_LEFT_R;
         if( name == "spaceright" )
             return SPACE_RIGHT_R;
+        if( name == "sizesame" )
+            return SIZE_SAME_R;
         
         printf("Unknown relation type %s!",name.c_str());
         return UNK_R;

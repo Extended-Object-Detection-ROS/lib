@@ -60,6 +60,7 @@ File: Class realises loading simple_simple_objects parameters from XML file
 #include "ImageRangeRelation.h"
 #include "ThreeDimRangeRelation.h"
 #include "SpaceRelations.h"
+#include "SizeRelations.h"
 
 
 #if CV_MAJOR_VERSION > 3

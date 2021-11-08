@@ -818,6 +818,13 @@ namespace eod{
                 case SPACE_RIGHT_R:
                     tmp_r = new SpaceRightRelation();
                     break;
+                case SIZE_SAME_R:
+                {
+                    double error = 0.1;
+                    rel->Attribute("error", &error);
+                    tmp_r = new SizeSameRelation(error);
+                    break;
+                }
                 
                 
                 default:
