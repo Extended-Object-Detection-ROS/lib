@@ -28,21 +28,11 @@ namespace eod{
     void ExtendedObjectInfo::initVars(){                
         track_id = -1;
         total_score = 0;
-        //sub_id.push_back(-1);
-        //extracted_info.push_back("");
+        
         track_status = 0;
     }    
     
     void ExtendedObjectInfo::inheritData(ExtendedObjectInfo* a, ExtendedObjectInfo* b){
-        // sub_id
-        //sub_id.clear();
-        //sub_id.insert( sub_id.end(), a->sub_id.begin(), a->sub_id.end());
-        //sub_id.insert( sub_id.end(), b->sub_id.begin(), b->sub_id.end());
-                
-        // extracted info
-        //extracted_info.clear();
-        //extracted_info.insert( extracted_info.end(), a->extracted_info.begin(), a->extracted_info.end());
-        //extracted_info.insert( extracted_info.end(), b->extracted_info.begin(), b->extracted_info.end());
         
         extracted_info = a->extracted_info;
         extracted_info.insert(b->extracted_info.begin(), b->extracted_info.end());
@@ -158,7 +148,7 @@ namespace eod{
     void ExtendedObjectInfo::mergeAllData(MergingPolicy mp){
         // score mergin'
         calcTotalScore();
-        // mean of tvecs
+        // mean of tvecs        
         if( tvec.size() > 1 ){
             Vec3d total_tvec;
             for( size_t i = 0 ; i < tvec.size() ; i++ ){
@@ -169,6 +159,8 @@ namespace eod{
             total_tvec[0] /= tvec.size();
             total_tvec[1] /= tvec.size();
             total_tvec[2] /= tvec.size();
+            //tvec.clear();
+            //tvec.push_back(total_tvec);
             tvec.insert( tvec.begin(), total_tvec);
         }
         // contour merging

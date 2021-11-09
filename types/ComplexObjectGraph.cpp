@@ -253,6 +253,7 @@ namespace eod{
                 merged = merged | ObjectsToSimpleObjects[object_name]->objects[obj_num];
                 //printf("\t%s %i\n", object_name.c_str(), obj_num);
             }
+            merged.mergeAllData();
             merged.total_score = maps[i].second;
             result.push_back(merged);
         }
@@ -334,6 +335,7 @@ namespace eod{
                 else
                     merged = merged | ObjectsToSimpleObjects[object_name]->objects[obj_num];                
             }
+            merged.mergeAllData();
             merged.total_score = maps[i].second;
             result.push_back(merged);
                                     
