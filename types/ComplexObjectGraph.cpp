@@ -7,7 +7,7 @@ namespace eod{
     Graph::Graph(){
         vertices_len = 0;
         edges_len = 0;
-        igraph_empty(&graph, 0, IGRAPH_UNDIRECTED);
+        igraph_empty(&graph, 0, IGRAPH_DIRECTED);
         accuracy = 100;
     }        
     
