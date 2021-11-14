@@ -95,6 +95,8 @@ namespace eod{
         /// <param name="filename">Path to xml file</param>        
         bool loadFromXML(std::string filename);
         bool loadFromXML(char* filename){return loadFromXML(std::string(filename));}        
+
+        bool loadFromTextData(std::string filedata, std::string path);
         
         /// <summary>
         /// Prints composition of Base
@@ -156,6 +158,8 @@ namespace eod{
         void setCameraParams(cv::Mat cameraMatrix, cv::Mat distCoeffs);
         cv::Mat getCameraMatrix();
         cv::Mat getDistortionCoeff();
+
+        inline std::string getPath(){return object_base_path;}
 
     private:        
         

@@ -113,6 +113,41 @@ namespace eod{
 
         return loaded;
     }
+
+    bool ObjectBase::loadFromTextData(std::string filedata, std::string path){
+        object_base_path = path;
+
+        TiXmlDocument *doc = new TiXmlDocument();
+
+        doc->Parse(filedata.c_str(), 0, TIXML_ENCODING_UTF8);
+
+        loaded = loadFromXMLa(doc, object_base_path);
+        if( loaded ) printf("Attributes have been readed sucsessfuly.\n");
+        else printf("Error reading attributes.\n");
+
+        loaded &= loadFromXMLso(doc);
+        if( loaded ) printf("Simple objects have been readed sucsessfuly.\n");
+        else printf("Error reading simple_objects.\n");
+
+        loaded &= loadFromXMLr(doc);
+        if( loaded ) printf("Relationship list has been readed sucsessfuly.\n");
+        else printf("Error reading relations.\n");
+
+        loaded &= loadFromXMLsNM(doc);
+        if( loaded ) printf("Complex objects SubDef have been loaded successfully!\n");
+        else printf("Error reading SubDef complex objects.\n");
+#ifdef USE_IGRAPH
+        loaded &= loadFromXMLsG(doc);
+        if( loaded ) printf("Complex objects Graph have been loaded successfully!\n");
+        else printf("Error reading Graph complex objects.\n");
+#endif
+        doc->~TiXmlDocument();
+
+        checkIDobj();
+        //checkIDsc();
+
+        return loaded;
+    }
     
     // ------------------
     // attributes
