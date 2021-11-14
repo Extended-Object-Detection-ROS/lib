@@ -304,7 +304,15 @@ namespace eod{
                 symbol = " > ";
             
             string attributeName = symbol + mode_attributes[j].second->Name + " ["+(j < obj->scores_with_weights.size() ? to_string(roundf(obj->scores_with_weights[j].first * 100) / 100).substr(0,4) : "-1" )+"]" /*+ (j >= obj->sub_id.size() || obj->sub_id[j] == -1? "" : "{"+to_string(obj->sub_id[j])+"}")/* +(j >= obj->extracted_info.size() || obj->extracted_info[j] == "" ? "" : "("+obj->extracted_info[j]+")")*/;
-            prevBr = drawFilledRectangleWithText(image, Point(obj->tl().x, prevBr.y), attributeName, col);
+            string extracted_info = " ";
+            map<string, string>::iterator it;
+            for( it  = obj->extracted_info.begin(); it != obj->extracted_info.end(); it++){
+                auto res = std::mismatch(mode_attributes[j].second->Name.begin(), mode_attributes[j].second->Name.end(), it->first.begin());
+                if( res.first == mode_attributes[j].second->Name.end() ){
+                    extracted_info += it->second + " ";//it->second.substr(mode_attributes[j].second->Name.length());
+                }
+            }
+            prevBr = drawFilledRectangleWithText(image, Point(obj->tl().x, prevBr.y), attributeName + extracted_info, col);
             
         }        
    }
