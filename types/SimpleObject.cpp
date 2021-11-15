@@ -161,16 +161,16 @@ namespace eod{
         for( size_t i = 0 ; i < objects.size(); i++)
             //objects[i].calcTotalScore();
             objects[i].mergeAllData(merging_policy);
-        auto it = objects.begin();
-        while (it != objects.end() ){   
-            //it->calcTotalScore();
-            it->mergeAllData(merging_policy);
-            if( it->total_score < Probability ){
-                it = objects.erase(it);
+            auto it = objects.begin();
+            while (it != objects.end() ){
+                //it->calcTotalScore();
+                it->mergeAllData(merging_policy);
+                if( it->total_score < Probability ){
+                    it = objects.erase(it);
+                }
+                else
+                    ++it;
             }
-            else
-                ++it;
-        }    
         
         return objects;
     }

@@ -53,8 +53,9 @@ namespace eod{
             if( !Check2(image, *it) ){                
                 it = rects->erase(it);
             }
-            else {                
-                ++it;                
+            else {
+                it->setScoreWeight(1, Weight);
+                ++it;
             }
         }                        
     }
