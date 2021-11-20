@@ -1102,7 +1102,9 @@ namespace eod{
         complex_objects.clear();
         attributes.clear();
         relations.clear();
+#ifdef USE_IGRAPH        
         complex_objects_graph.clear();
+#endif
     }
 
     void ObjectBase::clear_stuff(){
