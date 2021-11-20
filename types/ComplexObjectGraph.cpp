@@ -139,7 +139,7 @@ namespace eod{
                             VECTOR(pair)[1] = j2;
                             igraph_get_eids(&(sub_graph -> graph), &edge_id, &pair, NULL, 0, 0);
                             int edge_id_ind_tar = VECTOR(edge_id)[0];
-                            double k_edge = double(EAN(&(sub_graph->graph), "weight", edge_id_ind_tar));
+                            double k_edge = double(EAN(&(sub_graph->graph), "weight", edge_id_ind_tar))/accuracy;
                             
                             if( EAN(&graph, "fake", edge_id_ind) ){
                                 // IT IS FAKE       
@@ -193,7 +193,7 @@ namespace eod{
         
         NamesToObjects.insert(std::pair<std::string, std::pair<std::string, std::string>>(auto_name,std::pair<std::string, std::string>(o1_name, o2_name)));        
         
-        graph.add_edge(auto_name, rs->ID, ObjectsToGraphsVerticesIds[o1_name], ObjectsToGraphsVerticesIds[o2_name] );
+        graph.add_edge(auto_name, rs->ID, ObjectsToGraphsVerticesIds[o1_name], ObjectsToGraphsVerticesIds[o2_name], false, weight);
     }
     
     std::vector<ExtendedObjectInfo> ComplexObjectGraph::Identify(const cv::Mat& frame, const cv::Mat& depth, int seq ){
@@ -299,10 +299,10 @@ namespace eod{
                         current_view_graph.add_edge(NamesToRelations[nto.first]->Name, NamesToRelations[nto.first]->ID, ind1, ind2, true);
                     else{
                         if( NamesToRelations[nto.first]->checkRelation(frame, &obj1[i], &obj2[j]) ){
-                            current_view_graph.add_edge(NamesToRelations[nto.first]->Name, NamesToRelations[nto.first]->ID, ind1, ind2);
+                            current_view_graph.add_edge(NamesToRelations[nto.first]->Name, NamesToRelations[nto.first]->ID, ind1, ind2, false);
                         }
                         else{
-                            current_view_graph.add_edge(NamesToRelations[nto.first]->Name, NamesToRelations[nto.first]->ID, ind1, ind2, true);
+                            current_view_graph.add_edge(NamesToRelations[nto.first]->Name, NamesToRelations[nto.first]->ID, ind1, ind2, true, 0);
                         }
                     }
                 }

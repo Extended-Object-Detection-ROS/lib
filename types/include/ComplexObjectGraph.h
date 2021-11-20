@@ -76,6 +76,8 @@ namespace eod{
         std::map<std::string, SimpleObject*> ObjectsToSimpleObjects;
         
         std::map<std::string, RelationShip*> NamesToRelations;
+        //std::map<std::string, double> NamesToRelationsWights;
+
         std::map<std::string, std::pair<std::string, std::string>> NamesToObjects;
         
         
