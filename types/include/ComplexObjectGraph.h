@@ -4,6 +4,7 @@
 #include "SimpleObject.h"
 #include "Relationship.h"
 #include "igraph.h"
+#include "Filtering.h"
 
 namespace eod{
     
@@ -67,6 +68,8 @@ namespace eod{
         void drawAll(const cv::Mat& frameTD, cv::Scalar color, int tickness);
         
         std::vector<ExtendedObjectInfo> complex_objects;
+
+        std::vector<EoiFilter*> filters;
                         
     private:
         std::map<std::string, int> ObjectsToGraphsVerticesIds;

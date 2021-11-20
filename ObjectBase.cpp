@@ -1000,6 +1000,39 @@ namespace eod{
 
                 relation = relation->NextSiblingElement("Relation");
             }
+
+            // filtering
+            // TODO: make filtering read same for all instatnces
+            TiXmlElement *filter_el = scene->FirstChildElement("Filter");
+            while( filter_el ){
+                string filterTypeStr = filter_el->Attribute("Type");
+
+                FilterTypes filterType = getFilterTypeFromString(filterTypeStr);
+                if( filterType == INSIDER_F ){
+                    InsiderFilter* tmpF = new InsiderFilter();
+                    tmpGs->filters.push_back(tmpF);
+                }
+                else if( filterType == IOU_F ){
+                    double threshold = 0.75;
+                    filter_el->Attribute("threshold",&threshold);
+                    IOUFilter* tmpF = new IOUFilter(threshold);
+                    tmpGs->filters.push_back(tmpF);
+                }
+                else if(filterType == ROI_F ){
+                    int x = 0, y = 0, w = 0, h = 0;
+                    filter_el->Attribute("x",&x);
+                    filter_el->Attribute("y",&y);
+                    filter_el->Attribute("w",&w);
+                    filter_el->Attribute("h",&h);
+                    Rect roi = Rect(x, y, w, h);
+                    ROIFilter* tmpF = new ROIFilter(roi);
+                    tmpGs->filters.push_back(tmpF);
+                }
+                else if( filterType == UNK_F ){
+                    printf("Unknown filter name %s in Attribute %s!\n",filterTypeStr.c_str(), name.c_str());
+                }
+                filter_el = filter_el->NextSiblingElement("Filter");
+            }
             
             complex_objects_graph.push_back(tmpGs);
             scene = scene->NextSiblingElement("ComplexObject");

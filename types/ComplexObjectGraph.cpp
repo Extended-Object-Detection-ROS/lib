@@ -198,9 +198,14 @@ namespace eod{
     
     std::vector<ExtendedObjectInfo> ComplexObjectGraph::Identify(const cv::Mat& frame, const cv::Mat& depth, int seq ){
         if( identify_mode == HARD )
-            return IdentifyHard(frame, depth, seq);
+            IdentifyHard(frame, depth, seq);
         else
-            return IdentifySoft(frame, depth, seq);
+            IdentifySoft(frame, depth, seq);
+
+        for( size_t i = 0; i < filters.size() ; i ++ ){
+            filters[i]->Filter(&complex_objects);
+        }
+        return complex_objects;
     }
     
     std::vector<ExtendedObjectInfo> ComplexObjectGraph::IdentifyHard(const cv::Mat& frame, const cv::Mat& depth, int seq ){
