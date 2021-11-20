@@ -12,7 +12,7 @@ namespace eod{
     public:
         
         AndAttribute();
-        AndAttribute(Attribute*, Attribute*, double);
+        AndAttribute(Attribute*, Attribute*, double, bool second_check = false);
         
         std::vector<ExtendedObjectInfo> Detect2(const cv::Mat& image, int seq);
         
@@ -24,6 +24,7 @@ namespace eod{
         Attribute* attributeA;
         Attribute* attributeB;
         double iou_threshold;
+        bool second_check;
         
     };
     

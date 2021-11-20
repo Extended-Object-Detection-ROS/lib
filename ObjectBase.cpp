@@ -391,6 +391,8 @@ namespace eod{
                 string attributeB = attr->Attribute("B");
                 double iou = 0.75;
                 attr->Attribute("iou",&iou);
+                int second_check = 0;
+                attr->Attribute("second_check",&second_check);
                 
                 Attribute* aA = getByNameA(attributeA);                
                 if( aA == NULL ){
@@ -404,7 +406,7 @@ namespace eod{
                     attr = attr->NextSiblingElement("Attribute");
                     continue;
                 }
-                tmpA = new AndAttribute(aA, aB, iou);                
+                tmpA = new AndAttribute(aA, aB, iou, bool(second_check));                
                 break;
             }
             case LOG_NOT_A:

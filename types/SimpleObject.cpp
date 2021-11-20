@@ -248,9 +248,11 @@ namespace eod{
                         check_result = mode_attributes[i].second->Check2(frame, objects[j]);
                     else if( mode_attributes[i].first.second == DEPTH)
                         check_result = mode_attributes[i].second->Check2(depth, objects[j]);
-                    if( ! check_result ){
+                    if( ! check_result )
                         objects[j].setScoreWeight(0, mode_attributes[i].second->Weight);
-                    }
+                    else
+                        objects[j].setScoreWeight(1, mode_attributes[i].second->Weight); //NOTE TODO KOSTYL this should not be there
+                    
                 }
             }            
             else if(mode_attributes[i].first.first == EXTRACT){

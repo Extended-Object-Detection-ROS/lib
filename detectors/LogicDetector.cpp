@@ -14,14 +14,16 @@ namespace eod{
         attributeB = NULL;
         iou_threshold = 0.75;
         inited = false;
+        second_check = false;
         Type = LOG_AND_A;
     }
         
-    AndAttribute::AndAttribute(Attribute* a, Attribute* b, double iou_thesh){
+    AndAttribute::AndAttribute(Attribute* a, Attribute* b, double iou_thesh, bool second_check_){
         attributeA = a;
         attributeB = b;
         iou_threshold = iou_thesh;
         inited = true;
+        second_check = second_check_;
         Type = LOG_AND_A;
     }
     
@@ -29,30 +31,47 @@ namespace eod{
         vector<ExtendedObjectInfo> objects;    
         if(!inited) return objects;
         vector<ExtendedObjectInfo> rectsA = attributeA->Detect2(image, seq);
-        vector<ExtendedObjectInfo> rectsB = attributeB->Detect2(image, seq);                
-            
-        if( rectsA.size() == 0 || rectsB.size() == 0)
-            return objects;
+        
+        if( !second_check ){
+            vector<ExtendedObjectInfo> rectsB = attributeB->Detect2(image, seq);                
                 
-        Mat_<double> closenessMapD = createClosenessMap(&rectsA, &rectsB, iou_threshold);
-        
-        Mat mask(closenessMapD.size(), CV_8UC1, Scalar(255,255,255));            
-        
-        while( true ){
-            double min, max = 0;
-            Point min_loc, max_loc;
-            minMaxLoc(closenessMapD, &min, &max, &min_loc, &max_loc, mask);
-            if( max == 0 ) break;                                           
-            ExtendedObjectInfo newone = rectsA[max_loc.y] & rectsB[max_loc.x];                        
-            // TODO: here may be diffrent policy of inner information merging, rather different than for simple objects
-            objects.push_back(newone); 
-            mask.row(max_loc.y).setTo(Scalar(0,0,0));                                    
-            mask.col(max_loc.x).setTo(Scalar(0,0,0));                                
-        }
-        mask.release();
-        closenessMapD.release();
+            if( rectsA.size() == 0 || rectsB.size() == 0)
+                return objects;
                     
-        return objects;
+            Mat_<double> closenessMapD = createClosenessMap(&rectsA, &rectsB, iou_threshold);
+            
+            Mat mask(closenessMapD.size(), CV_8UC1, Scalar(255,255,255));            
+            
+            while( true ){
+                double min, max = 0;
+                Point min_loc, max_loc;
+                minMaxLoc(closenessMapD, &min, &max, &min_loc, &max_loc, mask);
+                if( max == 0 ) break;                                           
+                ExtendedObjectInfo newone = rectsA[max_loc.y] & rectsB[max_loc.x];                        
+                // TODO: here may be diffrent policy of inner information merging, rather different than for simple objects
+                objects.push_back(newone); 
+                mask.row(max_loc.y).setTo(Scalar(0,0,0));                                    
+                mask.col(max_loc.x).setTo(Scalar(0,0,0));                                
+            }
+            mask.release();
+            closenessMapD.release();
+                        
+            return objects;
+        }
+        else{
+            auto it = rectsA.begin();
+            while (it != rectsA.end() ){            
+                if( !attributeB->Check2(image, *it) ){                
+                    it = rectsA.erase(it);
+                }
+                else {
+                    //it->setScoreWeight(1, Weight);
+                    ++it;
+                }
+            }    
+            return rectsA;
+        }
+        
     }
     
     bool AndAttribute::Check2(const cv::Mat& image, ExtendedObjectInfo& rect){
