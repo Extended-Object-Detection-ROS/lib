@@ -142,22 +142,17 @@ namespace eod{
                             double k_edge = double(EAN(&(sub_graph->graph), "weight", edge_id_ind_tar))/accuracy;
                             
                             if( EAN(&graph, "fake", edge_id_ind) ){
-                                // IT IS FAKE       
-                                //printf("Fake\n");
+                                // IT IS FAKE                                    
                             }
-                            else{
-                                                                
+                            else{                                                                
                                 // calc
                                 Dc += k_edge*(k1 * dc1 + k2 * dc2);                                
                             }   
                             denominator += k_edge*(k1 + k2);
                         }
-                    //}
                 }
-            }            
-            //printf("Denominator %f\n", denominator);            
+            }                        
             Dc /= denominator;                      
-            //printf("Dc %f\n", Dc);
             vect_maps[i].second = Dc;
         }        
         return vect_maps;                
@@ -307,16 +302,12 @@ namespace eod{
                     }
                 }
             }                        
-        }
-        //printf("VF2\n");
+        }        
         // DO VF2
-        std::vector<std::pair<std::vector<int>, double>> maps = current_view_graph.get_subisomorphisms(&graph);                
-        
+        std::vector<std::pair<std::vector<int>, double>> maps = current_view_graph.get_subisomorphisms(&graph);                        
         // maps:
-        // j - vert id graph, maps[_][j] - vert id current_view_graph
-        
-        // RETRIEVE DATA
-        //printf("DATA\n");
+        // j - vert id graph, maps[_][j] - vert id current_view_graph        
+        // RETRIEVE DATA        
         for( size_t i = 0 ; i < maps.size() ; i++ ){
             
             if( maps[i].second < Probability ){
@@ -337,16 +328,19 @@ namespace eod{
                 object_name = current_view_graph.get_vertice_params(maps[i].first[j], &obj_type, &obj_num);
                 if( obj_num == -1){
                 }
-                else
-                    merged = merged | ObjectsToSimpleObjects[object_name]->objects[obj_num];                
+                else{
+                    if( ObjectsToSimpleObjects[object_name]->objects[obj_num].height == 0 or ObjectsToSimpleObjects[object_name]->objects[obj_num].width == 0){
+                        //skip
+                    }
+                    merged = merged | ObjectsToSimpleObjects[object_name]->objects[obj_num];
+                }
             }
             merged.mergeAllData();
             merged.total_score = maps[i].second;
             result.push_back(merged);
                                     
             
-        }
-                        
+        }                        
         //TODO destroy graph
         complex_objects = result;
         
