@@ -34,9 +34,11 @@ namespace eod{
     //-----------
     class InsiderFilter : public EoiFilter{
     public:
-        InsiderFilter();
+        InsiderFilter(bool supress_same = false);
         
         void Filter(std::vector<ExtendedObjectInfo>* src);
+    private:
+        bool supress_same;
     };
     
     //-----------

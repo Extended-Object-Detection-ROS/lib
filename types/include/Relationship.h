@@ -24,6 +24,7 @@ namespace eod{
         SIZE_BIGGER_R,
         SIZE_SMALLER_R,
         SIZE_PERCENT_R,        
+        SAME_EXTR_INFO_R,
     };
     
     RelationTypes getRelationTypeFromName(std::string name);

@@ -28,21 +28,32 @@ namespace eod{
     // Insider filter: clears rects of objects are complitely in other
     //
     
-    InsiderFilter::InsiderFilter(){
+    InsiderFilter::InsiderFilter(bool supress_same){
         type = INSIDER_F;
+        this->supress_same = supress_same;
     }
     
     void InsiderFilter::Filter(vector<ExtendedObjectInfo>* src){
         auto it = src->begin();
-        while (it != src->end() ){            
+        while (it != src->end() ){
             bool in = false;
-            for(size_t i = 0 ; i < src->size() ; i++ ){
-                if( rect_inside((*it).getRect(), src->at(i).getRect() ) ){
+            //for(size_t i = 0 ; i < src->size() ; i++ ){                
+            auto it2 = src->begin();
+            while( it2 != src->end()){
+                if( it == it2 ){
+                    ++it2;
+                    continue;
+                }
+                //bool ss = supress_same and *it == src->at(i);
+                bool ss = supress_same and *it == *it2;
+                //if( ss or rect_inside((*it).getRect(), src->at(i).getRect() ) ){
+                if( ss or rect_inside((*it).getRect(), (*it2).getRect() ) ){
                     in = true;
                     break;
                 }
+                ++it2;
             }
-            if( in ){                
+            if( in ){
                 it = src->erase(it);
             }
             else {
@@ -71,12 +82,13 @@ namespace eod{
                     continue;
                 }   
                 double iou = intersectionOverUnion( &(src->at(i)), &(src->at(j)) );
-                if( iou >= iou_threshold ){
+                if( iou > iou_threshold ){
                     // delete with lower score
-                    if( src->at(i).scores_with_weights.back().first > src->at(j).scores_with_weights.back().first ){
+                    //if( src->at(i).scores_with_weights.back().first > src->at(j).scores_with_weights.back().first ){
+                    if( src->at(i).total_score > src->at(j).total_score ){
                         badIndexes.push_back(j);
                     }
-                    else{
+                    else if(src->at(i).total_score < src->at(j).total_score) {
                         badIndexes.push_back(i);
                         break;
                     }

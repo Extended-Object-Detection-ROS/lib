@@ -163,6 +163,7 @@ namespace eod{
             //tvec.push_back(total_tvec);
             tvec.insert( tvec.begin(), total_tvec);
         }
+        
         // contour merging
         if( contour.size() > 1 ){
             vector<Point> total_contour = contour[0];

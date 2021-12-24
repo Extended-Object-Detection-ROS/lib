@@ -862,7 +862,11 @@ namespace eod{
                     tmp_r = new SizeSameRelation(error);
                     break;
                 }
-                
+                case SAME_EXTR_INFO_R:
+                {
+                    tmp_r = new SameExtractedInfoRelation(rel->Attribute("field"));
+                    break;
+                }
                 
                 default:
                     rel = rel->NextSiblingElement("RelationShip");                                    
@@ -1011,7 +1015,7 @@ namespace eod{
 
                 FilterTypes filterType = getFilterTypeFromString(filterTypeStr);
                 if( filterType == INSIDER_F ){
-                    InsiderFilter* tmpF = new InsiderFilter();
+                    InsiderFilter* tmpF = new InsiderFilter(true);// DANGER dont forget bring to params
                     tmpGs->filters.push_back(tmpF);
                 }
                 else if( filterType == IOU_F ){

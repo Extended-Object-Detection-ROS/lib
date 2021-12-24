@@ -31,6 +31,8 @@ namespace eod{
             return SPACE_RIGHT_R;
         if( name == "sizesame" )
             return SIZE_SAME_R;
+        if( name == "sameextractedinfo" )
+            return SAME_EXTR_INFO_R;
         
         printf("Unknown relation type %s!",name.c_str());
         return UNK_R;

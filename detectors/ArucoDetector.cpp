@@ -35,7 +35,7 @@ namespace eod{
         if( !inited )
             return vector<ExtendedObjectInfo>(0);
         
-        if( hasCamParams() ){
+        if( !hasCamParams() ){            
             setCamParams(parent_base->getCameraMatrix(), parent_base->getDistortionCoeff() );
         }
                         
@@ -48,12 +48,14 @@ namespace eod{
             set_extracted_info(tmp, "marker_id", markerIds[i]);            
             if( returnContours )
                 tmp.contour.push_back(float2intPointVector(markerCorners[i]));
+            
             if( hasCamParams() && markerLen > 0){
                 vector<cv::Vec3d> rvecs, tvecs;                    
-                cv::aruco::estimatePoseSingleMarkers(vector<vector<Point2f> >(markerCorners.begin()+i,markerCorners.begin()+i+1), markerLen, camMat, distCoef, rvecs, tvecs);
+                cv::aruco::estimatePoseSingleMarkers(vector<vector<Point2f> >(markerCorners.begin()+i,markerCorners.begin()+i+1), markerLen, camMat, distCoef, rvecs, tvecs);            
                 tmp.tvec.push_back(tvecs[0]);
                 tmp.rvec.push_back(rvecs[0]);
             }
+            
             tmp.setScoreWeight(1, Weight);//TODO use reprojection to calc 
             rects.push_back(tmp);                
             

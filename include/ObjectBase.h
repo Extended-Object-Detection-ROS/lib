@@ -53,15 +53,12 @@ File: Class realises loading simple_simple_objects parameters from XML file
 #include "ComplexObjectGraph.h"
 #endif
 // RELATIONS
-// #include "RangeRelations.h"
-// #include "SpaceRelations.h"
-// #include "SizeRelations.h"
 #include "LogicRelations.h"
 #include "ImageRangeRelation.h"
 #include "ThreeDimRangeRelation.h"
 #include "SpaceRelations.h"
 #include "SizeRelations.h"
-
+#include "SameExtractedInfoRelation.h"
 
 #if CV_MAJOR_VERSION > 3
 #include "Tracker.h"
