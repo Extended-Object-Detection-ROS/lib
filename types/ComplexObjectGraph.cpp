@@ -335,11 +335,11 @@ namespace eod{
                     merged = merged | ObjectsToSimpleObjects[object_name]->objects[obj_num];
                 }
             }
+            if( merged.x == 0 && merged.y == 0 && merged.width == 0 && merged.height == 0)
+                continue;                
             merged.mergeAllData();
             merged.total_score = maps[i].second;
-            result.push_back(merged);
-                                    
-            
+            result.push_back(merged);                                                
         }                        
         //TODO destroy graph
         complex_objects = result;
