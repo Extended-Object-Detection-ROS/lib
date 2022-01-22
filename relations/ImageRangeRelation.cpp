@@ -3,12 +3,12 @@
 #include <math.h>
 
 namespace eod{
-    ImageRangeRelation::ImageRangeRelation(){
+    ImageRangeRelation::ImageRangeRelation() : RelationShip(){
         inited = false;
         Type = IM_RANGE_R;
     }
     
-    ImageRangeRelation::ImageRangeRelation(int px_dist_low_, int px_dist_high_){
+    ImageRangeRelation::ImageRangeRelation(int px_dist_low_, int px_dist_high_) : RelationShip(){
         inited = true;
         Type = IM_RANGE_R;
         sub_type = PURE_PIXEL;
@@ -16,13 +16,13 @@ namespace eod{
         px_dist_low = px_dist_low_;
     }
     
-    ImageRangeRelation::ImageRangeRelation(double dist_, double prob_){
+    ImageRangeRelation::ImageRangeRelation(double dist_, double prob_) : RelationShip(){
         inited = true;
         Type = IM_RANGE_R;
         sub_type = IM_DIAG_RELATIVE;
     }
     
-    ImageRangeRelation::ImageRangeRelation(TiXmlElement* relation_tag){
+    ImageRangeRelation::ImageRangeRelation(TiXmlElement* relation_tag) : RelationShip(){
         Type = IM_RANGE_R;
         if( relation_tag->Attribute("pxDistLow", &px_dist_low) && relation_tag->Attribute("pxDistHigh", &px_dist_high) ){
             sub_type = PURE_PIXEL;

@@ -867,7 +867,13 @@ namespace eod{
                     tmp_r = new SameExtractedInfoRelation(rel->Attribute("field"));
                     break;
                 }
-                
+                case SAME_DIST_IMAGE_R:
+                {
+                    double error = 0.1;
+                    rel->Attribute("error", &error);
+                    tmp_r = new SameDistImageRelation(error);
+                    break;
+                }
                 default:
                     rel = rel->NextSiblingElement("RelationShip");                                    
                     printf("Error! Relation of type %s is unknown!\n",type_name.c_str());
@@ -1000,11 +1006,41 @@ namespace eod{
                 RelationShip* r = getByNameR(relation->Attribute("Relationship"));
                 if( !r ){
                     printf("RelationShip %s has not been found!\n",relation->Attribute("Relationship"));
-                }
+                }                
                 
                 tmpGs->add_relation(relation->Attribute("Obj1"),relation->Attribute("Obj2"), r, w);
 
                 relation = relation->NextSiblingElement("Relation");
+            }
+
+            TiXmlElement *ml_relation = scene->FirstChildElement("MultiLinearRelation");
+            int max_id_so = 0;
+            if( ml_relation ){
+                max_id_so = tmpGs->get_max_so_id();
+            }
+            while(ml_relation){
+                max_id_so++;
+
+                double w = 1;
+                ml_relation->Attribute("Weight", &w);
+
+                RelationShip* r = getByNameR(ml_relation->Attribute("Relationship"));
+                // TODO COPY!
+                RelationShip * copy_r = ((MultiLinearRelationShip*)r)->clone();
+
+                std::string objects_str = ml_relation->Attribute("Objects");
+
+                size_t pos = 0;
+                vector<std::string> objects;
+                while ((pos = objects_str.find(" ")) != std::string::npos) {
+                    objects.push_back(objects_str.substr(0, pos));
+                    objects_str.erase(0, pos + 1);
+                }
+                objects.push_back(objects_str);
+
+                tmpGs->add_multilinear_relation(max_id_so, copy_r, objects);
+
+                ml_relation = ml_relation->NextSiblingElement("MultiLinearRelation");
             }
 
             // filtering

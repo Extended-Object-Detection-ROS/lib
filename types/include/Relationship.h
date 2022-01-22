@@ -6,6 +6,11 @@
 #include "tinyxml.h"
 
 namespace eod{
+
+    enum RelationLinearity{
+        BILINEAR_R,
+        MULTILINEAR_R,
+    };
         
     enum RelationTypes{
         UNK_R = 0,
@@ -25,6 +30,7 @@ namespace eod{
         SIZE_SMALLER_R,
         SIZE_PERCENT_R,        
         SAME_EXTR_INFO_R,
+        SAME_DIST_IMAGE_R
     };
     
     RelationTypes getRelationTypeFromName(std::string name);
@@ -33,6 +39,7 @@ namespace eod{
     public:
       std::string Name;              
       int ID;
+      RelationLinearity linearity;
 
       /// <summary>
       /// Default constructor
@@ -61,7 +68,28 @@ namespace eod{
     protected:
         int Type;        
         bool inited;
+
 		
+    };
+
+    class MultiLinearRelationShip : public RelationShip{
+    public:
+        MultiLinearRelationShip();
+
+        virtual MultiLinearRelationShip * clone() const = 0;
+
+        int graph_v_color;
+
+        bool checkRelation(const cv::Mat& image, ExtendedObjectInfo* A, ExtendedObjectInfo* B);
+
+        virtual std::vector<int> checkMultilinearRelation(const cv::Mat& image, int seq, const ExtendedObjectInfo& A, const ExtendedObjectInfo& B) = 0;
+
+        bool get_vid_from_index(int index, int& vid);
+        void set_vid_for_index(int index, int vid);
+
+    protected:
+        int prev_seq;
+        std::map<int, int> Index2VID;
     };
 }
 

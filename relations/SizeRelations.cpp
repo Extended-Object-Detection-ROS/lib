@@ -5,13 +5,13 @@ namespace eod{
     //====================================
     // SAME SIZE
     //====================================
-    SizeSameRelation::SizeSameRelation(){
+    SizeSameRelation::SizeSameRelation() : RelationShip(){
         Type = SIZE_SAME_R;
         error = 0;
         inited = true;
     }
     
-    SizeSameRelation::SizeSameRelation(double err){
+    SizeSameRelation::SizeSameRelation(double err) : RelationShip(){
         Type = SIZE_SAME_R;
         error = err;
         inited = true;

@@ -6,7 +6,7 @@ namespace eod {
     // AND
     //=========================================
 
-    AndRelation::AndRelation(){
+    AndRelation::AndRelation() : RelationShip(){
         Type = LOG_AND_R;
         inited = false;
     }
@@ -27,7 +27,7 @@ namespace eod {
     // OR
     //=========================================
 
-    OrRelation::OrRelation(){
+    OrRelation::OrRelation() : RelationShip(){
         Type = LOG_OR_R;
         inited = false;
     }
@@ -48,7 +48,7 @@ namespace eod {
     // NOT
     //=========================================
 
-    NotRelation::NotRelation(){
+    NotRelation::NotRelation() : RelationShip(){
         Type = LOG_NOT_R;
         inited = false;
     }

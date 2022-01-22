@@ -59,6 +59,7 @@ File: Class realises loading simple_simple_objects parameters from XML file
 #include "SpaceRelations.h"
 #include "SizeRelations.h"
 #include "SameExtractedInfoRelation.h"
+#include "SameDistanceRelation.h"
 
 #if CV_MAJOR_VERSION > 3
 #include "Tracker.h"

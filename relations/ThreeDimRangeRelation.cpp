@@ -3,7 +3,7 @@
 
 namespace eod{
     
-    ThreeDimRangeRelation::ThreeDimRangeRelation(){
+    ThreeDimRangeRelation::ThreeDimRangeRelation() : RelationShip(){
         inited = false;
         Type = TD_RANGE_R;
     }

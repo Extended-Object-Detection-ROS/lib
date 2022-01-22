@@ -33,6 +33,8 @@ namespace eod{
             return SIZE_SAME_R;
         if( name == "sameextractedinfo" )
             return SAME_EXTR_INFO_R;
+        if( name == "samedistimage")
+            return SAME_DIST_IMAGE_R;
         
         printf("Unknown relation type %s!",name.c_str());
         return UNK_R;
@@ -41,6 +43,7 @@ namespace eod{
     RelationShip::RelationShip(){
         Type = UNK_R;
         inited = false;
+        linearity = BILINEAR_R;
     }        
     
     bool RelationShip::setName(const char* name){
@@ -49,4 +52,31 @@ namespace eod{
         Name = string(name);      
         return true;
     }
+
+    MultiLinearRelationShip::MultiLinearRelationShip(){
+        Type = UNK_R;
+        inited = false;
+        linearity = MULTILINEAR_R;
+        graph_v_color = -1;
+        prev_seq = 0;
+    }
+
+    bool MultiLinearRelationShip::checkRelation(const cv::Mat& image, ExtendedObjectInfo* A, ExtendedObjectInfo* B){
+        return false;
+    }
+
+    bool MultiLinearRelationShip::get_vid_from_index(int index, int& vid){
+        if( Index2VID.find(index) == Index2VID.end() ){
+            return false;
+        }
+        else{
+            vid = Index2VID[index];
+            return true;
+        }
+    }
+
+    void MultiLinearRelationShip::set_vid_for_index(int index, int vid){
+        Index2VID.insert(std::pair<int, int>(index, vid));
+    }
+
 }

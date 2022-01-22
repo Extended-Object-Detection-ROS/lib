@@ -1,12 +1,12 @@
 #include "SameExtractedInfoRelation.h"
 
 namespace eod{
-    SameExtractedInfoRelation::SameExtractedInfoRelation(){
+    SameExtractedInfoRelation::SameExtractedInfoRelation() : RelationShip(){
         inited = false;
         Type = SAME_EXTR_INFO_R;
     }
     
-    SameExtractedInfoRelation::SameExtractedInfoRelation(std::string key){
+    SameExtractedInfoRelation::SameExtractedInfoRelation(std::string key) : RelationShip(){
         inited = true;
         Type = SAME_EXTR_INFO_R;
         this->key = key;

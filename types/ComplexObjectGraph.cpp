@@ -190,14 +190,41 @@ namespace eod{
         
         graph.add_edge(auto_name, rs->ID, ObjectsToGraphsVerticesIds[o1_name], ObjectsToGraphsVerticesIds[o2_name], false, weight);
     }
+
+    // multilinear relation init stuff
+    int ComplexObjectGraph::get_max_so_id(){
+        int max_id = 0;
+        for (auto const& x : ObjectsToSimpleObjects){
+            if( x.second->ID > max_id)
+                max_id = x.second->ID;
+        }
+        return max_id;
+    }
     
+    void ComplexObjectGraph::add_multilinear_relation(int id, RelationShip* mlrs, std::vector<std::string> objects_names){
+        //std::string auto_name = std::to_string(id);
+        ((MultiLinearRelationShip*)mlrs)->graph_v_color = id;
+        int vid = graph.add_vectice(mlrs->Name, id, 0, 1);        
+
+
+        //for(auto name: objects_names){
+        for( size_t i = 0 ; i < objects_names.size() ; i++){
+            std::string auto_name = std::to_string(graph.get_edges_len());
+            graph.add_edge(auto_name, mlrs->ID, ObjectsToGraphsVerticesIds[objects_names[i]], vid, false, 1);
+            NamesToRelations.insert(std::pair<std::string, RelationShip*>(auto_name, mlrs));
+            for( size_t j = i+1 ; j < objects_names.size() ; j++){
+                NamesToObjects.insert(std::pair<std::string, std::pair<std::string, std::string>>(auto_name,std::pair<std::string, std::string>(objects_names[i], objects_names[j])));
+            }
+        }
+    }
+
     std::vector<ExtendedObjectInfo> ComplexObjectGraph::Identify(const cv::Mat& frame, const cv::Mat& depth, int seq ){
         if( identify_mode == HARD )
             IdentifyHard(frame, depth, seq);
         else
             IdentifySoft(frame, depth, seq);
 
-        for( size_t i = 0; i < filters.size() ; i ++ ){
+        for( size_t i = 0; i < filters.size(); i++ ){
             filters[i]->Filter(&complex_objects);
         }
         return complex_objects;
@@ -223,8 +250,31 @@ namespace eod{
                     int ind2 = current_view_graph.add_vectice(nto.second.second, ObjectsToSimpleObjects[nto.second.second]->ID, j, obj2[j].total_score);
                     //printf("%i %i -> %i\n",ObjectsToSimpleObjects[nto.second.second]->ID, j, ind2);
                     
-                    if( NamesToRelations[nto.first]->checkRelation(frame, &obj1[i], &obj2[j]) ){
-                        current_view_graph.add_edge(NamesToRelations[nto.first]->Name, NamesToRelations[nto.first]->ID, ind1, ind2);
+                    if( NamesToRelations[nto.first]->linearity == BILINEAR_R){
+                        if( NamesToRelations[nto.first]->checkRelation(frame, &obj1[i], &obj2[j]) ){
+                            current_view_graph.add_edge(NamesToRelations[nto.first]->Name, NamesToRelations[nto.first]->ID, ind1, ind2);
+                        }
+                     }
+                    else if(NamesToRelations[nto.first]->linearity == MULTILINEAR_R){
+                        // TODO here something clever
+                        MultiLinearRelationShip* rel = ((MultiLinearRelationShip*)NamesToRelations[nto.first]);
+
+                        std::vector<int> ids = rel->checkMultilinearRelation(frame, seq, obj1[i], obj2[i]);
+                        for(size_t k = 0 ; k < ids.size() ; k++ ){
+                            int vid;
+                            if( rel->get_vid_from_index(ids[k], vid)){
+                                // exists
+                            }
+                            else{
+                                vid = current_view_graph.add_vectice(rel->Name, rel->graph_v_color);
+                                rel->set_vid_for_index(ids[k], vid);
+                            }
+                            current_view_graph.add_edge(rel->Name, rel->ID, ind1, vid);
+                            current_view_graph.add_edge(rel->Name, rel->ID, ind2, vid);
+                        }
+                    }
+                    else{
+                        // this should not be yet
                     }
                 }
             }                        
@@ -250,6 +300,8 @@ namespace eod{
             //printf("\t%s %i\n", object_name.c_str(), obj_num);
             for( int j = 1 ; j < maps[i].first.size(); j++){
                 object_name = current_view_graph.get_vertice_params(maps[i].first[j], &obj_type, &obj_num);
+                if( ObjectsToSimpleObjects.find(object_name) == ObjectsToSimpleObjects.end())
+                    continue;
                 merged = merged | ObjectsToSimpleObjects[object_name]->objects[obj_num];
                 //printf("\t%s %i\n", object_name.c_str(), obj_num);
             }

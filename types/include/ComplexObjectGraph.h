@@ -59,6 +59,10 @@ namespace eod{
         void add_object(std::string name, SimpleObject* so, int num = 0, double weight = 1);
         void add_relation(std::string o1_name, std::string o2_name, RelationShip* rs, double weight = 1);
         
+        int get_max_so_id();
+        void add_multilinear_relation(int id, RelationShip *mlrs, std::vector<std::string> objects_names);
+
+
         std::vector<ExtendedObjectInfo> Identify(const cv::Mat& frame, const cv::Mat& depth, int seq);
         
         std::vector<ExtendedObjectInfo> IdentifyHard(const cv::Mat& frame, const cv::Mat& depth, int seq);
@@ -70,14 +74,17 @@ namespace eod{
         std::vector<ExtendedObjectInfo> complex_objects;
 
         std::vector<EoiFilter*> filters;
+
+
                         
     private:
         std::map<std::string, int> ObjectsToGraphsVerticesIds;
+        // inner CO object name to SimpleObject class
         std::map<std::string, SimpleObject*> ObjectsToSimpleObjects;
         
-        std::map<std::string, RelationShip*> NamesToRelations;
-        //std::map<std::string, double> NamesToRelationsWights;
-
+        // auto generated names of relations to its class
+        std::map<std::string, RelationShip*> NamesToRelations;        
+        // auto generated names of relations to names of objects it connects
         std::map<std::string, std::pair<std::string, std::string>> NamesToObjects;
         
         

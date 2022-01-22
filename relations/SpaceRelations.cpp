@@ -6,7 +6,7 @@ namespace eod{
     // ------------------------------------------------
     // IN
     // ------------------------------------------------
-    SpaceInRelation::SpaceInRelation(){
+    SpaceInRelation::SpaceInRelation() : RelationShip(){
         Type = SPACE_IN_R;
         inited = true;
     }
@@ -18,7 +18,7 @@ namespace eod{
     // ------------------------------------------------
     // OUT
     // ------------------------------------------------
-    SpaceOutRelation::SpaceOutRelation(){
+    SpaceOutRelation::SpaceOutRelation() : RelationShip(){
         Type = SPACE_OUT_R;
         inited = true;
     }
@@ -30,7 +30,7 @@ namespace eod{
     // ------------------------------------------------
     // UP
     // ------------------------------------------------
-    SpaceUpRelation::SpaceUpRelation(){
+    SpaceUpRelation::SpaceUpRelation() : RelationShip(){
         Type = SPACE_UP_R;
         inited = true;
     }
@@ -42,7 +42,7 @@ namespace eod{
     // ------------------------------------------------
     // DOWN
     // ------------------------------------------------
-    SpaceDownRelation::SpaceDownRelation(){
+    SpaceDownRelation::SpaceDownRelation() : RelationShip(){
         Type = SPACE_DOWN_R;
         inited = true;
     }
@@ -54,7 +54,7 @@ namespace eod{
     // ------------------------------------------------
     // LEFT
     // ------------------------------------------------
-    SpaceLeftRelation::SpaceLeftRelation(){
+    SpaceLeftRelation::SpaceLeftRelation() : RelationShip(){
         Type = SPACE_LEFT_R;
         inited = true;
     }
@@ -66,7 +66,7 @@ namespace eod{
     // ------------------------------------------------
     // RIGHT
     // ------------------------------------------------
-    SpaceRightRelation::SpaceRightRelation(){
+    SpaceRightRelation::SpaceRightRelation() : RelationShip(){
         Type = SPACE_RIGHT_R;
         inited = true;
     }
