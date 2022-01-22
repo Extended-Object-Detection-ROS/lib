@@ -259,7 +259,7 @@ namespace eod{
                         // TODO here something clever
                         MultiLinearRelationShip* rel = ((MultiLinearRelationShip*)NamesToRelations[nto.first]);
 
-                        std::vector<int> ids = rel->checkMultilinearRelation(frame, seq, obj1[i], obj2[i]);
+                        std::vector<int> ids = rel->checkMultilinearRelation(frame, seq, obj1[i], obj2[j]);
                         for(size_t k = 0 ; k < ids.size() ; k++ ){
                             int vid;
                             if( rel->get_vid_from_index(ids[k], vid)){

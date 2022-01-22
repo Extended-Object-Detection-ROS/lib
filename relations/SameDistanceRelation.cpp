@@ -13,11 +13,15 @@ namespace eod {
     }
 
     std::vector<int> SameDistImageRelation::checkMultilinearRelation(const cv::Mat& image, int seq, const ExtendedObjectInfo& A, const ExtendedObjectInfo& B){
-        if( seq == 0 || seq != prev_seq)
+        if( seq == 0 || seq != prev_seq){
             distances.clear();
+            prev_seq = seq;
+        }
 
-        double dist = rect_distance(A, B);
         std::vector<int> indexes;
+        double dist = rect_distance(A, B);
+        if (dist == 0)
+            return indexes;
 
         for( int i = 0 ; i < distances.size() ; i++){
             if(fabs(distances[i]-dist)/std::max(distances[i], dist) < error ){
