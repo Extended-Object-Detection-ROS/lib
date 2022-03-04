@@ -85,7 +85,7 @@ namespace eod{
                 if( iou > iou_threshold ){
                     // delete with lower score
                     //if( src->at(i).scores_with_weights.back().first > src->at(j).scores_with_weights.back().first ){
-                    if( src->at(i).total_score > src->at(j).total_score ){
+                    if( src->at(i).total_score >= src->at(j).total_score ){
                         badIndexes.push_back(j);
                     }
                     else if(src->at(i).total_score < src->at(j).total_score) {
