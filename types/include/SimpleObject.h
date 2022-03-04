@@ -4,7 +4,7 @@
 #include "ExtendedObjectInfo.h"
 #include "Attribute.h"
 #include <utility>
-
+#include "Filtering.h"
 
 namespace eod{
     
@@ -95,6 +95,8 @@ namespace eod{
         /// <returns>Updated list of  objects</returns>
         std::vector <ExtendedObjectInfo> clearInsiders();	  
         std::vector <ExtendedObjectInfo> clearInsidersCnt();        
+        
+        std::vector<EoiFilter*> filters;
 
 	protected:      
         

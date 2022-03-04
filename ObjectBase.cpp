@@ -566,41 +566,45 @@ namespace eod{
             
             // filtering
             TiXmlElement *filter_el = attr->FirstChildElement("Filter");
-            while( filter_el ){
-                string filterTypeStr = filter_el->Attribute("Type");
-                
-                FilterTypes filterType = getFilterTypeFromString(filterTypeStr);
-                if( filterType == INSIDER_F ){
-                    InsiderFilter* tmpF = new InsiderFilter();
-                    tmpA->filters.push_back(tmpF);
-                }
-                else if( filterType == IOU_F ){
-                    double threshold = 0.75;
-                    filter_el->Attribute("threshold",&threshold);
-                    IOUFilter* tmpF = new IOUFilter(threshold);
-                    tmpA->filters.push_back(tmpF);
-                }
-                else if(filterType == ROI_F ){
-                    int x = 0, y = 0, w = 0, h = 0;
-                    filter_el->Attribute("x",&x);
-                    filter_el->Attribute("y",&y);
-                    filter_el->Attribute("w",&w);
-                    filter_el->Attribute("h",&h);
-                    Rect roi = Rect(x, y, w, h);                    
-                    ROIFilter* tmpF = new ROIFilter(roi);
-                    tmpA->filters.push_back(tmpF);
-                }
-                else if( filterType == UNK_F ){
-                    printf("Unknown filter name %s in Attribute %s!\n",filterTypeStr.c_str(), name.c_str());
-                }                
-                filter_el = filter_el->NextSiblingElement("Filter");
-            }
+            readFilters(filter_el, &(tmpA->filters));
                                     
             attributes.push_back(tmpA);
 
             attr = attr->NextSiblingElement("Attribute");
         }
         return true;
+    }
+    
+    void ObjectBase::readFilters(TiXmlElement* filter_el, std::vector<EoiFilter*> *filters){
+        while( filter_el ){
+            string filterTypeStr = filter_el->Attribute("Type");
+            
+            FilterTypes filterType = getFilterTypeFromString(filterTypeStr);
+            if( filterType == INSIDER_F ){
+                InsiderFilter* tmpF = new InsiderFilter();
+                filters->push_back(tmpF);
+            }
+            else if( filterType == IOU_F ){
+                double threshold = 0.75;
+                filter_el->Attribute("threshold",&threshold);
+                IOUFilter* tmpF = new IOUFilter(threshold);
+                filters->push_back(tmpF);
+            }
+            else if(filterType == ROI_F ){
+                int x = 0, y = 0, w = 0, h = 0;
+                filter_el->Attribute("x",&x);
+                filter_el->Attribute("y",&y);
+                filter_el->Attribute("w",&w);
+                filter_el->Attribute("h",&h);
+                Rect roi = Rect(x, y, w, h);                    
+                ROIFilter* tmpF = new ROIFilter(roi);
+                filters->push_back(tmpF);
+            }
+            else if( filterType == UNK_F ){
+                printf("Unknown filter name %s !\n",filterTypeStr.c_str());
+            }                
+            filter_el = filter_el->NextSiblingElement("Filter");
+        }
     }
     
     // ------------------
@@ -744,6 +748,9 @@ namespace eod{
                     temp->merging_policy = INTERSECTION_MP;
                 }
             }
+            
+            TiXmlElement *filter_el = obj->FirstChildElement("Filter");
+            readFilters(filter_el, &(temp->filters));
             
             simple_objects.push_back(temp);
             obj = obj->NextSiblingElement("SimpleObject");
@@ -1009,36 +1016,8 @@ namespace eod{
 
             // filtering
             // TODO: make filtering read same for all instatnces
-            TiXmlElement *filter_el = scene->FirstChildElement("Filter");
-            while( filter_el ){
-                string filterTypeStr = filter_el->Attribute("Type");
-
-                FilterTypes filterType = getFilterTypeFromString(filterTypeStr);
-                if( filterType == INSIDER_F ){
-                    InsiderFilter* tmpF = new InsiderFilter(true);// DANGER dont forget bring to params
-                    tmpGs->filters.push_back(tmpF);
-                }
-                else if( filterType == IOU_F ){
-                    double threshold = 0.75;
-                    filter_el->Attribute("threshold",&threshold);
-                    IOUFilter* tmpF = new IOUFilter(threshold);
-                    tmpGs->filters.push_back(tmpF);
-                }
-                else if(filterType == ROI_F ){
-                    int x = 0, y = 0, w = 0, h = 0;
-                    filter_el->Attribute("x",&x);
-                    filter_el->Attribute("y",&y);
-                    filter_el->Attribute("w",&w);
-                    filter_el->Attribute("h",&h);
-                    Rect roi = Rect(x, y, w, h);
-                    ROIFilter* tmpF = new ROIFilter(roi);
-                    tmpGs->filters.push_back(tmpF);
-                }
-                else if( filterType == UNK_F ){
-                    printf("Unknown filter name %s in Attribute %s!\n",filterTypeStr.c_str(), name.c_str());
-                }
-                filter_el = filter_el->NextSiblingElement("Filter");
-            }
+            TiXmlElement *filter_el = scene->FirstChildElement("Filter");            
+            readFilters(filter_el, &(tmpGs->filters));
             
             complex_objects_graph.push_back(tmpGs);
             scene = scene->NextSiblingElement("ComplexObject");

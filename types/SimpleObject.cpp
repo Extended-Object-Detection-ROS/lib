@@ -65,6 +65,10 @@ namespace eod{
             IdentifySoft(frame, depth, seq);
         }        
         ident_seq = seq;
+        
+        for( size_t i = 0; i < filters.size() ; i ++ ){
+            filters[i]->Filter(&objects);
+        }
         return objects;
     }
     

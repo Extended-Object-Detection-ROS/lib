@@ -48,6 +48,8 @@ File: Class realises loading simple_simple_objects parameters from XML file
 #include "ExtractedInfoIdChecker.h"
 #include "ExtractedInfoStringChecker.h"
 
+#include "Filtering.h"
+
 #include "ComplexObject.h"
 #ifdef USE_IGRAPH
 #include "ComplexObjectGraph.h"
@@ -221,6 +223,8 @@ namespace eod{
         /// <param name="relname">Name of relation</param>
         /// <returns>Pointer to object, or NULL if is not successful</returns>
         RelationShip* getByNameR(std::string relname);
+        
+        void readFilters(TiXmlElement* filter_el, std::vector<EoiFilter*> *filters);
         
         bool loaded;        
         cv::Mat cameraMatrix, distCoeffs;
