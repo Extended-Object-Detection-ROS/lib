@@ -128,8 +128,9 @@ namespace eod{
         // first time 
         if( tracks.size() == 0 ){            
             for( size_t i = 0 ; i < objects.size() ; i++ ){
-                if( identify_mode == SOFT && objects[i].total_score >= Probability)
-                    tracks.push_back(new Track(id_cnt++, objects[i], tracker_type));
+                if( identify_mode == HARD || (identify_mode == SOFT && objects[i].total_score >= Probability))
+                    tracks.push_back(new Track(id_cnt++, objects[i], tracker_type));                
+                
             }
             setTrackingResult();
             frame.copyTo(previous_frame);

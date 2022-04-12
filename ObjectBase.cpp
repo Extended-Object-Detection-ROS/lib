@@ -647,7 +647,7 @@ namespace eod{
                 ((eodTracker*)temp)->soft_prob = soft_prob;
                 
                 if( tracker_el->NextSiblingElement("Tracker") )
-                    printf("Object %s has more that one Tracker insnace, every except first will be ignored!",object_name.c_str());                
+                    printf("Object %s has more that one Tracker insnace, every except first will be ignored!\n",object_name.c_str());                
             }
             else{
                 // create regular object
