@@ -36,7 +36,7 @@ namespace eod{
             }
             Rect rect_of_depth_image = Rect(0, 0, image.size().width, image.size().height);
             Mat cropped = image(rect.getRect() & rect_of_depth_image); 
-            double distance = mat_median(cropped, false) * depth_scale;  
+            double distance = mat_median(cropped, true) * depth_scale;  
             if( distance > 0 ){
                 Mat camMat = parent_base->getCameraMatrix(); 
                 if( !camMat.empty() ){
