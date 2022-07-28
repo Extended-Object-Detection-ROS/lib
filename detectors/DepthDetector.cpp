@@ -48,9 +48,8 @@ namespace eod{
                 printf("Unknown mode in DepthAttribute!\n");
                 return;          
             }
-            
-            
-            double distance = mat_median(cropped, false) * depth_scale;  
+                        
+            double distance = mat_median(cropped, true) * depth_scale;  
             if( distance > 0 ){
                 Mat camMat = parent_base->getCameraMatrix(); 
                 if( !camMat.empty() ){
