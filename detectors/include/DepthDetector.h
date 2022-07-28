@@ -12,7 +12,7 @@ namespace eod{
         
         DepthAttribute();        
         
-        DepthAttribute(double depth_scale, int mode = ALL_BOX);
+        DepthAttribute(double depth_scale, int mode );
         
         std::vector<ExtendedObjectInfo> Detect2(const cv::Mat& image, int seq);
         
