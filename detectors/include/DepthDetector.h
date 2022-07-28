@@ -4,13 +4,15 @@
 #include "Attribute.h"
 
 namespace eod{
+    
+    enum DEPTH_EXTRACT_MODE {ALL_BOX, HALF_SIZE_BOX};
 
     class DepthAttribute : public Attribute{
     public:
         
         DepthAttribute();        
         
-        DepthAttribute(double depth_scale);        
+        DepthAttribute(double depth_scale, int mode = ALL_BOX);
         
         std::vector<ExtendedObjectInfo> Detect2(const cv::Mat& image, int seq);
         
@@ -20,6 +22,7 @@ namespace eod{
         
     private:
         double depth_scale;
+        int mode;
         
     };
     

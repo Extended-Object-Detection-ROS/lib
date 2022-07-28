@@ -470,7 +470,9 @@ namespace eod{
             case DEPTH_A:
             {
                 double depth_scale = 0.001;
+                int mode = 0;
                 attr->Attribute("depthScale", &depth_scale);                
+                attr->Attribute("mode", &mode);
                 tmpA = new DepthAttribute(depth_scale);
                 break;
             }
