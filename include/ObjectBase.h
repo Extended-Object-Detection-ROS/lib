@@ -231,9 +231,7 @@ namespace eod{
         
         int relation_counter;
 
-    };
-        
-    
+    };        
 }
 
 #endif

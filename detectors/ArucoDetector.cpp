@@ -51,11 +51,15 @@ namespace eod{
                 tmp.contour.push_back(float2intPointVector(markerCorners[i]));
             
             //if( hasCamParams() && markerLen > 0){
-            printf("%s <?> %s \n",typeid(image).name(), typeid(InfoImage()).name());
+            //printf("%s <?> %s \n",typeid(image).name(), typeid(InfoImage()).name());
             
             if( markerLen > 0 ){                
                 //const InfoImage& image_plus = dynamic_cast<const InfoImage&>(image);
+                
+                // DANGER THIS IS VERY BAD MOMENT
                 const InfoImage& image_plus = (const InfoImage&)image;
+                
+                
                 vector<cv::Vec3d> rvecs, tvecs;                    
                 cv::aruco::estimatePoseSingleMarkers(vector<vector<Point2f> >(markerCorners.begin()+i,markerCorners.begin()+i+1), markerLen, image_plus.K, image_plus.D, rvecs, tvecs);            
                 tmp.tvec.push_back(tvecs[0]);
