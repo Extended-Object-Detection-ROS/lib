@@ -8,14 +8,27 @@
  */
 
 namespace eod{
+        
+    class polyMat : public cv::Mat{        
+    public:
+        polyMat() : cv::Mat(){}    
+        polyMat(const cv::Mat& m) : cv::Mat(m){}
+        
+        virtual void foo() {}
+        
+    private:
+        
+    };
     
-    class InfoImage : public cv::Mat {
+    class InfoImage : public polyMat {
     public:
         InfoImage();
         InfoImage(cv::Mat image, cv::Mat K, cv::Mat D);
         
         cv::Mat K;
         cv::Mat D;
+        
+        virtual ~InfoImage();
         
     private:
         

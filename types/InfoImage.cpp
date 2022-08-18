@@ -2,10 +2,12 @@
 
 namespace eod{
     
-    InfoImage::InfoImage() : cv::Mat() {}
+    InfoImage::InfoImage() : polyMat() {}
     
+    InfoImage::~InfoImage(){
+    }
     
-    InfoImage::InfoImage(cv::Mat image, cv::Mat K_, cv::Mat D_) : cv::Mat(image) {
+    InfoImage::InfoImage(cv::Mat image, cv::Mat K_, cv::Mat D_) : polyMat(image) {
         K = cv::Mat(K_);
         D = cv::Mat(D_);
     }
