@@ -48,6 +48,11 @@ namespace eod{
                 printf("Unknown mode in DepthAttribute!\n");
                 return;          
             }
+            
+            if( cropped.empty()){                
+                printf("Cropped image for DepthAttribute is empty!\n");
+                return;
+            }
                         
             double distance = mat_median(cropped, true) * depth_scale;  
             if( distance > 0 ){
@@ -60,14 +65,13 @@ namespace eod{
                 }
                 else{
                     printf("Camera parameters have not been specified for DepthAttribute!\n");
+                    return;
                 }
             }
             else{
                 printf("Object is away from depthmap!\n");
-            }
-            
-            
-            
+                return;
+            }                                    
         }
     }
     
