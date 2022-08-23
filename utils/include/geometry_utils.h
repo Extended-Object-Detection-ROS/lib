@@ -40,7 +40,9 @@ namespace eod{
  
     double mat_median( cv::Mat channel, bool mask_zeros = false );
     
-    cv::Vec3d get_translation(cv::Point point, cv::Mat camMat, double dist = 1.0);
+    cv::Vec3d get_translation(const cv::Point& point, const cv::Mat& camMat, double dist = 1.0);
+    
+    cv::Point reverse_translation(const cv::Vec3d&, const cv::Mat& camMat);
     
     double range_v3d(cv::Vec3d, cv::Vec3d);
     

@@ -37,6 +37,8 @@ namespace eod{
             }
             double distance = 0;
             if( mode == ALL_BOX || mode == HALF_SIZE_BOX ){
+                                
+                
                 Rect rect_of_depth_image = Rect(0, 0, image.size().width, image.size().height);
                 Mat cropped;
                 if( mode == ALL_BOX){                
@@ -50,13 +52,31 @@ namespace eod{
                     printf("Cropped image for DepthAttribute is empty!\n");
                     return;
                 }                            
-                distance = mat_median(cropped, true) * depth_scale;  
+                distance = mat_median(cropped, true) ;  
             }
             else if( mode == CENTER_PX ){
                 if(rect.tvec.size() == 0){
-                    printf("DepthAttribute in mode CENTER_PX can't obtain distance without translation vector");
+                    printf("DepthAttribute in mode CENTER_PX can't obtain distance without translation vector\n");
                     return;
                 }
+                if( image.K().empty() ){
+                    printf("Camera parameters have not been specified for DepthAttribute!\n");
+                    return;
+                }
+                Point center_registered = reverse_translation(rect.tvec[0], image.K());     
+                
+                
+                distance = image.at<float>(center_registered);
+                                
+                
+                printf("distance at (%i, %i): %f\n", center_registered.x, center_registered.y, distance);
+                
+                Mat image2draw;
+                cvtColor(image, image2draw, CV_GRAY2RGB);
+                image2draw *= 255;
+                circle(image2draw, center_registered, 10, Scalar(0, 255, 0), 3);
+                imshow("depth", image2draw);
+                waitKey(1);
             }
             else{
                 printf("Unknown mode in DepthAttribute!\n");
@@ -65,10 +85,17 @@ namespace eod{
             if( distance > 0 ){
                 
                 if( !image.K().empty() ){
-                    Vec3d tvec = get_translation(rect.getCenter(), image.K(), distance);
-                    Vec3d rvec;
-                    rect.tvec.push_back(tvec);
-                    rect.rvec.push_back(rvec);
+                    if( rect.tvec.size() == 0 ){
+                        Vec3d tvec = get_translation(rect.getCenter(), image.K(), distance);
+                        Vec3d rvec;
+                        rect.tvec.push_back(tvec);
+                        //rect.rvec.push_back(rvec);
+                    }
+                    else{
+                        for(auto& tvec : rect.tvec){
+                            tvec *= distance;
+                        }
+                    }
                 }
                 else{
                     printf("Camera parameters have not been specified for DepthAttribute!\n");

@@ -173,12 +173,18 @@ namespace eod{
         return med;
     }
     
-    Vec3d get_translation(Point point, Mat camMat, double dist){
+    Vec3d get_translation(const Point& point, const Mat& camMat, double dist){
         Vec3d tvec;
         tvec[0] = dist * (point.x - camMat.at<double>(0,2)) / camMat.at<double>(0,0);
         tvec[1] = dist * (point.y - camMat.at<double>(1,2)) / camMat.at<double>(1,1);
         tvec[2] = dist;
         return tvec;
+    }
+    
+    Point reverse_translation(const Vec3d& translation, const Mat& camMat){
+        int x = int(((translation[0] * camMat.at<double>(0,0))/translation[2]) + camMat.at<double>(0,2));
+        int y = int(((translation[1] * camMat.at<double>(1,1))/translation[2]) + camMat.at<double>(1,2));
+        return Point(x, y);        
     }
     
     double range_v3d(Vec3d a, Vec3d b){
