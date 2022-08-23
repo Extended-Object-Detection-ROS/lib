@@ -42,11 +42,11 @@ namespace eod{
         
         FaceDlibAttribute(std::string base_path, std::string base_file_path, std::string shape_predictor_path, std::string recognition_model_path);
         
-        std::vector<ExtendedObjectInfo> Detect2(const cv::Mat& image, int seq);
+        std::vector<ExtendedObjectInfo> Detect2(const InfoImage& image, int seq);
         
-        bool Check2(const cv::Mat& image, ExtendedObjectInfo& rect);
+        bool Check2(const InfoImage& image, ExtendedObjectInfo& rect);
         
-        void Extract2(const cv::Mat& image, ExtendedObjectInfo& rect);
+        void Extract2(const InfoImage& image, ExtendedObjectInfo& rect);
                         
         void save_face_descriptors(std::string base_path);
     private:

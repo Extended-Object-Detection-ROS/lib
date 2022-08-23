@@ -27,7 +27,7 @@ namespace eod{
         Type = LOG_AND_A;
     }
     
-    vector<ExtendedObjectInfo> AndAttribute::Detect2(const Mat& image, int seq){                
+    vector<ExtendedObjectInfo> AndAttribute::Detect2(const InfoImage& image, int seq){                
         vector<ExtendedObjectInfo> objects;    
         if(!inited) return objects;
         vector<ExtendedObjectInfo> rectsA = attributeA->Detect2(image, seq);
@@ -74,11 +74,11 @@ namespace eod{
         
     }
     
-    bool AndAttribute::Check2(const cv::Mat& image, ExtendedObjectInfo& rect){
+    bool AndAttribute::Check2(const InfoImage& image, ExtendedObjectInfo& rect){
         return attributeA->Check2(image, rect) && attributeB->Check2(image, rect);
     }
     
-    void AndAttribute::Extract2(const cv::Mat& image, ExtendedObjectInfo& rect){
+    void AndAttribute::Extract2(const InfoImage& image, ExtendedObjectInfo& rect){
     }
     
     // ------------------------
@@ -96,7 +96,7 @@ namespace eod{
         Type = LOG_NOT_A;
     }
     
-    vector<ExtendedObjectInfo> NotAttribute::Detect2(const Mat& image, int seq){                
+    vector<ExtendedObjectInfo> NotAttribute::Detect2(const InfoImage& image, int seq){                
         vector<ExtendedObjectInfo> objects;                                    
         vector<ExtendedObjectInfo> rects = attribute->Detect2(image, seq);
         if( rects.size() == 0 ){
@@ -109,7 +109,7 @@ namespace eod{
         return objects;
     }
     
-    bool NotAttribute::Check2(const cv::Mat& image, ExtendedObjectInfo& rect){
+    bool NotAttribute::Check2(const InfoImage& image, ExtendedObjectInfo& rect){
         bool rv = !attribute->Check2(image, rect);
         if( rv == false){
             rect.scores_with_weights.pop_back();
@@ -120,7 +120,7 @@ namespace eod{
         return rv;
     }    
     
-    void NotAttribute::Extract2(const cv::Mat& image, ExtendedObjectInfo& rect){
+    void NotAttribute::Extract2(const InfoImage& image, ExtendedObjectInfo& rect){
     }
     
     // ------------------------
@@ -142,7 +142,7 @@ namespace eod{
         Type = LOG_OR_A;
     }
     
-    vector<ExtendedObjectInfo> OrAttribute::Detect2(const Mat& image, int seq){                
+    vector<ExtendedObjectInfo> OrAttribute::Detect2(const InfoImage& image, int seq){                
         vector<ExtendedObjectInfo> objects;    
         if(!inited) return objects;
         
@@ -188,13 +188,13 @@ namespace eod{
         return objects;
     }
     
-    bool OrAttribute::Check2(const cv::Mat& image, ExtendedObjectInfo& rect){
+    bool OrAttribute::Check2(const InfoImage& image, ExtendedObjectInfo& rect){
         bool val = attributeA->Check2(image, rect) || attributeB->Check2(image, rect);
         rect.setScoreWeight(1, Weight);
         return val;
     }
     
-    void OrAttribute::Extract2(const cv::Mat& image, ExtendedObjectInfo& rect){
+    void OrAttribute::Extract2(const InfoImage& image, ExtendedObjectInfo& rect){
     }
     
     // ------------------------

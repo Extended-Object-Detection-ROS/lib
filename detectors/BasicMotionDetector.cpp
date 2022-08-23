@@ -12,7 +12,7 @@ namespace eod {
 #endif
     }
 
-    vector<ExtendedObjectInfo> BasicMotionAttribute::Detect2(const Mat& image, int seq){        
+    vector<ExtendedObjectInfo> BasicMotionAttribute::Detect2(const InfoImage& image, int seq){        
 
         vector<ExtendedObjectInfo> result;
 
@@ -54,11 +54,11 @@ namespace eod {
         return result;
     }
 
-    bool BasicMotionAttribute::Check2(const Mat& image, ExtendedObjectInfo& rect){
+    bool BasicMotionAttribute::Check2(const InfoImage& image, ExtendedObjectInfo& rect){
         return false;
     }
     
-    void BasicMotionAttribute::Extract2(const cv::Mat& image, ExtendedObjectInfo& rect){
+    void BasicMotionAttribute::Extract2(const InfoImage& image, ExtendedObjectInfo& rect){
     }
 
 }

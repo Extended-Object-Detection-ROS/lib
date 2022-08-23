@@ -60,7 +60,7 @@ namespace eod{
         status = status_update;
     }
     
-    void Track::initTracker(const Mat& frame){        
+    void Track::initTracker(const InfoImage& frame){        
         if( !frame.empty() ){
             if( tracker ){
                 Rect2d base_rect = current_object.getRect2d();
@@ -71,7 +71,7 @@ namespace eod{
             printf("Frame for tracker init is empty!\n");
     }
     
-    void Track::updateTracker(const Mat& frame){
+    void Track::updateTracker(const InfoImage& frame){
         Rect2d box = current_object.getRect2d();        
         if( tracker ){
             if( tracker->update(frame, box)){
@@ -101,7 +101,7 @@ namespace eod{
         tracker_type = tracker_type_;
     }
     
-    vector <ExtendedObjectInfo> eodTracker::Identify(const Mat& frame, const Mat& depth, int seq ){
+    vector <ExtendedObjectInfo> eodTracker::Identify(const InfoImage& frame, const InfoImage& depth, int seq ){
         // do regular things        
         double real_prob;
         if( identify_mode == SOFT ){
@@ -253,7 +253,7 @@ namespace eod{
                     if( mode_attributes[j].first.first == EXTRACT ){
                         continue;
                     }
-                    string attributeName = (mode_attributes[j].first.first == DETECT ? " + " : " - ") + mode_attributes[j].second->Name + " ["+(real_indx < objects[i].scores_with_weights.size() ? to_string(roundf(objects[i].scores_with_weights[real_indx].first * 100) / 100).substr(0,4) : "-1" )+"]" /*+ (objects[i].sub_id[real_indx] == -1 ? "" : "{"+to_string(objects[i].sub_id[real_indx])+"}") /*+ (objects[i].extracted_info[real_indx] == "" ? "" : "("+objects[i].extracted_info[real_indx]+")")*/;
+                    string attributeName = (mode_attributes[j].first.first == DETECT ? " + " : " - ") + mode_attributes[j].second->Name + " ["+(real_indx < objects[i].scores_with_weights.size() ? to_string(roundf(objects[i].scores_with_weights[real_indx].first * 100) / 100).substr(0,4) : "-1" )+"]";
                     
                     prevBr = drawFilledRectangleWithText(image, Point(objects[i].tl().x, prevBr.y), attributeName, col);
                     real_indx++;

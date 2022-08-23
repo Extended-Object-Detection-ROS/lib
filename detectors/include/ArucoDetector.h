@@ -25,23 +25,16 @@ namespace eod{
         /// </summary>
         /// <param name="image">Destination image</param>
         /// <returns>Vector of rects of found objects</returns>
-        std::vector<ExtendedObjectInfo> Detect2(const cv::Mat& image, int seq);
+        std::vector<ExtendedObjectInfo> Detect2(const InfoImage& image, int seq);
         
-        bool Check2(const cv::Mat& image, ExtendedObjectInfo& rect);
+        bool Check2(const InfoImage& image, ExtendedObjectInfo& rect);
         
-        void Extract2(const cv::Mat& image, ExtendedObjectInfo& rect);
-        
-        void setCamParams(cv::Mat camMat, cv::Mat distCoef);        
-        bool hasCamParams();
-        
+        void Extract2(const InfoImage& image, ExtendedObjectInfo& rect);                        
         
     private:
                         
         cv::aruco::PREDEFINED_DICTIONARY_NAME dict;                
-        cv::Ptr<cv::aruco::Dictionary> dictionary;
-                
-        cv::Mat camMat;
-        cv::Mat distCoef;        
+        cv::Ptr<cv::aruco::Dictionary> dictionary;                        
         
         std::vector< std::vector<cv::Point2f> > markerCorners;
         std::vector< int > markerIds; 

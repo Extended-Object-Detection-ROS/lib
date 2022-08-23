@@ -17,16 +17,16 @@ namespace eod{
         forbidden = forbidden_;
 	}
 	
-	vector<ExtendedObjectInfo> ExtractedInfoIdChecker::Detect2(const Mat& image, int seq){
+	vector<ExtendedObjectInfo> ExtractedInfoIdChecker::Detect2(const InfoImage& image, int seq){
         vector<ExtendedObjectInfo> rects(0);
         return rects;
     }
     
-    void ExtractedInfoIdChecker::Extract2(const cv::Mat& image, ExtendedObjectInfo& rect){
+    void ExtractedInfoIdChecker::Extract2(const InfoImage& image, ExtendedObjectInfo& rect){
         
     }
     
-    bool ExtractedInfoIdChecker::Check2(const Mat& image, ExtendedObjectInfo& rect){              
+    bool ExtractedInfoIdChecker::Check2(const InfoImage& image, ExtendedObjectInfo& rect){              
         if( rect.extracted_info.count(field) > 0){
             int rect_id = stoi(rect.extracted_info[field]);
             

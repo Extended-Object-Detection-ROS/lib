@@ -9,6 +9,7 @@ File: Attribute description
 #include "ExtendedObjectInfo.h"
 #include "Filtering.h"
 #include "Clusterization.h"
+#include "InfoImage.h"
 
 namespace eod{
     
@@ -75,9 +76,9 @@ namespace eod{
             /// </summary>
             /// <param name="image">Destination image</param>
             /// <returns>Vector of rects of found objects</returns>  
-            std::vector<ExtendedObjectInfo> Detect(const cv::Mat& image, int seq);
+            std::vector<ExtendedObjectInfo> Detect(const InfoImage& image, int seq);
             
-            virtual std::vector<ExtendedObjectInfo> Detect2(const cv::Mat& image, int seq) = 0;
+            virtual std::vector<ExtendedObjectInfo> Detect2(const InfoImage& image, int seq) = 0;
             
             /// <summary>
             /// Functon checks objects params on image
@@ -85,7 +86,7 @@ namespace eod{
             /// <param name="image">Destination image</param>
             /// <param name="rects">List of rects to be checked</param>
             /// <returns>Vector of rects of appropriate objects</returns>  	
-            void Check(const cv::Mat& image, std::vector<ExtendedObjectInfo>* rects);
+            void Check(const InfoImage& image, std::vector<ExtendedObjectInfo>* rects);
             
             /// <summary>
             /// Functon checks rect params on image
@@ -93,11 +94,11 @@ namespace eod{
             /// <param name="image">Destination image</param>
             /// <param name="rect">Rect to be checked</param>
             /// <returns>True if object is presented, false overwice</returns>  	
-            virtual bool Check2(const cv::Mat& image, ExtendedObjectInfo& rect) = 0;
+            virtual bool Check2(const InfoImage& image, ExtendedObjectInfo& rect) = 0;
             
-            void Extract(const cv::Mat& image, std::vector<ExtendedObjectInfo>* rects);
+            void Extract(const InfoImage& image, std::vector<ExtendedObjectInfo>* rects);
             
-            virtual void Extract2(const cv::Mat& image, ExtendedObjectInfo& rect) = 0;
+            virtual void Extract2(const InfoImage& image, ExtendedObjectInfo& rect) = 0;
     
             ObjectBase* parent_base;
             

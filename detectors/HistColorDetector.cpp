@@ -54,7 +54,7 @@ namespace eod{
       histogram.release();
   }
   
-  vector<ExtendedObjectInfo> HistColorAttribute::Detect2(const Mat& image, int seq){
+  vector<ExtendedObjectInfo> HistColorAttribute::Detect2(const InfoImage& image, int seq){
     vector<ExtendedObjectInfo>result;
     if(!inited){
         return result;
@@ -101,7 +101,7 @@ namespace eod{
     return result;
   }
   
-  bool HistColorAttribute::Check2(const Mat& image, ExtendedObjectInfo& rect){
+  bool HistColorAttribute::Check2(const InfoImage& image, ExtendedObjectInfo& rect){
         Rect original(0,0,image.cols,image.rows);
         Mat cropped;
         cropped = image(rect.getRect() & original);
@@ -151,7 +151,7 @@ namespace eod{
         return false;
   }
   
-  void HistColorAttribute::Extract2(const cv::Mat& image, ExtendedObjectInfo& rect){
+  void HistColorAttribute::Extract2(const InfoImage& image, ExtendedObjectInfo& rect){
     }
   
   void HistColorAttribute::setHist(MatND hist){

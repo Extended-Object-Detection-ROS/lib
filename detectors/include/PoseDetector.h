@@ -33,7 +33,7 @@ namespace eod{
 	/// </summary>
 	/// <param name="image">Destination image</param>
 	/// <returns>Vector of rects of found objects</returns>  
-        std::vector<ExtendedObjectInfo> Detect2(const cv::Mat& image, int seq);
+        std::vector<ExtendedObjectInfo> Detect2(const InfoImage& image, int seq);
 	/*
 	/// <summary>
 	/// Functon checks objects params on image
@@ -44,9 +44,9 @@ namespace eod{
         vector<ExtendedObjectInfo> Check(Mat image,vector<ExtendedObjectInfo> rects);
 	*/
     
-	bool Check2(const cv::Mat& image, ExtendedObjectInfo &rect);
+	bool Check2(const InfoImage& image, ExtendedObjectInfo &rect);
     
-    void Extract2(const cv::Mat& image, ExtendedObjectInfo& rect);
+    void Extract2(const InfoImage& image, ExtendedObjectInfo& rect);
 
     private:
 	};

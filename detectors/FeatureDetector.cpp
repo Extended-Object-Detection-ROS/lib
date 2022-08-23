@@ -15,8 +15,7 @@ namespace eod{
     
     FeatureAttribute::FeatureAttribute(FEATURE_DETECTOR featureExtractorType_, string image, int min_matches, double height_){
         Type = FEATURE_A;                
-        featureExtractorType = featureExtractorType_;
-        
+        featureExtractorType = featureExtractorType_;        
         
         Mat original = imread(image, 0);
         
@@ -28,10 +27,7 @@ namespace eod{
             if( GSFD == NULL ){
                 GSFD = new GlobalSimpleFeatureDetector();
             }            
-            GSFD->get_descriptors_and_keypoints(image_or, original_keypoints, original_descriptors, featureExtractorType);            
-            
-            //printf("Extracted %i keypoints\n", original_keypoints.size());
-            //printf("Descriptos size %i %i\n", original_descriptors.cols, original_descriptors.rows);
+            GSFD->get_descriptors_and_keypoints(image_or, original_keypoints, original_descriptors, featureExtractorType);                                    
                         
             original_corners = vector<Point2f>(4);
             
@@ -55,23 +51,20 @@ namespace eod{
             inited = false;
     }
                 
-    vector<ExtendedObjectInfo> FeatureAttribute::Detect2(const Mat& image_in, int seq){        
+    vector<ExtendedObjectInfo> FeatureAttribute::Detect2(const InfoImage& image_in, int seq){        
         vector<ExtendedObjectInfo> result;
-        
-        if(!GSFD->hasCamParams() ){
-            GSFD->setCamParams(parent_base->getCameraMatrix(), parent_base->getDistortionCoeff() );
-        }                                
+                             
         result = GSFD->Detect(image_in, seq,  original_keypoints, original_descriptors, original_corners, min_matches_to_detect, featureExtractorType, scale, original_corners_shifted, Weight, returnContours);            
         
         return result;
     }            
 
     
-    bool FeatureAttribute::Check2(const Mat& image,ExtendedObjectInfo& rect){
+    bool FeatureAttribute::Check2(const InfoImage& image,ExtendedObjectInfo& rect){
         return false;        
     }
     
-    void FeatureAttribute::Extract2(const cv::Mat& image, ExtendedObjectInfo& rect){
+    void FeatureAttribute::Extract2(const InfoImage& image, ExtendedObjectInfo& rect){
     }
     
     // -----------------------------------
@@ -87,7 +80,7 @@ namespace eod{
         orb_detector = ORB::create();
     }
     
-    bool GlobalSimpleFeatureDetector::get_descriptors_and_keypoints(const Mat& image, std::vector<KeyPoint> & keypoints, Mat & descriptors, FEATURE_DETECTOR detector_type){
+    bool GlobalSimpleFeatureDetector::get_descriptors_and_keypoints(const InfoImage& image, std::vector<KeyPoint> & keypoints, Mat & descriptors, FEATURE_DETECTOR detector_type){
         
         switch( detector_type){
             case FD_SIFT:
@@ -107,7 +100,7 @@ namespace eod{
         }        
     }
     
-    vector<ExtendedObjectInfo> GlobalSimpleFeatureDetector::Detect(const Mat& image, int seq, std::vector<KeyPoint> original_keypoints, Mat original_descriptors, vector<Point2f> original_corners, int min_matches_to_detect, FEATURE_DETECTOR detector_type, double scale, vector<Point3f> original_corners_shifted, double Weight, bool returnContours ){
+    vector<ExtendedObjectInfo> GlobalSimpleFeatureDetector::Detect(const InfoImage& image, int seq, std::vector<KeyPoint> original_keypoints, Mat original_descriptors, vector<Point2f> original_corners, int min_matches_to_detect, FEATURE_DETECTOR detector_type, double scale, vector<Point3f> original_corners_shifted, double Weight, bool returnContours ){
         int prev_seq;
         switch(detector_type){
             case FD_SIFT:
@@ -198,7 +191,6 @@ namespace eod{
             for(int i = 0; i < good_matches.size() ; i++){
                 original_obj.push_back((original_keypoints)[good_matches[i].queryIdx].pt);
                 obj.push_back((*keypoints)[good_matches[i].trainIdx].pt);
-
             }
             Mat H = findHomography(original_obj, obj, RANSAC);
             if (H.data){
@@ -208,13 +200,16 @@ namespace eod{
                 if( returnContours )
                     tmp.contour.push_back(float2intPointVector(vector<Point2f>(corners)));
                 // tvec rvec
-                if( hasCamParams() ){
+                if( !image.K().empty() and !image.D().empty() ){
                     Vec3d rvec, tvec;                                                            
-                    if( solvePnP(original_corners_shifted, corners, camMat, distCoef, rvec, tvec)){                            
+                    if( solvePnP(original_corners_shifted, corners, image.K(), image.D(), rvec, tvec)){                            
                         if( scale > 0 )
                             tmp.tvec.push_back(scaleVec3d(tvec,scale));
                         tmp.rvec.push_back(rvec);
                     }                        
+                }
+                else{
+                    printf("No camera parameters for FeatureDetector!");
                 }
                 tmp.setScoreWeight(1, Weight);//TODO try to solve feature matches %
                 rects.push_back(tmp);
@@ -225,15 +220,6 @@ namespace eod{
             printf("[%i] Not enoght matches (%i)\n",detector_type, good_matches.size());
         }*/
         return rects;        
-    }
-    
-    void GlobalSimpleFeatureDetector::setCamParams(Mat camMat_, Mat distCoef_){
-        camMat = camMat_;
-        distCoef = distCoef_;
-    }
-    
-    bool GlobalSimpleFeatureDetector::hasCamParams(){
-        return !(camMat.empty() & distCoef.empty());
     }
     
             

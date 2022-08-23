@@ -54,7 +54,7 @@ namespace eod{
         inited = true;
     }
     
-    vector<ExtendedObjectInfo> BlobAttribute::Detect2(const cv::Mat& image, int seq){
+    vector<ExtendedObjectInfo> BlobAttribute::Detect2(const InfoImage& image, int seq){
         vector<ExtendedObjectInfo> res;
         if( !inited )
             return res;
@@ -73,11 +73,11 @@ namespace eod{
         return res;
     }
     
-    bool BlobAttribute::Check2(const cv::Mat& image, ExtendedObjectInfo &rect){
+    bool BlobAttribute::Check2(const InfoImage& image, ExtendedObjectInfo &rect){
         return false;
     }
     
-    void BlobAttribute::Extract2(const cv::Mat& image, ExtendedObjectInfo& rect){
+    void BlobAttribute::Extract2(const InfoImage& image, ExtendedObjectInfo& rect){
     }
     
 }

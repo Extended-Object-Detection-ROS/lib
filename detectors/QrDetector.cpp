@@ -12,14 +12,14 @@ namespace eod{
         inited = true;
     }
     
-    bool QrAttribute::Check2(const Mat& image, ExtendedObjectInfo& rect){
+    bool QrAttribute::Check2(const InfoImage& image, ExtendedObjectInfo& rect){
         return false;
     }
     
-    void QrAttribute::Extract2(const cv::Mat& image, ExtendedObjectInfo& rect){
+    void QrAttribute::Extract2(const InfoImage& image, ExtendedObjectInfo& rect){
     }
     
-    vector<ExtendedObjectInfo> QrAttribute::Detect2(const Mat& image, int seq){
+    vector<ExtendedObjectInfo> QrAttribute::Detect2(const InfoImage& image, int seq){
         vector<ExtendedObjectInfo> rects;        
         Mat bbox, rectifiedImage;
         //string data = qrDecoder->detectAndDecode(image, bbox, rectifiedImage);

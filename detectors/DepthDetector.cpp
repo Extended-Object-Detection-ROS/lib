@@ -20,16 +20,16 @@ namespace eod{
         mode = mode_;
     }
     
-    vector<ExtendedObjectInfo> DepthAttribute::Detect2(const Mat& image, int seq){      
+    vector<ExtendedObjectInfo> DepthAttribute::Detect2(const InfoImage& image, int seq){      
         vector<ExtendedObjectInfo> objects;    
         return objects;
     }
     
-    bool DepthAttribute::Check2(const cv::Mat& image, ExtendedObjectInfo& rect){
+    bool DepthAttribute::Check2(const InfoImage& image, ExtendedObjectInfo& rect){
         return false;
     }
     
-    void DepthAttribute::Extract2(const cv::Mat& image, ExtendedObjectInfo& rect){
+    void DepthAttribute::Extract2(const InfoImage& image, ExtendedObjectInfo& rect){
         if( inited ){                         
             if(image.empty()){  
                 printf("Depth image is not provided for DepthAttribute!\n");
@@ -51,9 +51,9 @@ namespace eod{
                         
             double distance = mat_median(cropped, true) * depth_scale;  
             if( distance > 0 ){
-                Mat camMat = parent_base->getCameraMatrix(); 
-                if( !camMat.empty() ){
-                    Vec3d tvec = get_translation(rect.getCenter(), camMat, distance);
+                
+                if( !image.K().empty() ){
+                    Vec3d tvec = get_translation(rect.getCenter(), image.K(), distance);
                     Vec3d rvec;
                     rect.tvec.push_back(tvec);
                     rect.rvec.push_back(rvec);

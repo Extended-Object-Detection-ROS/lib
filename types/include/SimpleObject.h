@@ -47,21 +47,21 @@ namespace eod{
         /// </summary>		 
         /// <param name="frame">Destination image</param>	
         /// <returns>List of identified objects</returns>
-        virtual std::vector <ExtendedObjectInfo> Identify(const cv::Mat& frame, const cv::Mat& depth, int seq = 0 );
+        virtual std::vector <ExtendedObjectInfo> Identify(const InfoImage& frame, const InfoImage& depth, int seq = 0 );
         
         /// <summary>
         /// Hard identification
         /// </summary>		 
         /// <param name="frame">Destination image</param>	
         /// <returns>List of identified objects</returns>
-        virtual std::vector <ExtendedObjectInfo> IdentifyHard(const cv::Mat& frame, const cv::Mat& depth, int seq = 0 );
+        virtual std::vector <ExtendedObjectInfo> IdentifyHard(const InfoImage& frame, const InfoImage& depth, int seq = 0 );
                             
         /// <summary>
         /// Soft identification
         /// </summary>		 
         /// <param name="frame">Destination image</param>	
         /// <returns>List of identified objects</returns>
-        virtual std::vector<ExtendedObjectInfo> IdentifySoft(const cv::Mat& frame, const cv::Mat& depth, int seq = 0 );        
+        virtual std::vector<ExtendedObjectInfo> IdentifySoft(const InfoImage& frame, const InfoImage& depth, int seq = 0 );        
     
         /// <summary>
         /// Draws found objets

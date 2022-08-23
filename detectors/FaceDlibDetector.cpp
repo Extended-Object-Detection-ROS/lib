@@ -49,7 +49,7 @@ namespace eod{
         }
     }
     
-    vector<ExtendedObjectInfo> FaceDlibAttribute::Detect2(const Mat& image, int seq){
+    vector<ExtendedObjectInfo> FaceDlibAttribute::Detect2(const InfoImage& image, int seq){
         vector<ExtendedObjectInfo> answers;
         
 
@@ -71,11 +71,11 @@ namespace eod{
         return answers;
     }
     
-    bool FaceDlibAttribute::Check2(const Mat& image, ExtendedObjectInfo& rect){
+    bool FaceDlibAttribute::Check2(const InfoImage& image, ExtendedObjectInfo& rect){
         return false;
     }
         
-    void FaceDlibAttribute::Extract2(const Mat& image, ExtendedObjectInfo& rect){
+    void FaceDlibAttribute::Extract2(const InfoImage& image, ExtendedObjectInfo& rect){
         
         if( base_face_descriptors.size() == 0 )
             return;
