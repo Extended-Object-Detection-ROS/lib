@@ -24,8 +24,7 @@ namespace eod{
     private:
         std::string field;
         std::vector<int> allowed;
-        std::vector<int> forbidden;
-        
+        std::vector<int> forbidden;        
     };
     
 }

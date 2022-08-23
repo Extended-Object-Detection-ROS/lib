@@ -35,26 +35,33 @@ namespace eod{
                 printf("Depth image is not provided for DepthAttribute!\n");
                 return;          
             }
-            Rect rect_of_depth_image = Rect(0, 0, image.size().width, image.size().height);
-            Mat cropped;
-            if( mode == ALL_BOX){                
-                cropped = image(rect.getRect() & rect_of_depth_image); 
+            double distance = 0;
+            if( mode == ALL_BOX || mode == HALF_SIZE_BOX ){
+                Rect rect_of_depth_image = Rect(0, 0, image.size().width, image.size().height);
+                Mat cropped;
+                if( mode == ALL_BOX){                
+                    cropped = image(rect.getRect() & rect_of_depth_image); 
+                }
+                else if(mode == HALF_SIZE_BOX){
+                    Rect half_rect(rect.x + rect.width/4, rect.y + rect.height/4, rect.width/2, rect.height/2);
+                    cropped = image(half_rect & rect_of_depth_image);                 
+                }                                
+                if( cropped.empty()){                
+                    printf("Cropped image for DepthAttribute is empty!\n");
+                    return;
+                }                            
+                distance = mat_median(cropped, true) * depth_scale;  
             }
-            else if(mode == HALF_SIZE_BOX){
-                Rect half_rect(rect.x + rect.width/4, rect.y + rect.height/4, rect.width/2, rect.height/2);
-                cropped = image(half_rect & rect_of_depth_image);                 
+            else if( mode == CENTER_PX ){
+                if(rect.tvec.size() == 0){
+                    printf("DepthAttribute in mode CENTER_PX can't obtain distance without translation vector");
+                    return;
+                }
             }
             else{
                 printf("Unknown mode in DepthAttribute!\n");
                 return;          
             }
-            
-            if( cropped.empty()){                
-                printf("Cropped image for DepthAttribute is empty!\n");
-                return;
-            }
-                        
-            double distance = mat_median(cropped, true) * depth_scale;  
             if( distance > 0 ){
                 
                 if( !image.K().empty() ){

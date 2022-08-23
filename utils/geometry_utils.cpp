@@ -72,14 +72,14 @@ namespace eod{
         return dst;
     }
     
-    cv::Point float2intPoint(cv::Point2f src){
+    cv::Point float2intPoint(const cv::Point2f& src){
         Point dst;
         dst.x = (int)src.x;
         dst.y = (int)src.y;
         return dst;
     }
     
-    cv::Point2f int2floatPoint(cv::Point src){
+    cv::Point2f int2floatPoint(const cv::Point& src){
         Point2f dst;
         dst.x = src.x;
         dst.y = src.y;

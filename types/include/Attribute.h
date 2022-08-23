@@ -53,6 +53,7 @@ namespace eod{
         FACE_DLIB_A,
         EI_ID_CHECK_A,
         EI_STR_CHECK_A,
+        UNIT_TRANS_EXTR_A,
     };
     
     AttributeTypes getAttributeTypeFromName(std::string name);

@@ -529,6 +529,11 @@ namespace eod{
                 tmpA = new ExtractedInfoStringChecker(field, allowed, (partially != 0));
                 break;
             }
+            case UNIT_TRANS_EXTR_A:
+            {
+                tmpA = new UnitTranslationExtracter();
+                break;
+            }
             
             default:
             {

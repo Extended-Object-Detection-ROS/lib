@@ -20,9 +20,9 @@ namespace eod{
     
     cv::Vec3d scaleVec3d(cv::Vec3d src, double scale);
     
-    cv::Point float2intPoint(cv::Point2f);
+    cv::Point float2intPoint(const cv::Point2f&);
     
-    cv::Point2f int2floatPoint(cv::Point);
+    cv::Point2f int2floatPoint(const cv::Point&);
     
     std::vector<cv::Point> float2intPointVector(std::vector<cv::Point2f>);
     

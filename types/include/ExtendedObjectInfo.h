@@ -55,12 +55,7 @@ namespace eod{
         void setScoreWeight(double score, double weight);
         void calcTotalScore();        
         
-        // weak detection stuff
-        //double dcnt; // TODO remove in future
-        //int cnt; // TODO remove in future
-        //std::vector<int> pattern; // TODO remove in future
-        
-        //std::vector<cv::Point>* track_history_image;        
+          
         
         //
         // Variables behind is those, which could be individual for each attribute
