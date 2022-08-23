@@ -8,7 +8,7 @@
  */
 
 namespace eod{
-        
+    /*
     class polyMat : public cv::Mat{        
     public:
         polyMat() : cv::Mat(){}    
@@ -16,23 +16,23 @@ namespace eod{
         
         virtual void foo() {}
         
-    private:
-        
-    };
+    private:        
+    };*/
     
-    class InfoImage : public polyMat {
+    class InfoImage : public cv::Mat {
     public:
         InfoImage();
         InfoImage(cv::Mat image, cv::Mat K, cv::Mat D);
-        
-        cv::Mat K;
-        cv::Mat D;
+                
+        const cv::Mat& K() const {return K_;}
+        const cv::Mat& D() const {return D_;}
         
         virtual ~InfoImage();
         
     private:
         
-        
+        cv::Mat K_;
+        cv::Mat D_;                
     };
     
 }
