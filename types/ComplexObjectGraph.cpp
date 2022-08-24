@@ -237,25 +237,28 @@ namespace eod{
         // j - vert id graph, maps[_][j] - vert id current_view_graph
         
         // RETRIEVE DATA
-        
+        simple_objects.clear();
         for( size_t i = 0 ; i < maps.size() ; i++ ){
             if( maps[i].second < Probability ){
                 continue;
             }            
-            //printf("Merged\n");
+            std::vector<std::pair<std::string, ExtendedObjectInfo*>> simples;
+            
             int obj_type, obj_num;
             std::string object_name = current_view_graph.get_vertice_params(maps[i].first[0], &obj_type, &obj_num);
             
             ExtendedObjectInfo merged = ObjectsToSimpleObjects[object_name]->objects[obj_num];
-            //printf("\t%s %i\n", object_name.c_str(), obj_num);
+            simples.push_back(std::pair<std::string, ExtendedObjectInfo*>(object_name, &(ObjectsToSimpleObjects[object_name]->objects[obj_num])));
+                        
             for( int j = 1 ; j < maps[i].first.size(); j++){
                 object_name = current_view_graph.get_vertice_params(maps[i].first[j], &obj_type, &obj_num);
-                merged = merged | ObjectsToSimpleObjects[object_name]->objects[obj_num];
-                //printf("\t%s %i\n", object_name.c_str(), obj_num);
+                merged = merged | ObjectsToSimpleObjects[object_name]->objects[obj_num];                
+                simples.push_back(std::pair<std::string, ExtendedObjectInfo*>(object_name, &(ObjectsToSimpleObjects[object_name]->objects[obj_num])));
             }
             merged.mergeAllData();
             merged.total_score = maps[i].second;
             result.push_back(merged);
+            simple_objects.push_back(simples);
         }
         
         complex_objects = result;
@@ -307,12 +310,14 @@ namespace eod{
         std::vector<std::pair<std::vector<int>, double>> maps = current_view_graph.get_subisomorphisms(&graph);                        
         // maps:
         // j - vert id graph, maps[_][j] - vert id current_view_graph        
-        // RETRIEVE DATA        
+        // RETRIEVE DATA      
+        simple_objects.clear();
         for( size_t i = 0 ; i < maps.size() ; i++ ){
             
             if( maps[i].second < Probability ){
                 continue;
             }            
+            std::vector<std::pair<std::string, ExtendedObjectInfo*>> simples;
             
             int obj_type, obj_num;
             std::string object_name = current_view_graph.get_vertice_params(maps[i].first[0], &obj_type, &obj_num);
@@ -321,8 +326,10 @@ namespace eod{
                         
             if( obj_num == -1){
             }
-            else
+            else{
                 merged = ObjectsToSimpleObjects[object_name]->objects[obj_num];
+                simples.push_back(std::pair<std::string, ExtendedObjectInfo*>(object_name, &(ObjectsToSimpleObjects[object_name]->objects[obj_num])));
+            }
                         
             for( size_t j = 1 ; j < maps[i].first.size(); j++){
                 object_name = current_view_graph.get_vertice_params(maps[i].first[j], &obj_type, &obj_num);
@@ -333,13 +340,15 @@ namespace eod{
                         //skip
                     }
                     merged = merged | ObjectsToSimpleObjects[object_name]->objects[obj_num];
+                    simples.push_back(std::pair<std::string, ExtendedObjectInfo*>(object_name, &(ObjectsToSimpleObjects[object_name]->objects[obj_num])));
                 }
             }
             if( merged.x == 0 && merged.y == 0 && merged.width == 0 && merged.height == 0)
                 continue;                
             merged.mergeAllData();
             merged.total_score = maps[i].second;
-            result.push_back(merged);                                                
+            result.push_back(merged);
+            simple_objects.push_back(simples);
         }                        
         //TODO destroy graph
         complex_objects = result;

@@ -68,6 +68,7 @@ namespace eod{
         void drawAll(const cv::Mat& frameTD, cv::Scalar color, int tickness);
         
         std::vector<ExtendedObjectInfo> complex_objects;
+        std::vector<std::vector<std::pair<std::string, ExtendedObjectInfo*>>> simple_objects;
 
         std::vector<EoiFilter*> filters;
                         
