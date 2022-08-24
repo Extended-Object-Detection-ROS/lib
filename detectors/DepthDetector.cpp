@@ -64,19 +64,18 @@ namespace eod{
                     return;
                 }
                 Point center_registered = reverse_translation(rect.tvec[0], image.K());     
-                
-                
-                distance = image.at<float>(center_registered);
                                 
+                distance = image.at<float>(center_registered);                                
                 
-                printf("distance at (%i, %i): %f\n", center_registered.x, center_registered.y, distance);
-                
+                /*
+                printf("distance at (%i, %i): %f\n", center_registered.x, center_registered.y, distance);                
                 Mat image2draw;
                 cvtColor(image, image2draw, CV_GRAY2RGB);
                 image2draw *= 255;
                 circle(image2draw, center_registered, 10, Scalar(0, 255, 0), 3);
                 imshow("depth", image2draw);
                 waitKey(1);
+                */
             }
             else{
                 printf("Unknown mode in DepthAttribute!\n");
