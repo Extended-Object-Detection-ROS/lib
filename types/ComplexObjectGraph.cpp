@@ -191,7 +191,7 @@ namespace eod{
         graph.add_edge(auto_name, rs->ID, ObjectsToGraphsVerticesIds[o1_name], ObjectsToGraphsVerticesIds[o2_name], false, weight);
     }
     
-    std::vector<ExtendedObjectInfo> ComplexObjectGraph::Identify(const cv::Mat& frame, const cv::Mat& depth, int seq ){
+    std::vector<ExtendedObjectInfo> ComplexObjectGraph::Identify(const InfoImage& frame, const InfoImage& depth, int seq ){
         if( identify_mode == HARD )
             IdentifyHard(frame, depth, seq);
         else
@@ -203,7 +203,7 @@ namespace eod{
         return complex_objects;
     }
     
-    std::vector<ExtendedObjectInfo> ComplexObjectGraph::IdentifyHard(const cv::Mat& frame, const cv::Mat& depth, int seq ){
+    std::vector<ExtendedObjectInfo> ComplexObjectGraph::IdentifyHard(const InfoImage& frame, const InfoImage& depth, int seq ){
         //printf("NEW GRAPH\n");
         std::vector <ExtendedObjectInfo> result;
         
@@ -262,7 +262,7 @@ namespace eod{
         return result;
     }
     
-    std::vector<ExtendedObjectInfo> ComplexObjectGraph::IdentifySoft(const cv::Mat& frame, const cv::Mat& depth, int seq ){        
+    std::vector<ExtendedObjectInfo> ComplexObjectGraph::IdentifySoft(const InfoImage& frame, const InfoImage& depth, int seq ){        
         std::vector <ExtendedObjectInfo> result;
         
         //printf("New graph\n");

@@ -12,8 +12,7 @@ namespace eod{
         HARD,
         SOFT
     };
-        
-    
+            
     /// <summary>
 	/// Class SimpleObject
 	/// </summary>

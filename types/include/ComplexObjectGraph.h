@@ -59,10 +59,10 @@ namespace eod{
         void add_object(std::string name, SimpleObject* so, int num = 0, double weight = 1);
         void add_relation(std::string o1_name, std::string o2_name, RelationShip* rs, double weight = 1);
         
-        std::vector<ExtendedObjectInfo> Identify(const cv::Mat& frame, const cv::Mat& depth, int seq);
+        std::vector<ExtendedObjectInfo> Identify(const InfoImage& frame, const InfoImage& depth, int seq);
         
-        std::vector<ExtendedObjectInfo> IdentifyHard(const cv::Mat& frame, const cv::Mat& depth, int seq);
-        std::vector<ExtendedObjectInfo> IdentifySoft(const cv::Mat& frame, const cv::Mat& depth, int seq);
+        std::vector<ExtendedObjectInfo> IdentifyHard(const InfoImage& frame, const InfoImage& depth, int seq);
+        std::vector<ExtendedObjectInfo> IdentifySoft(const InfoImage& frame, const InfoImage& depth, int seq);
         
         void drawOne(const cv::Mat& frameTD, int no, cv::Scalar color, int tickness);
         void drawAll(const cv::Mat& frameTD, cv::Scalar color, int tickness);
