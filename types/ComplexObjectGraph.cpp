@@ -366,6 +366,11 @@ namespace eod{
             
             complex_objects[no].draw(frameTd, color);
             
+            for(auto& n_so : simple_objects[no]){
+                n_so.second->draw(frameTd, color);
+            }
+            
+            
             std::string objectInfo = std::to_string(ID)+": "+name +" ["+ std::to_string(complex_objects[no].total_score).substr(0,4)+"]";
             cv::Point prevBr = drawFilledRectangleWithText(frameTd, cv::Point(complex_objects[no].x,complex_objects[no].y /*-12*/)  , objectInfo, color);     
         }
