@@ -7,14 +7,12 @@ using namespace cv;
 
 namespace eod{
 
-    DepthAttribute::DepthAttribute(){
-        depth_scale = 0.0;
+    DepthAttribute::DepthAttribute(){        
         inited = false;
         Type = DEPTH_A;
     }
     
-    DepthAttribute::DepthAttribute(double depth_scale_, int mode_){
-        depth_scale = depth_scale_;
+    DepthAttribute::DepthAttribute(int mode_){        
         inited = true;
         Type = DEPTH_A;
         mode = mode_;
@@ -52,7 +50,7 @@ namespace eod{
                     printf("Cropped image for DepthAttribute is empty!\n");
                     return;
                 }                            
-                distance = mat_median(cropped, true) ;  
+                distance = mat_median(cropped, true);  
             }
             else if( mode == CENTER_PX ){
                 if(rect.tvec.size() == 0){

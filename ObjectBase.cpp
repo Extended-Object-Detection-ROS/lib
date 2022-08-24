@@ -468,12 +468,10 @@ namespace eod{
                 break;                
             }
             case DEPTH_A:
-            {
-                double depth_scale = 0.001;
-                int mode = 0;
-                attr->Attribute("depthScale", &depth_scale);                
+            {                
+                int mode = 0;                
                 attr->Attribute("mode", &mode);
-                tmpA = new DepthAttribute(depth_scale, mode);
+                tmpA = new DepthAttribute(mode);
                 break;
             }
             case ROUGH_DIST_A:
