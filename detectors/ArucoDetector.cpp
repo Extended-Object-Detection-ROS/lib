@@ -1,6 +1,7 @@
 #include "ArucoDetector.h"
 #include "ObjectBase.h"
 #include "geometry_utils.h"
+#include <typeinfo>
 
 using namespace std;
 using namespace cv;
@@ -31,13 +32,9 @@ namespace eod{
         inited = true;        
     }    
     
-    vector<ExtendedObjectInfo> ArucoAttribute::Detect2(const Mat& image, int seq){
+    vector<ExtendedObjectInfo> ArucoAttribute::Detect2(const InfoImage& image, int seq){
         if( !inited )
-            return vector<ExtendedObjectInfo>(0);
-        
-        if( !hasCamParams() ){            
-            setCamParams(parent_base->getCameraMatrix(), parent_base->getDistortionCoeff() );
-        }
+            return vector<ExtendedObjectInfo>(0);                
                         
         vector<ExtendedObjectInfo> rects;        
         if( seq == 0 || seq != prev_seq ){            
@@ -47,11 +44,12 @@ namespace eod{
             ExtendedObjectInfo tmp = boundingRect( markerCorners[i] );                                                                  
             set_extracted_info(tmp, "marker_id", markerIds[i]);            
             if( returnContours )
-                tmp.contour.push_back(float2intPointVector(markerCorners[i]));
+                tmp.contour.push_back(float2intPointVector(markerCorners[i]));                        
             
-            if( hasCamParams() && markerLen > 0){
+            // if image has params
+            if( markerLen > 0 && !image.K().empty() && !image.D().empty() ){                                
                 vector<cv::Vec3d> rvecs, tvecs;                    
-                cv::aruco::estimatePoseSingleMarkers(vector<vector<Point2f> >(markerCorners.begin()+i,markerCorners.begin()+i+1), markerLen, camMat, distCoef, rvecs, tvecs);            
+                cv::aruco::estimatePoseSingleMarkers(vector<vector<Point2f> >(markerCorners.begin()+i,markerCorners.begin()+i+1), markerLen, image.K(), image.D(), rvecs, tvecs);            
                 tmp.tvec.push_back(tvecs[0]);
                 tmp.rvec.push_back(rvecs[0]);
             }
@@ -66,20 +64,12 @@ namespace eod{
     }
           
         
-    bool ArucoAttribute::Check2(const Mat& image,ExtendedObjectInfo& rect){
+    bool ArucoAttribute::Check2(const InfoImage& image,ExtendedObjectInfo& rect){
         return false;        
     }
     
-    void ArucoAttribute::Extract2(const cv::Mat& image, ExtendedObjectInfo& rect){
+    void ArucoAttribute::Extract2(const InfoImage& image, ExtendedObjectInfo& rect){
     }
     
-    void ArucoAttribute::setCamParams(Mat camMat_, Mat distCoef_){
-        camMat = camMat_;
-        distCoef = distCoef_;
-    }
-    
-    bool ArucoAttribute::hasCamParams(){
-        return !(camMat.empty() & distCoef.empty());
-    }
     
 }

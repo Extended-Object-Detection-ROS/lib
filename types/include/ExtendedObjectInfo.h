@@ -23,15 +23,15 @@ namespace eod{
         ~ExtendedObjectInfo(){/*TODO add all pointer release*/}
 
         // basic rects
-        cv::Rect getRect();
-        cv::Rect2d getRect2d();
-        cv::Point getCenter();
+        const cv::Rect getRect();
+        const cv::Rect2d getRect2d();
+        const cv::Point getCenter();
         
-        std::vector<cv::Point2f> getCorners();
+        const std::vector<cv::Point2f> getCorners();
         
         // help functions
-        void print(std::string prefix = ""); 
-        std::string getInfo();        
+        const void print(std::string prefix = ""); 
+        const std::string getInfo();        
         void draw(const cv::Mat& image, cv::Scalar col = cv::Scalar(0, 255, 0) );
         
         void normalize(int im_width, int im_height);                
@@ -55,12 +55,7 @@ namespace eod{
         void setScoreWeight(double score, double weight);
         void calcTotalScore();        
         
-        // weak detection stuff
-        //double dcnt; // TODO remove in future
-        //int cnt; // TODO remove in future
-        //std::vector<int> pattern; // TODO remove in future
-        
-        //std::vector<cv::Point>* track_history_image;        
+          
         
         //
         // Variables behind is those, which could be individual for each attribute

@@ -21,19 +21,17 @@ namespace eod{
     }
             
     
-    vector<ExtendedObjectInfo> RoughDistAttribute::Detect2(const Mat& image, int seq){
+    vector<ExtendedObjectInfo> RoughDistAttribute::Detect2(const InfoImage& image, int seq){
         return vector<ExtendedObjectInfo>();
     }
                 
-    bool RoughDistAttribute::Check2(const Mat& image, ExtendedObjectInfo& rect){
+    bool RoughDistAttribute::Check2(const InfoImage& image, ExtendedObjectInfo& rect){
         return false;
     }
         
-    void RoughDistAttribute::Extract2(const Mat& image, ExtendedObjectInfo& rect){
-        Mat camMat = parent_base->getCameraMatrix(); 
-        Mat distCoef = parent_base->getDistortionCoeff();
+    void RoughDistAttribute::Extract2(const InfoImage& image, ExtendedObjectInfo& rect){        
         
-        if( !camMat.empty() && !distCoef.empty() ){
+        if( !image.K().empty() && !image.D().empty() ){
                  
             vector<Point2f> image_corners = rect.getCorners();            
             vector<Point3f> original_corners;
@@ -51,7 +49,7 @@ namespace eod{
                 return;
             }            
             Vec3d rvec, tvec;                          
-            if( solvePnP(original_corners, image_corners, camMat, distCoef, rvec, tvec)){
+            if( solvePnP(original_corners, image_corners, image.K(), image.D(), rvec, tvec)){
                 rect.tvec.push_back(tvec);
                 rect.rvec.push_back(rvec);
             }                

@@ -128,7 +128,7 @@ namespace eod{
         isLabelMap = readLabelsMap(labelmapfile, labelMap);
     }
     
-    vector<ExtendedObjectInfo> DnnAttribute::Detect2(const Mat& image, int seq){
+    vector<ExtendedObjectInfo> DnnAttribute::Detect2(const InfoImage& image, int seq){
         if( prev_seq != seq || seq == 0){        
             // input net
             Mat blob;        
@@ -224,11 +224,11 @@ namespace eod{
         }
     }
     
-    bool DnnAttribute::Check2(const Mat& image,ExtendedObjectInfo& rect){
+    bool DnnAttribute::Check2(const InfoImage& image,ExtendedObjectInfo& rect){
         return false;        
     }
     
-    void DnnAttribute::Extract2(const cv::Mat& image, ExtendedObjectInfo& rect){
+    void DnnAttribute::Extract2(const InfoImage& image, ExtendedObjectInfo& rect){
     }
     
 }

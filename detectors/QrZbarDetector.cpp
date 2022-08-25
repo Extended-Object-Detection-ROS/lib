@@ -32,14 +32,14 @@ namespace eod{
         info = info_;
     }
     
-    bool QrZbarAttribute::Check2(const Mat& image, ExtendedObjectInfo& rect){
+    bool QrZbarAttribute::Check2(const InfoImage& image, ExtendedObjectInfo& rect){
         return false;
     }
     
-    void QrZbarAttribute::Extract2(const cv::Mat& image, ExtendedObjectInfo& rect){
+    void QrZbarAttribute::Extract2(const InfoImage& image, ExtendedObjectInfo& rect){
     }
     
-    vector<ExtendedObjectInfo> QrZbarAttribute::Detect2(const Mat& image_, int seq){
+    vector<ExtendedObjectInfo> QrZbarAttribute::Detect2(const InfoImage& image_, int seq){
         vector<ExtendedObjectInfo> rects;
         
         // Convert image to grayscale
@@ -74,14 +74,12 @@ namespace eod{
                 if( symbol->get_location_size() != 4 ){
                     printf("QRcode points size error. Can't solve 3d-position.\n");
                 }
-                else{
-                    Mat camMat = parent_base->getCameraMatrix(); 
-                    Mat distCoef = parent_base->getDistortionCoeff();
-                    if( !camMat.empty() && !distCoef.empty() ){
+                else{                    
+                    if( !image.K().empty() && !image.D().empty() ){
                         vector<vector<Point2f> > corners;
                         corners.push_back(int2floatPointVector(contour));
                         vector<Vec3d> rvecs, tvecs;   
-                        cv::aruco::estimatePoseSingleMarkers(corners, real_len, camMat, distCoef, rvecs, tvecs);
+                        cv::aruco::estimatePoseSingleMarkers(corners, real_len, image.K(), image.D(), rvecs, tvecs);
                         tmp.tvec.push_back(tvecs[0]);
                         tmp.rvec.push_back(rvecs[0]);
                     }

@@ -48,9 +48,9 @@ namespace eod{
         vector<Rect> Check(Mat image, vector<ExtendedObjectInfo> rects);
         */
 
-        bool Check2(Mat image,ExtendedObjectInfo rect);
+        bool Check2(InfoImage& image,ExtendedObjectInfo rect);
         
-        void Extract2(const cv::Mat& image, ExtendedObjectInfo& rect);
+        void Extract2(const InfoImage& image, ExtendedObjectInfo& rect);
 
     private:
 

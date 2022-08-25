@@ -47,6 +47,8 @@ File: Class realises loading simple_simple_objects parameters from XML file
 #endif
 #include "ExtractedInfoIdChecker.h"
 #include "ExtractedInfoStringChecker.h"
+#include "UnitTranslationExtracter.h"
+
 
 #include "Filtering.h"
 
@@ -231,9 +233,7 @@ namespace eod{
         
         int relation_counter;
 
-    };
-        
-    
+    };        
 }
 
 #endif

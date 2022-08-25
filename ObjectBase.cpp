@@ -468,12 +468,10 @@ namespace eod{
                 break;                
             }
             case DEPTH_A:
-            {
-                double depth_scale = 0.001;
-                int mode = 0;
-                attr->Attribute("depthScale", &depth_scale);                
+            {                
+                int mode = 0;                
                 attr->Attribute("mode", &mode);
-                tmpA = new DepthAttribute(depth_scale, mode);
+                tmpA = new DepthAttribute(mode);
                 break;
             }
             case ROUGH_DIST_A:
@@ -527,6 +525,11 @@ namespace eod{
                 vector<string> allowed = getStringVectorAttribute(attr, "allowed");
                 
                 tmpA = new ExtractedInfoStringChecker(field, allowed, (partially != 0));
+                break;
+            }
+            case UNIT_TRANS_EXTR_A:
+            {
+                tmpA = new UnitTranslationExtracter();
                 break;
             }
             

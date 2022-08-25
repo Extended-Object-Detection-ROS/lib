@@ -21,7 +21,7 @@ namespace eod{
     }
     
     //TODO should not return array but take it as pointer\link
-    vector<ExtendedObjectInfo> Attribute::Detect(const Mat& image, int seq){
+    vector<ExtendedObjectInfo> Attribute::Detect(const InfoImage& image, int seq){
         //TODO: check that all detectors cares about 'inited' param
         /*
         if( !inited ){
@@ -38,16 +38,14 @@ namespace eod{
         }
         if( clusterization_method )
             saved_answer = clusterization_method->cluster(saved_answer);
-        
-        //printf("Rects before filtering %i\n",saved_answer.size());
+                
         for( size_t i = 0; i < filters.size() ; i ++ ){
             filters[i]->Filter(&saved_answer);
-        }
-        //printf("Rects after filtering %i\n",saved_answer.size());
+        }        
         return saved_answer;
     }
     
-    void Attribute::Check(const Mat& image, vector<ExtendedObjectInfo>* rects){        
+    void Attribute::Check(const InfoImage& image, vector<ExtendedObjectInfo>* rects){        
         auto it = rects->begin();
         while (it != rects->end() ){            
             if( !Check2(image, *it) ){                
@@ -60,10 +58,8 @@ namespace eod{
         }                        
     }
     
-    void Attribute::Extract(const Mat& image, vector<ExtendedObjectInfo>* rects){
-        for( size_t i = 0 ; i < rects->size() ; i++ ){
-            //rects->at(i).sub_id.push_back(-1);
-            //rects->at(i).extracted_info.push_back("");
+    void Attribute::Extract(const InfoImage& image, vector<ExtendedObjectInfo>* rects){
+        for( size_t i = 0 ; i < rects->size() ; i++ ){            
             Extract2(image, rects->at(i));
         }
     }
@@ -122,6 +118,8 @@ namespace eod{
             return EI_ID_CHECK_A;
         if(name == "extractedinfostring")
             return EI_STR_CHECK_A;
+        if(name == "unittranslation")
+            return UNIT_TRANS_EXTR_A;
         
         printf("Unknown attribute type %s!",name.c_str());
         return UNK_A;

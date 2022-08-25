@@ -17,9 +17,9 @@ namespace eod{
         
         ExtractedInfoStringChecker(std::string field_, std::vector<std::string> allowed_, bool partially = false);
         
-        std::vector<ExtendedObjectInfo> Detect2(const cv::Mat& image, int seq);
-        bool Check2(const cv::Mat& image, ExtendedObjectInfo &rect);    
-        void Extract2(const cv::Mat& image, ExtendedObjectInfo& rect);
+        std::vector<ExtendedObjectInfo> Detect2(const InfoImage& image, int seq);
+        bool Check2(const InfoImage& image, ExtendedObjectInfo &rect);    
+        void Extract2(const InfoImage& image, ExtendedObjectInfo& rect);
 
     private:
         std::string field;

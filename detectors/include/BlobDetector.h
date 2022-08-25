@@ -18,11 +18,11 @@ namespace eod{
         
         void SetParams(int minThreshold, int maxThreshold, int blobColor, int minArea, double minCircularity, double minConvexity, double minInertiaRatio);
         
-        std::vector<ExtendedObjectInfo> Detect2(const cv::Mat& image, int seq);
+        std::vector<ExtendedObjectInfo> Detect2(const InfoImage& image, int seq);
 	
-        bool Check2(const cv::Mat& image, ExtendedObjectInfo &rect);
+        bool Check2(const InfoImage& image, ExtendedObjectInfo &rect);
         
-        void Extract2(const cv::Mat& image, ExtendedObjectInfo& rect);
+        void Extract2(const InfoImage& image, ExtendedObjectInfo& rect);
         
     private:
         cv::SimpleBlobDetector::Params params;

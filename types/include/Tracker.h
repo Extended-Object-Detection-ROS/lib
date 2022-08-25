@@ -24,8 +24,8 @@ namespace eod{
         void addObject(ExtendedObjectInfo, TrackStatus);
                 
                 
-        void initTracker(const cv::Mat&);
-        void updateTracker(const cv::Mat&);
+        void initTracker(const InfoImage&);
+        void updateTracker(const InfoImage&);
     private:        
         
         cv::Ptr<cv::Tracker> tracker;
@@ -42,7 +42,7 @@ namespace eod{
         
         eodTracker();
         eodTracker(std::string name, std::string trackerType);
-        std::vector <ExtendedObjectInfo> Identify(const cv::Mat& frame, const cv::Mat& depth, int seq = 0);
+        std::vector <ExtendedObjectInfo> Identify(const InfoImage& frame, const InfoImage& depth, int seq = 0);
         
         void draw(cv::Mat& image, cv::Scalar col = cv::Scalar(0,255,0) );
         
@@ -50,7 +50,7 @@ namespace eod{
         int id_cnt;
         std::vector<Track*> tracks;
         cv::Mat_<double> closenessMap;
-        cv::Mat previous_frame;
+        InfoImage previous_frame;
         std::string tracker_type;
         
         void createClosenessMap();

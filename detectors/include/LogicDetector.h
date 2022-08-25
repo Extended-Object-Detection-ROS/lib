@@ -14,11 +14,11 @@ namespace eod{
         AndAttribute();
         AndAttribute(Attribute*, Attribute*, double, bool second_check = false);
         
-        std::vector<ExtendedObjectInfo> Detect2(const cv::Mat& image, int seq);
+        std::vector<ExtendedObjectInfo> Detect2(const InfoImage& image, int seq);
         
-        bool Check2(const cv::Mat& image, ExtendedObjectInfo& rect);
+        bool Check2(const InfoImage& image, ExtendedObjectInfo& rect);
         
-        void Extract2(const cv::Mat& image, ExtendedObjectInfo& rect);
+        void Extract2(const InfoImage& image, ExtendedObjectInfo& rect);
         
     private:
         Attribute* attributeA;
@@ -37,11 +37,11 @@ namespace eod{
         NotAttribute();
         NotAttribute(Attribute*);
         
-        std::vector<ExtendedObjectInfo> Detect2(const cv::Mat& image, int seq);
+        std::vector<ExtendedObjectInfo> Detect2(const InfoImage& image, int seq);
         
-        bool Check2(const cv::Mat& image, ExtendedObjectInfo& rect);
+        bool Check2(const InfoImage& image, ExtendedObjectInfo& rect);
         
-        void Extract2(const cv::Mat& image, ExtendedObjectInfo& rect);
+        void Extract2(const InfoImage& image, ExtendedObjectInfo& rect);
         
     private:
         Attribute* attribute;        
@@ -57,11 +57,11 @@ namespace eod{
         OrAttribute();
         OrAttribute(Attribute*, Attribute*, double);
         
-        std::vector<ExtendedObjectInfo> Detect2(const cv::Mat& image, int seq);
+        std::vector<ExtendedObjectInfo> Detect2(const InfoImage& image, int seq);
         
-        bool Check2(const cv::Mat& image, ExtendedObjectInfo& rect);
+        bool Check2(const InfoImage& image, ExtendedObjectInfo& rect);
         
-        void Extract2(const cv::Mat& image, ExtendedObjectInfo& rect);
+        void Extract2(const InfoImage& image, ExtendedObjectInfo& rect);
         
     private:
         Attribute* attributeA;

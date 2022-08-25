@@ -15,12 +15,12 @@ namespace eod{
     Type = DIMEN_A;
   }
   
-  vector<ExtendedObjectInfo> DimentionAttribute::Detect2(const Mat& image, int seq){
+  vector<ExtendedObjectInfo> DimentionAttribute::Detect2(const InfoImage& image, int seq){
     vector <ExtendedObjectInfo> ans;
     return ans;
   }
   
-  bool DimentionAttribute::Check2(const Mat& image, ExtendedObjectInfo &rect){    
+  bool DimentionAttribute::Check2(const InfoImage& image, ExtendedObjectInfo &rect){    
     
     if( (double)rect.width / (double)rect.height < ratioMin )
         return false;
@@ -33,6 +33,6 @@ namespace eod{
     return true;
   }
   
-  void DimentionAttribute::Extract2(const cv::Mat& image, ExtendedObjectInfo& rect){}
+  void DimentionAttribute::Extract2(const InfoImage& image, ExtendedObjectInfo& rect){}
   
 }

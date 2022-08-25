@@ -18,15 +18,15 @@ namespace eod{
         this->y_max = y_max;
     }	    
     
-    vector<ExtendedObjectInfo> PoseAttribute::Detect2(const Mat& image, int seq){
+    vector<ExtendedObjectInfo> PoseAttribute::Detect2(const InfoImage& image, int seq){
         vector<ExtendedObjectInfo> rects(0);
         return rects;
     }
     
-    void PoseAttribute::Extract2(const cv::Mat& image, ExtendedObjectInfo& rect){
+    void PoseAttribute::Extract2(const InfoImage& image, ExtendedObjectInfo& rect){
     }
     
-    bool PoseAttribute::Check2(const Mat& image,ExtendedObjectInfo& rect){      
+    bool PoseAttribute::Check2(const InfoImage& image,ExtendedObjectInfo& rect){      
         Point center = rect.getCenter();
         
         double y_lim_u = image.size().height * y_max;

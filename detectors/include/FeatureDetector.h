@@ -36,11 +36,11 @@ namespace eod{
         /// </summary>
         /// <param name="image">Destination image</param>
         /// <returns>Vector of rects of found objects</returns>
-        std::vector<ExtendedObjectInfo> Detect2(const cv::Mat& image, int seq);
+        std::vector<ExtendedObjectInfo> Detect2(const InfoImage& image, int seq);
 
-        bool Check2(const cv::Mat& image,ExtendedObjectInfo& rect);
+        bool Check2(const InfoImage& image,ExtendedObjectInfo& rect);
         
-        void Extract2(const cv::Mat& image, ExtendedObjectInfo& rect);
+        void Extract2(const InfoImage& image, ExtendedObjectInfo& rect);
         
     private:
         FEATURE_DETECTOR featureExtractorType;
@@ -64,12 +64,10 @@ namespace eod{
       
       //GlobalSimpleFeatureDetector();
       
-      bool get_descriptors_and_keypoints(const cv::Mat& image, std::vector<KeyPoint> & keypoints, cv::Mat & descriptors, FEATURE_DETECTOR detector_type);
+      bool get_descriptors_and_keypoints(const cv::InfoImage& image, std::vector<KeyPoint> & keypoints, cv::Mat & descriptors, FEATURE_DETECTOR detector_type);
       
-      std::vector<ExtendedObjectInfo> Detect(const cv::Mat& image, int seq, std::vector<KeyPoint> original_keypoints, cv::Mat original_descriptors, std::vector<cv::Point2f> original_corners, int min_matches_to_detect, FEATURE_DETECTOR detector_type, double scale, std::vector<cv::Point3f> original_corners_shifted, double Weight, bool returnContours = true);
-      
-      void setCamParams(cv::Mat camMat, cv::Mat distCoef);        
-      bool hasCamParams();
+      std::vector<ExtendedObjectInfo> Detect(const cv::InfoImage& image, int seq, std::vector<KeyPoint> original_keypoints, cv::Mat original_descriptors, std::vector<cv::Point2f> original_corners, int min_matches_to_detect, FEATURE_DETECTOR detector_type, double scale, std::vector<cv::Point3f> original_corners_shifted, double Weight, bool returnContours = true);
+            
       
   private:
       Ptr<SIFT> sift_detector;
@@ -90,10 +88,7 @@ namespace eod{
       
       int sift_prev_seq;
       int surf_prev_seq;
-      int orb_prev_seq;
-      
-      cv::Mat camMat;
-      cv::Mat distCoef;
+      int orb_prev_seq;            
       
   };
   

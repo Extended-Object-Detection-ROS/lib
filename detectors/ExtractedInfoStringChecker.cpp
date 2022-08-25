@@ -17,16 +17,16 @@ namespace eod{
         partially = partially_;
 	}
 	
-	vector<ExtendedObjectInfo> ExtractedInfoStringChecker::Detect2(const Mat& image, int seq){
+	vector<ExtendedObjectInfo> ExtractedInfoStringChecker::Detect2(const InfoImage& image, int seq){
         vector<ExtendedObjectInfo> rects(0);
         return rects;
     }
     
-    void ExtractedInfoStringChecker::Extract2(const cv::Mat& image, ExtendedObjectInfo& rect){
+    void ExtractedInfoStringChecker::Extract2(const InfoImage& image, ExtendedObjectInfo& rect){
         
     }
     
-    bool ExtractedInfoStringChecker::Check2(const Mat& image, ExtendedObjectInfo& rect){              
+    bool ExtractedInfoStringChecker::Check2(const InfoImage& image, ExtendedObjectInfo& rect){              
         if( rect.extracted_info.count(field) > 0){
             string value = rect.extracted_info[field];
             

@@ -21,6 +21,7 @@ namespace eod{
     }
     
     void SimpleObject::defaultInit(){
+        //TODO remove depricated params
         identified = false;
         ident_seq = -1;
         totalWeight = 0;
@@ -53,7 +54,7 @@ namespace eod{
     //-----------------------------------------------------------------
     // Ordinary Detection Stuff
     //-----------------------------------------------------------------
-    vector<ExtendedObjectInfo> SimpleObject::Identify(const Mat& frame, const Mat& depth, int seq){
+    vector<ExtendedObjectInfo> SimpleObject::Identify(const InfoImage& frame, const InfoImage& depth, int seq){
         if (seq == ident_seq){
             return objects;
         }
@@ -72,7 +73,7 @@ namespace eod{
         return objects;
     }
     
-    vector<ExtendedObjectInfo> SimpleObject::IdentifyHard(const Mat& frame, const Mat& depth, int seq){
+    vector<ExtendedObjectInfo> SimpleObject::IdentifyHard(const InfoImage& frame, const InfoImage& depth, int seq){
         // speed up fo only for one attribute objects
         if( mode_attributes.size() == 1 ){
             objects.clear(); // need I this?
@@ -180,7 +181,7 @@ namespace eod{
     }
 
     
-    vector<ExtendedObjectInfo> SimpleObject::IdentifySoft(const Mat& frame, const Mat& depth, int seq){
+    vector<ExtendedObjectInfo> SimpleObject::IdentifySoft(const InfoImage& frame, const InfoImage& depth, int seq){
         ExtendedObjectInfo fake_empty_rect = ExtendedObjectInfo(0,0,frame.size().width, frame.size().height);
         vector<ExtendedObjectInfo> prev;
         
@@ -255,8 +256,7 @@ namespace eod{
                     if( ! check_result )
                         objects[j].setScoreWeight(0, mode_attributes[i].second->Weight);
                     else
-                        objects[j].setScoreWeight(1, mode_attributes[i].second->Weight); //NOTE TODO KOSTYL this should not be there
-                    
+                        objects[j].setScoreWeight(1, mode_attributes[i].second->Weight); //NOTE TODO KOSTYL this should not be there                    
                 }
             }            
             else if(mode_attributes[i].first.first == EXTRACT){
@@ -296,11 +296,8 @@ namespace eod{
         // add main object info
         string objectInfo = to_string(ID) +": "+ name + " ["+to_string(roundf(obj->total_score * 100) / 100).substr(0,4)+"]"+(obj->track_id == -1 ? "" : "("+to_string(obj->track_id)+")") ;                                    
         Point prevBr = drawFilledRectangleWithText(image, obj->tl(), objectInfo, col);
-        
-        //int real_indx = 0; // KOSTYLISH :C
-        for(size_t j = 0 ; j < mode_attributes.size() ; j++ ){
-            //if( mode_attributes[j].first.first == EXTRACT )
-              //  continue;
+                
+        for(size_t j = 0 ; j < mode_attributes.size() ; j++ ){            
             string symbol;
             if(mode_attributes[j].first.first == DETECT)
                 symbol = " + ";
@@ -309,13 +306,13 @@ namespace eod{
             else
                 symbol = " > ";
             
-            string attributeName = symbol + mode_attributes[j].second->Name + " ["+(j < obj->scores_with_weights.size() ? to_string(roundf(obj->scores_with_weights[j].first * 100) / 100).substr(0,4) : "-1" )+"]" /*+ (j >= obj->sub_id.size() || obj->sub_id[j] == -1? "" : "{"+to_string(obj->sub_id[j])+"}")/* +(j >= obj->extracted_info.size() || obj->extracted_info[j] == "" ? "" : "("+obj->extracted_info[j]+")")*/;
+            string attributeName = symbol + mode_attributes[j].second->Name + " ["+(j < obj->scores_with_weights.size() ? to_string(roundf(obj->scores_with_weights[j].first * 100) / 100).substr(0,4) : "-1" )+"]";
             string extracted_info = " ";
             map<string, string>::iterator it;
             for( it  = obj->extracted_info.begin(); it != obj->extracted_info.end(); it++){
                 auto res = std::mismatch(mode_attributes[j].second->Name.begin(), mode_attributes[j].second->Name.end(), it->first.begin());
                 if( res.first == mode_attributes[j].second->Name.end() ){
-                    extracted_info += it->second + " ";//it->second.substr(mode_attributes[j].second->Name.length());
+                    extracted_info += it->second + " ";
                 }
             }
             prevBr = drawFilledRectangleWithText(image, Point(obj->tl().x, prevBr.y), attributeName + extracted_info, col);

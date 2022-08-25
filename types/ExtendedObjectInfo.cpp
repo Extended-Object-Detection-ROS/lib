@@ -69,29 +69,29 @@ namespace eod{
         return ans;
     }
 
-    void ExtendedObjectInfo::print(string prefix){
+    const void ExtendedObjectInfo::print(string prefix){
         printf("%s (%i, %i, %i, %i)\n",prefix.c_str(),x,y,width,height);
     }
     
-    string ExtendedObjectInfo::getInfo(){
+    const string ExtendedObjectInfo::getInfo(){
         string info = to_string(x)+" "+to_string(y)+" "+to_string(width)+" "+to_string(height)+"\n";
         //TODO add additional
         return info;
     }
     
-    Rect ExtendedObjectInfo::getRect(){
+    const Rect ExtendedObjectInfo::getRect(){
         return Rect(x,y,width,height);
     }
     
-    Rect2d ExtendedObjectInfo::getRect2d(){
+    const Rect2d ExtendedObjectInfo::getRect2d(){
         return Rect2d(x,y,width,height);
     }
 
-    Point ExtendedObjectInfo::getCenter(){
+    const Point ExtendedObjectInfo::getCenter(){
         return Point(x + width/2,y+height/2);
     }   
     
-    vector<Point2f> ExtendedObjectInfo::getCorners(){
+    const vector<Point2f> ExtendedObjectInfo::getCorners(){
         vector<Point2f> corners;
         corners.push_back(Point2f(x,y));
         corners.push_back(Point2f(x+width,y));

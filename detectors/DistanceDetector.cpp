@@ -17,12 +17,12 @@ namespace eod{
     inited = true;
   }
   
-  vector<ExtendedObjectInfo> DistanceAttribute::Detect2(const Mat& image, int seq){
+  vector<ExtendedObjectInfo> DistanceAttribute::Detect2(const InfoImage& image, int seq){
     vector <ExtendedObjectInfo> ans;
     return ans;
   }
   
-  bool DistanceAttribute::Check2(const Mat& image, ExtendedObjectInfo &rect){        
+  bool DistanceAttribute::Check2(const InfoImage& image, ExtendedObjectInfo &rect){        
      if( rect.tvec.size() < 1 ){
          printf("DimentionAttribute: object has no translation calculated!\n");
          return false;
@@ -46,6 +46,6 @@ namespace eod{
      return true;
   }
   
-  void DistanceAttribute::Extract2(const cv::Mat& image, ExtendedObjectInfo& rect){} 
+  void DistanceAttribute::Extract2(const InfoImage& image, ExtendedObjectInfo& rect){} 
     
 }

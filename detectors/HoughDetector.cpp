@@ -40,11 +40,11 @@ namespace eod{
         maxLineGap = maxLineGap_;
     }
     
-    bool HoughAttribute::Check2(const Mat& image,ExtendedObjectInfo& rect){
+    bool HoughAttribute::Check2(const InfoImage& image,ExtendedObjectInfo& rect){
       return false;
     }
     
-    void HoughAttribute::Extract2(const cv::Mat& image, ExtendedObjectInfo& rect){
+    void HoughAttribute::Extract2(const InfoImage& image, ExtendedObjectInfo& rect){
     }
 
     void HoughAttribute::SetParamsCircle(double d, double md, double p1, double p2, int mr, int Mr){
@@ -59,7 +59,7 @@ namespace eod{
         maxradius = Mr;
     }    
 
-    vector<ExtendedObjectInfo> HoughAttribute::Detect2(const Mat& image, int seq){      
+    vector<ExtendedObjectInfo> HoughAttribute::Detect2(const InfoImage& image, int seq){      
 
         vector<ExtendedObjectInfo> res;
         switch( TypeH ){

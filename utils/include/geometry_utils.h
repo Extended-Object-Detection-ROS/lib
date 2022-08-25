@@ -20,9 +20,9 @@ namespace eod{
     
     cv::Vec3d scaleVec3d(cv::Vec3d src, double scale);
     
-    cv::Point float2intPoint(cv::Point2f);
+    cv::Point float2intPoint(const cv::Point2f&);
     
-    cv::Point2f int2floatPoint(cv::Point);
+    cv::Point2f int2floatPoint(const cv::Point&);
     
     std::vector<cv::Point> float2intPointVector(std::vector<cv::Point2f>);
     
@@ -40,7 +40,9 @@ namespace eod{
  
     double mat_median( cv::Mat channel, bool mask_zeros = false );
     
-    cv::Vec3d get_translation(cv::Point point, cv::Mat camMat, double dist = 1.0);
+    cv::Vec3d get_translation(const cv::Point& point, const cv::Mat& camMat, double dist = 1.0);
+    
+    cv::Point reverse_translation(const cv::Vec3d&, const cv::Mat& camMat);
     
     double range_v3d(cv::Vec3d, cv::Vec3d);
     

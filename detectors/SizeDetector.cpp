@@ -15,12 +15,12 @@ namespace eod{
         maxSizePc = (double)MSpc * 0.01;
     }    
     
-    vector<ExtendedObjectInfo> SizeAttribute::Detect2(const Mat& image, int seq){
+    vector<ExtendedObjectInfo> SizeAttribute::Detect2(const InfoImage& image, int seq){
         vector<ExtendedObjectInfo> rects(0);
         return rects;        
     }
     
-    bool SizeAttribute::Check2(const Mat& image,ExtendedObjectInfo& rect){
+    bool SizeAttribute::Check2(const InfoImage& image,ExtendedObjectInfo& rect){
         int rectArea = rect.width * rect.height;
         int imgArea = image.size().height * image.size().width;
         
@@ -33,7 +33,7 @@ namespace eod{
         return false;
     }
     
-    void SizeAttribute::Extract2(const cv::Mat& image, ExtendedObjectInfo& rect){
+    void SizeAttribute::Extract2(const InfoImage& image, ExtendedObjectInfo& rect){
     }
     
 

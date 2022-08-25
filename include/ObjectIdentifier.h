@@ -14,5 +14,6 @@
 #include "ExtendedObjectInfo.h"
 #include "Attribute.h"
 #include "SimpleObject.h"
+#include "InfoImage.h"
 
 #endif
