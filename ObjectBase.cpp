@@ -847,8 +847,21 @@ namespace eod{
                     break;
                 }
                 case TD_RANGE_R:
-                    tmp_r = new ThreeDimRangeRelation(rel);
+                {
+                    int mode = 0;
+                    rel->Attribute("mode", &mode);
+                    if( mode == CLOSED_RANGE ){
+                        double dist_low = 0, dist_high = 0;
+                        rel->Attribute("distLow", &dist_low);
+                        rel->Attribute("distHigh", &dist_high);
+                        tmp_r = new ThreeDimRangeRelation(mode, dist_low, dist_high);
+                    }
+                    else if(mode == PROB_RANGE){
+                        double dist = 0, prob = 0;
+                        tmp_r = new ThreeDimRangeRelation(mode, dist, prob);
+                    }
                     break;
+                }
                 case SPACE_IN_R:
                     tmp_r = new SpaceInRelation();
                     break;
@@ -959,24 +972,24 @@ namespace eod{
 
         if (!baseO) return false;
 
-        TiXmlElement *scene = baseO->FirstChildElement("ComplexObject");
+        TiXmlElement *co = baseO->FirstChildElement("ComplexObject");
 
 
-        while (scene){
+        while (co){
             
             ComplexObjectGraph* tmpGs = new ComplexObjectGraph();
             
-            String name = scene->Attribute("Name");
+            String name = co->Attribute("Name");
             tmpGs->name = name;
             int ID;
-            scene->Attribute("ID",&ID);
+            co->Attribute("ID",&ID);
             tmpGs->ID = ID;       
             
             double Probability = 0.75;
-            scene->Attribute("Probability",&Probability);
+            co->Attribute("Probability",&Probability);
             tmpGs->Probability = Probability;
                         
-            const char* identify_mode_c = scene->Attribute("Mode");
+            const char* identify_mode_c = co->Attribute("Mode");
             if( identify_mode_c == NULL ){                
                 tmpGs->identify_mode = HARD;
             }
@@ -995,7 +1008,7 @@ namespace eod{
                 }
             }  
             
-            TiXmlElement *object = scene->FirstChildElement("SimpleObject");
+            TiXmlElement *object = co->FirstChildElement("SimpleObject");
             while (object){
                 double w = 1;
                 object->Attribute("Weight", &w);
@@ -1003,7 +1016,7 @@ namespace eod{
                 object = object ->NextSiblingElement("SimpleObject");
             }
             
-            TiXmlElement *relation = scene->FirstChildElement("Relation");
+            TiXmlElement *relation = co->FirstChildElement("Relation");
             while(relation){
                 
                 double w = 1;
@@ -1019,18 +1032,103 @@ namespace eod{
                 relation = relation->NextSiblingElement("Relation");
             }
 
-            // filtering
-            // TODO: make filtering read same for all instatnces
-            TiXmlElement *filter_el = scene->FirstChildElement("Filter");            
+            // filtering            
+            TiXmlElement *filter_el = co->FirstChildElement("Filter");            
             readFilters(filter_el, &(tmpGs->filters));
             
             complex_objects_graph.push_back(tmpGs);
-            scene = scene->NextSiblingElement("ComplexObject");
+            co = co->NextSiblingElement("ComplexObject");
         }
 
         
         return true;
     }
+    
+bool ObjectBase::loadSceneXML(TiXmlDocument *doc){
+    
+    TiXmlElement *base = doc->FirstChildElement("SceneBase");
+    
+    if( !base ) return false;
+    
+    TiXmlElement *scene = base->FirstChildElement("Scene");
+    
+    while(scene){
+        
+        std::string name = scene->Attribute("Name");
+        int ID;
+        scene->Attribute("ID",&ID);
+        
+        Scene *sc = new Scene(name, ID);
+        
+        TiXmlElement *so = scene->FirstChildElement("SimpleObject");
+        double x, y, z, h, r;
+        std::string class_name;
+        std::string name_name;
+        while(so){            
+            readObjectParams(so, x, y, z, h, r);            
+            class_name = so->Attribute("Class");
+            name_name = so->Attribute("Name");
+            SimpleObject* simple = getByName(class_name);
+            if(simple){
+                SceneObject obj(name_name, x, y, z, h, r, simple);
+                sc->add_object(obj);
+            }
+            else{
+                printf("Not found simple object %s in scene %s!\n",name.c_str(), class_name.c_str());
+            }
+            so = so->NextSiblingElement("SimpleObject");
+        }
+        TiXmlElement *co = scene->FirstChildElement("ComplexObject");
+        while(co){            
+            readObjectParams(co, x, y, z, h, r);
+            class_name = so->Attribute("Class");
+            ComplexObjectGraph* complex = getByNameCO(class_name);
+            if(complex){
+                SceneObject obj(name_name, x, y, z, h, r, complex);
+                sc->add_object(obj);
+            }
+            else{
+                printf("Not found complex object %s in scene %s!\n",name.c_str(), class_name.c_str());
+            }
+            co = co->NextSiblingElement("ComplexObject");
+        }
+        
+        TiXmlElement *R = scene->FirstChildElement("Relation");
+        while(r){
+            
+            std::string relation_name = R->Attribute("Class");
+            RelationShip* rel =  getByNameR(relation_name);
+            if(rel){
+                sc->relations.push_back(rel);
+            }
+            else{
+                printf("Can't find relation %s for scene %s!\n", relation_name.c_str(), name.c_str());
+            }            
+            R = R->NextSiblingElement("Relation");
+        }
+        scenes.push_back(sc);     
+        scene = scene->NextSiblingElement("Scene");
+    }            
+    return true;
+}
+    
+    
+void ObjectBase::readObjectParams(TiXmlElement* obj, double &x, double &y, double &z, double &h, double &r){
+    obj->Attribute("x", &x);
+    obj->Attribute("y", &y);
+    obj->Attribute("z", &z);
+    obj->Attribute("h", &h);
+    obj->Attribute("r", &r);
+}
+
+ComplexObjectGraph* ObjectBase::getByNameCO(std::string name){
+    for( auto& co : complex_objects_graph){
+        if( co->name == name)
+            return co;
+    }
+    return NULL;
+}
+    
 #endif
     
     SimpleObject* ObjectBase::getByName(string objectname){

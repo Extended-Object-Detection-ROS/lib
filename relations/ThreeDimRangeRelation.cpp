@@ -1,5 +1,6 @@
 #include "ThreeDimRangeRelation.h"
 #include "geometry_utils.h"
+#include "math_utils.h"
 
 namespace eod{
     
@@ -8,25 +9,24 @@ namespace eod{
         Type = TD_RANGE_R;
     }
     
-    ThreeDimRangeRelation::ThreeDimRangeRelation(TiXmlElement* relation_tag){
+    ThreeDimRangeRelation::ThreeDimRangeRelation(int mode, double param1, double param2){
         Type = TD_RANGE_R;
-        if( relation_tag->Attribute("distLow", &dist_low) && relation_tag->Attribute("distHigh", &dist_high) ){
+        if( mode == CLOSED_RANGE){
+            sub_type = mode;
+            dist_high = param2;
+            dist_low = param1;
             inited = true;
-            sub_type = PURE_METERS;
         }
-//         else if( relation_tag->Attribute("distDiag", &dist) && relation_tag->Attribute("probDiag", &prob) ){
-//             inited = true;
-//             sub_type = OBJ_DIAG_RELATIVE;
-//         }
-        else{
-            printf("ThreeDimRangeRelation has not initied propelly!");
-            inited = false;
-        }   
+        else if( mode == PROB_RANGE){
+            sub_type = mode;
+            dist = param1;
+            prob = param2;
+            inited = true;
+        }        
     }
     
     bool ThreeDimRangeRelation::checkRelation(const cv::Mat& image, ExtendedObjectInfo* A, ExtendedObjectInfo* B){
-        if(inited){
-            
+        if(inited){            
             if( A->tvec.size() == 0 || B->tvec.size() == 0){
                 printf("Object on input to ThreeDimRangeRelation has not 3d translation yet!");
                 return false;
@@ -36,16 +36,13 @@ namespace eod{
                 return false;
             }
             double distance = range_v3d(A->tvec[0], B->tvec[0]);            
-            if(sub_type == PURE_METERS){
+            if(sub_type == CLOSED_RANGE){
                 if( distance > dist_high )            
                     return false;
                 if( distance < dist_low )
                     return false;
                 return true;
             }
-//             if(sub_type == OBJ_DIAG_RELATIVE){
-//                 
-//             }
             else{
                 printf("ThreeDimRangeRelation has unknown sub type!\n");
                 return false;
@@ -56,4 +53,37 @@ namespace eod{
             return false;
         }
     }
+    
+    double ThreeDimRangeRelation::checkSoft(const cv::Mat& image, ExtendedObjectInfo* A, ExtendedObjectInfo* B){
+        if(inited){            
+            if( A->tvec.size() == 0 || B->tvec.size() == 0){
+                printf("Object on input to ThreeDimRangeRelation has not 3d translation yet!");
+                return 0;
+            }
+            if( A->tvec[0][3] == 1 || B->tvec[0][3] == 1){
+                printf("Object on input to ThreeDimRangeRelation has unit 3d translation!");
+                return 0;
+            }
+            double distance = range_v3d(A->tvec[0], B->tvec[0]);            
+            if(sub_type == PROB_RANGE){
+                // TODO
+                double score = normal_pdf(dist, distance, prob);
+                return score;                
+            }
+            else{
+                printf("ThreeDimRangeRelation has unknown sub type!\n");
+                return 0;
+            }
+        }
+        else{
+            printf("ThreeDimRangeRelation isn't inited!\n");
+            return 0;
+        }        
+        return 0;
+    }
+    
+    void ThreeDimRangeRelation::extractParams(const cv::Mat& image, ExtendedObjectInfo* A, ExtendedObjectInfo* B){
+        dist = range_v3d(A->tvec[0], B->tvec[0]);
+    }
+    
 }

@@ -55,6 +55,7 @@ File: Class realises loading simple_simple_objects parameters from XML file
 #include "ComplexObject.h"
 #ifdef USE_IGRAPH
 #include "ComplexObjectGraph.h"
+#include "Scene.h"
 #endif
 // RELATIONS
 #include "LogicRelations.h"
@@ -78,6 +79,8 @@ namespace eod{
         std::vector<ComplexObject*> complex_objects;
 #ifdef USE_IGRAPH        
         std::vector<ComplexObjectGraph*> complex_objects_graph;
+        
+        std::vector<Scene*> scenes;
 #endif
 
         /// <summary>
@@ -193,6 +196,12 @@ namespace eod{
         
 #ifdef USE_IGRAPH        
         bool loadFromXMLsG(TiXmlDocument *doc);
+        
+        bool loadSceneXML(TiXmlDocument *doc);
+        
+        void readObjectParams(TiXmlElement* obj, double &x, double &y, double &z, double &h, double &r);
+        
+        ComplexObjectGraph* getByNameCO(std::string name);
 #endif
 
         /// <summary>
@@ -210,7 +219,7 @@ namespace eod{
         std::vector<std::string> getStringVectorAttribute(TiXmlElement * attr, const char * at_name);
         
         
-        ComplexObject* getByNameNS(std::string scenename);
+        ComplexObject* getByNameNS(std::string complex_obj);
 	
         /// <summary>
         /// Gets pointer to Attribute from list by its name

@@ -11,6 +11,11 @@ namespace eod{
         accuracy = 100;
     }        
     
+    /*
+     * object_name - inner name
+     * object_type - unique id of type
+     * obj_num - index of object in list to find it back
+     */
     int Graph::add_vectice(std::string object_name, int object_type, int obj_num, double dc, double weight){
         // check this already 
         if( vertices_len > 0 ){            

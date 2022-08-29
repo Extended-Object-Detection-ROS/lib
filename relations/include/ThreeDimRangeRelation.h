@@ -6,16 +6,21 @@
 namespace eod{
     
     enum THREE_DIM_RANGE_REL_SUBTYPE{
-        PURE_METERS,
-        //OBJ_DIAG_RELATIVE, //rename
+        CLOSED_RANGE,
+        PROB_RANGE,
     };
     
     class ThreeDimRangeRelation : public RelationShip{
     public:
         ThreeDimRangeRelation();
-        ThreeDimRangeRelation(TiXmlElement* relation_tag);
+        ThreeDimRangeRelation(int mode, double distLow_, double distHigh_);
         
         bool checkRelation(const cv::Mat& image, ExtendedObjectInfo* A, ExtendedObjectInfo* B);
+        
+        double checkSoft(const cv::Mat& image, ExtendedObjectInfo* A, ExtendedObjectInfo* B);
+        
+        void extractParams(const cv::Mat& image, ExtendedObjectInfo* A, ExtendedObjectInfo* B);
+        
     private:
         int sub_type;
         double dist_low, dist_high;
