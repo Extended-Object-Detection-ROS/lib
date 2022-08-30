@@ -86,4 +86,9 @@ namespace eod{
         dist = range_v3d(A->tvec[0], B->tvec[0]);
     }
     
+    RelationShip* ThreeDimRangeRelation::copy(){
+        ThreeDimRangeRelation* copie = new ThreeDimRangeRelation(*this);
+        return (RelationShip*)copie;
+    }
+    
 }

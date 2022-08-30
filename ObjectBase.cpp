@@ -105,6 +105,11 @@ namespace eod{
         loaded &= loadFromXMLsG(doc);
         if( loaded ) printf("Complex objects Graph have been loaded successfully!\n");
         else printf("Error reading Graph complex objects.\n");
+        
+        if( loadSceneXML(doc) )
+            printf("Scenes have been loaded successfully!\n");
+        else 
+            printf("Error reading Scenes.\n");
 #endif
         doc->~TiXmlDocument();
 

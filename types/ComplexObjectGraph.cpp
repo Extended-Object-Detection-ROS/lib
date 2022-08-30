@@ -84,6 +84,14 @@ namespace eod{
         return ec;
     }
     
+    /*
+     * Returns:
+     * vector of sub isomorphisms:
+     *  pair of:
+     *      vector of ids of main which corresponds to sub
+     *      score of isomorphism
+     *  
+     */
     std::vector<std::pair<std::vector<int>, double>> Graph::get_subisomorphisms(Graph * sub_graph){
         
         igraph_vector_ptr_t maps;
@@ -197,6 +205,7 @@ namespace eod{
     }
     
     std::vector<ExtendedObjectInfo> ComplexObjectGraph::Identify(const InfoImage& frame, const InfoImage& depth, int seq ){
+        // TODO analyze sequence
         if( identify_mode == HARD )
             IdentifyHard(frame, depth, seq);
         else

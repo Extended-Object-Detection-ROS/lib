@@ -16,6 +16,8 @@ namespace eod{
         std::string name;        
         std::vector<ExtendedObjectInfo> Identify(const InfoImage& frame, const InfoImage& depth, int seq);
         
+        ExtendedObjectInfo eoi;
+        
     private:
         SimpleObject* so;
         ComplexObjectGraph* co;

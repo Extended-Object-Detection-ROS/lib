@@ -21,6 +21,8 @@ namespace eod{
         
         void extractParams(const cv::Mat& image, ExtendedObjectInfo* A, ExtendedObjectInfo* B);
         
+        RelationShip* copy();
+        
     private:
         int sub_type;
         double dist_low, dist_high;

@@ -55,10 +55,13 @@ namespace eod{
       
       virtual double checkSoft(const cv::Mat& image, ExtendedObjectInfo* A, ExtendedObjectInfo* B){
           return 0;
+      }            
+      
+      
+      virtual RelationShip* copy(){
+          printf("copy not implemented!\n");
+          return NULL;
       }
-      
-      //virtual bool readFromXML(TiXmlElement* relation_tag) = 0;
-      
       
       bool setName(const char*);
 	
