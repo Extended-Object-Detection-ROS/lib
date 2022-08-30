@@ -5,6 +5,8 @@ namespace eod{
     
     double normal_pdf(double x, double m, double s);
     
+    double norm_distribution(double x, double m, double s);
+    
 }
 
 #endif

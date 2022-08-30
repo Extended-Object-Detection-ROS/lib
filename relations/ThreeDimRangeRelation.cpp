@@ -28,11 +28,11 @@ namespace eod{
     bool ThreeDimRangeRelation::checkRelation(const cv::Mat& image, ExtendedObjectInfo* A, ExtendedObjectInfo* B){
         if(inited){            
             if( A->tvec.size() == 0 || B->tvec.size() == 0){
-                printf("Object on input to ThreeDimRangeRelation has not 3d translation yet!");
+                printf("Object on input to ThreeDimRangeRelation has not 3d translation yet!\n");
                 return false;
             }
             if( A->tvec[0][3] == 1 || B->tvec[0][3] == 1){
-                printf("Object on input to ThreeDimRangeRelation has unit 3d translation!");
+                printf("Object on input to ThreeDimRangeRelation has unit 3d translation!\n");
                 return false;
             }
             double distance = range_v3d(A->tvec[0], B->tvec[0]);            
@@ -57,17 +57,18 @@ namespace eod{
     double ThreeDimRangeRelation::checkSoft(const cv::Mat& image, ExtendedObjectInfo* A, ExtendedObjectInfo* B){
         if(inited){            
             if( A->tvec.size() == 0 || B->tvec.size() == 0){
-                printf("Object on input to ThreeDimRangeRelation has not 3d translation yet!");
+                printf("Object on input to ThreeDimRangeRelation has not 3d translation yet!\n");
                 return 0;
             }
             if( A->tvec[0][3] == 1 || B->tvec[0][3] == 1){
-                printf("Object on input to ThreeDimRangeRelation has unit 3d translation!");
+                printf("Object on input to ThreeDimRangeRelation has unit 3d translation!\n");
                 return 0;
             }
             double distance = range_v3d(A->tvec[0], B->tvec[0]);            
             if(sub_type == PROB_RANGE){
-                // TODO
-                double score = normal_pdf(dist, distance, prob);
+                
+                double score = norm_distribution(dist, distance, prob);
+                //printf("%f = norm_distribution(%f, %f, %f)\n",score, dist, distance, prob);
                 return score;                
             }
             else{

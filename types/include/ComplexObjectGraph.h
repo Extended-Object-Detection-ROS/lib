@@ -13,6 +13,8 @@ namespace eod{
     public:
         Graph();
         
+        Graph(const Graph&);
+        
         int add_vectice(std::string object_name, int object_type, int obj_num = 0, double dc = 1, double weight = 1);
         int add_edge(std::string relation_name, int relation_type, int o1, int o2, bool fake = false, double weight = 1);                        
         
@@ -20,9 +22,15 @@ namespace eod{
         
         std::string get_vertice_params(int id, int* object_type, int* obj_num);
         
+        inline int get_vert_len(){
+            return vertices_len;
+        }
+        
         inline int get_edges_len(){
             return edges_len;
         }
+        
+        std::string get_color_info();
         
     private:
         // graph representation

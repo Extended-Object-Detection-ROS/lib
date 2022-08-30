@@ -863,6 +863,8 @@ namespace eod{
                     }
                     else if(mode == PROB_RANGE){
                         double dist = 0, prob = 0;
+                        rel->Attribute("dist", &dist);
+                        rel->Attribute("prob", &prob);
                         tmp_r = new ThreeDimRangeRelation(mode, dist, prob);
                     }
                     break;
@@ -1050,13 +1052,13 @@ namespace eod{
     }
     
 bool ObjectBase::loadSceneXML(TiXmlDocument *doc){
-    
+    //printf("start reading...\n");
     TiXmlElement *base = doc->FirstChildElement("SceneBase");
     
     if( !base ) return false;
     
     TiXmlElement *scene = base->FirstChildElement("Scene");
-    
+    //printf("reading scenes...\n");
     while(scene){
         
         std::string name = scene->Attribute("Name");
@@ -1069,13 +1071,15 @@ bool ObjectBase::loadSceneXML(TiXmlDocument *doc){
         double x, y, z, h, r;
         std::string class_name;
         std::string name_name;
+        //printf("reading simples...\n");
         while(so){            
             readObjectParams(so, x, y, z, h, r);            
             class_name = so->Attribute("Class");
             name_name = so->Attribute("Name");
             SimpleObject* simple = getByName(class_name);
             if(simple){
-                SceneObject obj(name_name, x, y, z, h, r, simple);
+                SceneObject *obj = new SceneObject(name_name, x, y, z, h, r, simple);
+                printf("Adding %s...\n",obj->class_name().c_str());
                 sc->add_object(obj);
             }
             else{
@@ -1083,13 +1087,14 @@ bool ObjectBase::loadSceneXML(TiXmlDocument *doc){
             }
             so = so->NextSiblingElement("SimpleObject");
         }
+        //printf("reading complex...\n");
         TiXmlElement *co = scene->FirstChildElement("ComplexObject");
         while(co){            
             readObjectParams(co, x, y, z, h, r);
             class_name = so->Attribute("Class");
             ComplexObjectGraph* complex = getByNameCO(class_name);
             if(complex){
-                SceneObject obj(name_name, x, y, z, h, r, complex);
+                SceneObject *obj = new SceneObject(name_name, x, y, z, h, r, complex);
                 sc->add_object(obj);
             }
             else{
@@ -1097,9 +1102,9 @@ bool ObjectBase::loadSceneXML(TiXmlDocument *doc){
             }
             co = co->NextSiblingElement("ComplexObject");
         }
-        
+        //printf("reading relations...\n");
         TiXmlElement *R = scene->FirstChildElement("Relation");
-        while(r){
+        while(R){
             
             std::string relation_name = R->Attribute("Class");
             RelationShip* rel =  getByNameR(relation_name);

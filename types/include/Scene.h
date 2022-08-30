@@ -30,7 +30,7 @@ namespace eod{
         Scene();        
         Scene(std::string name, int id);
         
-        void add_object(SceneObject obj);        
+        void add_object(SceneObject* obj);        
                 
         void Identify(const InfoImage& frame, const InfoImage& depth, int seq);
         bool hasClass(std::string class_name);
@@ -41,7 +41,7 @@ namespace eod{
         
     private:
         std::vector<SceneObject*> unique_classes;
-        std::vector<SceneObject> scene_objects;
+        std::vector<SceneObject*> scene_objects;
         
         
         Graph scene_base_graph;

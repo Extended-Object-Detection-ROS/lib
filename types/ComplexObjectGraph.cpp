@@ -10,6 +10,15 @@ namespace eod{
         igraph_empty(&graph, 0, IGRAPH_DIRECTED);
         accuracy = 100;
     }        
+        
+    Graph::Graph(const Graph& other){
+        vertices_len = other.vertices_len;
+        edges_len = other.edges_len;
+        igraph_copy(&graph, &(other.graph));
+        accuracy = other.accuracy;
+        vertices_colors = other.vertices_colors;
+        edges_colors = other.edges_colors;
+    }
     
     /*
      * object_name - inner name
@@ -30,7 +39,7 @@ namespace eod{
             // TODO if check that it exists will be faster
             for( int i = 0 ; i < vertices_len ; i++){
                 if( object_type == VECTOR(types)[i] && obj_num == VECTOR(nums)[i] && object_name == VAS(&graph, "obj_name", i) ){
-                    //printf("Vertice %i already added\n", i);
+                    printf("Vertice %i already added\n", i);
                     return i; //NOTE true?
                 }
             }            
@@ -82,6 +91,18 @@ namespace eod{
             VECTOR(ec)[i] = edges_colors[i];
         //printf("Edges len %i\n",edges_len);
         return ec;
+    }
+    
+    std::string Graph::get_color_info(){
+        std::string info = "Vert:";
+        for(auto& c : vertices_colors){
+            info+=(std::to_string(c)+"-");
+        }
+        info+="\nEdge:";
+        for(auto& e : edges_colors){
+            info+=(std::to_string(e)+"-");
+        }
+        return info;
     }
     
     /*
