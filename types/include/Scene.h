@@ -21,8 +21,19 @@ namespace eod{
     private:
         SimpleObject* so;
         ComplexObjectGraph* co;
-        double x, y, z, h, r;
-        
+        double x, y, z, h, r;        
+    };
+    
+    class RegisteredRelation{
+    public:
+        RegisteredRelation(RelationShip* rel, std::string o1, std::string o2){
+            relation = rel;
+            object_class1 = o1;
+            object_class2 = o2;
+        }
+        RelationShip* relation;
+        std::string object_class1;
+        std::string object_class2;
     };
     
     class Scene{

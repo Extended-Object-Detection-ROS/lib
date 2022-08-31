@@ -32,6 +32,8 @@ namespace eod{
         
         std::string get_color_info();
         
+        bool is_simple();
+        
     private:
         // graph representation
         igraph_t graph;

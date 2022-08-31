@@ -197,6 +197,12 @@ namespace eod{
         *obj_num = VAN(&graph, "obj_num", id);
         return std::string(VAS(&graph, "obj_name", id));        
     }
+    
+    bool Graph::is_simple(){
+        igraph_bool_t res;        
+        igraph_is_simple(&graph, &res);
+        return (bool)res;
+    }
             
     //----------------------
     // COMPLEX

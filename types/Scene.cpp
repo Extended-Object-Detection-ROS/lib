@@ -78,17 +78,21 @@ namespace eod{
     
     void Scene::Identify(const InfoImage& frame, const InfoImage& depth, int seq){        
         Graph observing_scene_graph;       
-        std::vector<RelationShip*> new_relations;
+        std::vector<RegisteredRelation> new_relations;
         
         //printf("1\n");
         // 1. form observing scene graph
         // // 1.1. detecting objects of observing scene
         std::vector<ExtendedObjectInfo> every_detections;
+        std::vector<std::string> classes;
         for( auto& scene_obj : unique_classes){            
-            printf("Identifying <%s>\n",scene_obj->class_name().c_str());
+            
             std::vector<ExtendedObjectInfo> res = scene_obj->Identify(frame, depth, seq);
             //printf("?\n");
+            printf("Identifying <%s> : %i\n",scene_obj->class_name().c_str(), res.size());
             every_detections.insert(every_detections.end(), res.begin(), res.end());            
+            for(size_t i = 0 ; i < res.size() ; i++ ) // this can be done more nicely
+                classes.push_back(scene_obj->class_name());
             //printf("!!\n");
             // // // 1.1.1 add vectices            
             for( size_t i = 0 ;i < res.size(); i++){
@@ -108,9 +112,9 @@ namespace eod{
                     for( auto& rel : relations ){
                         // NOTE: now I try to store all relations, but maybe in future it will better to compare new extracted relation with previour ones (maybe not)
                         rel->extractParams(frame, &every_detections[i], &every_detections[j]);
-                        printf("New relation %i \n",new_relations.size());
+                        printf("New relation %i between %s and %s \n",new_relations.size(), classes[i].c_str(), classes[j].c_str());
                         // copy extracted parameters and store it                        
-                        new_relations.push_back(rel->copy());
+                        new_relations.push_back(RegisteredRelation(rel->copy(), classes[i], classes[j]));
                         // also add relations on observing scene
                         observing_scene_graph.add_edge(rel->Name, new_relations.size()-1, i, j, false, 1);
                     }
@@ -124,18 +128,25 @@ namespace eod{
         Graph main_scene = Graph(scene_base_graph);   
         //printf("graph: %i %i\n", main_scene.get_vert_len(), main_scene.get_edges_len());
         for( size_t k = 0 ; k < new_relations.size(); k++){
-            RelationShip* rel = new_relations[k];
+            RelationShip* rel = new_relations[k].relation;
             for( size_t i = 0 ; i < scene_objects.size() ; i++ ){
+                if( scene_objects[i]->class_name() != new_relations[k].object_class1 )
+                    continue;
                 for( size_t j = i+1 ; j < scene_objects.size() ; j++ ){
+                    if( scene_objects[j]->class_name() != new_relations[k].object_class2 )
+                        continue;
                     if( i != j ){// rudiment
                         //printf("Checking %s...\n",rel->Name.c_str());
                         //printf("$\n");
                         double score = rel->checkSoft(frame, &(scene_objects[i]->eoi), &(scene_objects[j]->eoi));
                         //printf("score %f\n", score);
                         //printf("+\n");
-                        if( score > 0.1){ // WARN 
+                        if( score > 0.01){ // WARN 
                             main_scene.add_edge(rel->Name, k, i, j, false, score);
                             printf("Added base [%s] ---%i,%f--- [%s]\n",scene_objects[i]->name.c_str(), k, score, scene_objects[j]->name.c_str());
+                        }
+                        else{
+                            printf("Skipped [%s] ---%i,%f--- [%s]\n",scene_objects[i]->name.c_str(), k, score, scene_objects[j]->name.c_str());
                         }
                         //printf("-\n");
                     }
@@ -164,6 +175,10 @@ namespace eod{
         printf("obs: %s\n",observing_scene_graph.get_color_info().c_str());
         printf("main: %s\n",main_scene.get_color_info().c_str());
         printf("Isomorphisms size: %i\n",maps.size());
+        
+        
+        printf("obs: %s main: %s\n",observing_scene_graph.is_simple() ? "simple" : "notsimple", main_scene.is_simple() ? "simple" : "notsimple");
+        
         for( size_t i = 0 ; i < maps.size() ; i++ ){            
             std::pair<double,std::vector<std::pair<SceneObject*, ExtendedObjectInfo*>>> scene;
             scene.first = maps[i].second;           
