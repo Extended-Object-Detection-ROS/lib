@@ -5,10 +5,10 @@
 
 namespace eod{
     
-    Graph::Graph(){
+    Graph::Graph(bool directed){
         vertices_len = 0;
         edges_len = 0;
-        igraph_empty(&graph, 0, IGRAPH_DIRECTED);
+        igraph_empty(&graph, 0, directed ? IGRAPH_DIRECTED : IGRAPH_UNDIRECTED);
         accuracy = 100;
     }        
         

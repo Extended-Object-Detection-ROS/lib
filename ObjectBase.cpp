@@ -1107,9 +1107,11 @@ bool ObjectBase::loadSceneXML(TiXmlDocument *doc){
         while(R){
             
             std::string relation_name = R->Attribute("Class");
+            double thresh = 0;
+            R->Attribute("Threshold", &thresh);
             RelationShip* rel =  getByNameR(relation_name);
             if(rel){
-                sc->relations.push_back(rel);
+                sc->add_relation(rel, thresh);
             }
             else{
                 printf("Can't find relation %s for scene %s!\n", relation_name.c_str(), name.c_str());

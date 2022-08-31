@@ -11,7 +11,7 @@ namespace eod{
     class Graph{
         
     public:
-        Graph();
+        Graph(bool directed = true);
         
         Graph(const Graph&);
         

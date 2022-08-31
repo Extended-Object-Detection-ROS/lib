@@ -56,7 +56,8 @@ namespace eod{
     
     Scene::Scene(std::string name_, int id_){
         name = name_;
-        id = id_;                
+        id = id_;     
+        scene_base_graph = Graph(false);
     }    
     
     void Scene::add_object(SceneObject* obj){                
@@ -68,6 +69,10 @@ namespace eod{
         scene_base_graph.add_vectice(obj->name, id, scene_objects.size()-1, 1, 1);                        
     }
     
+    void Scene::add_relation(RelationShip* rel, double threshold){
+        relations.push_back(std::make_pair(rel, threshold));
+    }
+    
     bool Scene::hasClass(std::string class_name){
         for( auto& obj : unique_classes){
             if( obj->class_name() == class_name)
@@ -76,8 +81,8 @@ namespace eod{
         return false;
     }
     
-    void Scene::Identify(const InfoImage& frame, const InfoImage& depth, int seq){        
-        Graph observing_scene_graph;       
+    std::vector<std::pair<double, std::vector<std::pair<SceneObject*, ExtendedObjectInfo*>>>> Scene::Identify(const InfoImage& frame, const InfoImage& depth, int seq){        
+        Graph observing_scene_graph(false);       
         std::vector<RegisteredRelation> new_relations;
         
         //printf("1\n");
@@ -100,8 +105,9 @@ namespace eod{
             }
         }
         printf("%i every_detections\n",every_detections.size());
+        std::vector<std::pair<double, std::vector<std::pair<SceneObject*, ExtendedObjectInfo*>>>> results;        
         if( every_detections.size() == 0 ){            
-            return;
+            return results;
         }
         
         //printf("1.2\n");
@@ -109,14 +115,29 @@ namespace eod{
         for( size_t i = 0 ; i < every_detections.size() ; i++ ){
             for( size_t j = i+1 ; j < every_detections.size() ; j++ ){
                 if( i != j ){// rudiment
-                    for( auto& rel : relations ){
+                    for( auto& rel : relations ){                        
                         // NOTE: now I try to store all relations, but maybe in future it will better to compare new extracted relation with previour ones (maybe not)
-                        rel->extractParams(frame, &every_detections[i], &every_detections[j]);
+                        bool find_appr = false;
+                        for( auto& new_rel : new_relations ){
+                            // check same objects
+                            if( new_rel.object_class1 == classes[i] && new_rel.object_class2 == classes[j] ){
+                                // 
+                                double score = new_rel.relation->checkSoft(frame, &every_detections[i], &every_detections[j]);
+                                if( score > new_rel.threshold ){
+                                    find_appr = true;
+                                    break;
+                                }                                
+                            }
+                        }
+                        if( find_appr )
+                            continue;
+                        
+                        rel.first->extractParams(frame, &every_detections[i], &every_detections[j]);
                         printf("New relation %i between %s and %s \n",new_relations.size(), classes[i].c_str(), classes[j].c_str());
                         // copy extracted parameters and store it                        
-                        new_relations.push_back(RegisteredRelation(rel->copy(), classes[i], classes[j]));
+                        new_relations.push_back(RegisteredRelation(rel.first->copy(), classes[i], classes[j], rel.second));
                         // also add relations on observing scene
-                        observing_scene_graph.add_edge(rel->Name, new_relations.size()-1, i, j, false, 1);
+                        observing_scene_graph.add_edge(rel.first->Name, new_relations.size()-1, i, j, false, 1);
                     }
                 }
             }
@@ -141,7 +162,7 @@ namespace eod{
                         double score = rel->checkSoft(frame, &(scene_objects[i]->eoi), &(scene_objects[j]->eoi));
                         //printf("score %f\n", score);
                         //printf("+\n");
-                        if( score > 0.01){ // WARN 
+                        if( score > new_relations[k].threshold){ // WARN 
                             main_scene.add_edge(rel->Name, k, i, j, false, 1, score);
                             printf("Added base [%s] ---%i,%f--- [%s]\n",scene_objects[i]->name.c_str(), k, score, scene_objects[j]->name.c_str());
                         }
@@ -168,16 +189,15 @@ namespace eod{
          * ------ pointer to scene object
          * ------ pointer to EOI
          */
-        std::vector<std::pair<double, std::vector<std::pair<SceneObject*, ExtendedObjectInfo*>>>> results;
-        
+                
         printf("observing_scene_graph: %i, %i\n",observing_scene_graph.get_vert_len(), observing_scene_graph.get_edges_len());
         printf("main_scene: %i %i\n",main_scene.get_vert_len(), main_scene.get_edges_len());
         printf("obs: %s\n",observing_scene_graph.get_color_info().c_str());
         printf("main: %s\n",main_scene.get_color_info().c_str());
         printf("Isomorphisms size: %i\n",maps.size());
-        
-        
+                
         printf("obs: %s main: %s\n",observing_scene_graph.is_simple() ? "simple" : "notsimple", main_scene.is_simple() ? "simple" : "notsimple");
+        
         
         for( size_t i = 0 ; i < maps.size() ; i++ ){            
             std::pair<double,std::vector<std::pair<SceneObject*, ExtendedObjectInfo*>>> scene;
@@ -190,11 +210,12 @@ namespace eod{
                 obj_pair.first = scene_objects[maps[i].first[j]];
                 obj_pair.second = &every_detections[j];
                 printf("\t[%i] --> [%i] (%s)\n",j, maps[i].first[j], obj_pair.first->name.c_str());
+
+                scene.second.push_back(obj_pair);
             }
-            
-        }
-        
-        
+            results.push_back(scene);
+        }                
+        return results;
     }
     
     

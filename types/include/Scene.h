@@ -18,22 +18,26 @@ namespace eod{
         
         ExtendedObjectInfo eoi;
         
+        double x, y, z, h, r;  
+        
     private:
         SimpleObject* so;
         ComplexObjectGraph* co;
-        double x, y, z, h, r;        
+              
     };
     
     class RegisteredRelation{
     public:
-        RegisteredRelation(RelationShip* rel, std::string o1, std::string o2){
+        RegisteredRelation(RelationShip* rel, std::string o1, std::string o2, double thresh){
             relation = rel;
             object_class1 = o1;
             object_class2 = o2;
+            threshold = thresh;
         }
         RelationShip* relation;
         std::string object_class1;
         std::string object_class2;
+        double threshold;
     };
     
     class Scene{
@@ -43,17 +47,19 @@ namespace eod{
         
         void add_object(SceneObject* obj);        
                 
-        void Identify(const InfoImage& frame, const InfoImage& depth, int seq);
+        std::vector<std::pair<double, std::vector<std::pair<SceneObject*, ExtendedObjectInfo*>>>> Identify(const InfoImage& frame, const InfoImage& depth, int seq);
         bool hasClass(std::string class_name);
+        
+        void add_relation(RelationShip* rel, double threshold);
         
         std::string name;
         int id;        
-        std::vector<RelationShip*> relations;
+        
         
     private:
         std::vector<SceneObject*> unique_classes;
         std::vector<SceneObject*> scene_objects;
-        
+        std::vector<std::pair<RelationShip*, double>> relations;
         
         Graph scene_base_graph;
         
