@@ -1,6 +1,7 @@
 #ifdef USE_IGRAPH
 #include "ComplexObjectGraph.h"
 #include "drawing_utils.h"
+#include <algorithm>
 
 namespace eod{
     
@@ -59,7 +60,7 @@ namespace eod{
         return vertices_len-1;
     }
     
-    int Graph::add_edge(std::string relation_name, int relation_type, int o1, int o2, bool fake, double weight){
+    int Graph::add_edge(std::string relation_name, int relation_type, int o1, int o2, bool fake, double weight, double dc){
         //printf("Trying to added edge between vertices %i and %i\n", o1, o2);
         
         igraph_add_edge(&graph, o1, o2);
@@ -67,12 +68,65 @@ namespace eod{
         SETEAN(&graph, "rel_type", edges_len, relation_type);
         SETEAN(&graph, "fake", edges_len, int(fake));
         SETEAN(&graph, "weight", edges_len, int(weight*accuracy));
+        SETEAN(&graph, "dc", edges_len, int(dc*accuracy));
         
         edges_colors.push_back(relation_type);
         
         edges_len++;
         return edges_len;
     }
+    
+    /* Not working function
+    // If such color (type) edge is already in graph, it will be replaced IF current dc is higher
+    int Graph::add_edge_replace(std::string relation_name, int relation_type, int o1, int o2, bool fake, double weight, double dc){
+        printf("Adding replace \n");
+        //if( edges_len == 0 )
+        if( std::find(edges_colors.begin(), edges_colors.end(), relation_type) == edges_colors.end() )
+            return add_edge(relation_name, relation_type, o1, o2, fake, weight, dc);
+        
+        igraph_es_t es; // edge selector
+        igraph_eit_t eit; // edge iterator
+        
+        //igraph_es_pairs_small(&es, IGRAPH_DIRECTED, o1, o2, -1); // create selector between two vert
+        //igraph_es_all(&es, IGRAPH_EDGEORDER_ID);
+        //igraph_vector_t v;
+        //igraph_vector_init(&v, 2);
+        //VECTOR(v)[0] = o1;
+        //VECTOR(v)[1] = o2;
+        //igraph_es_pairs(&es, &v, IGRAPH_DIRECTED);
+        igraph_es_incident(&es, o1, IGRAPH_ALL);
+        printf("&&&\n");
+        igraph_eit_create(&graph, es, &eit); // create iterator
+        printf("&&&\n");
+        
+        int size_edges = IGRAPH_EIT_SIZE(eit);
+        printf("Size enges %i\n",size_edges);
+        if( size_edges == 0 ){
+            igraph_eit_destroy(&eit);
+            igraph_es_destroy(&es);
+            return add_edge(relation_name, relation_type, o1, o2, fake, weight, dc);
+        }        
+        while( !IGRAPH_EIT_END(eit) ){
+            int edge_id = IGRAPH_EIT_GET(eit);
+            // find same type
+            if( EAN(&graph, "rel_type", edge_id) == relation_type ){
+                if( EAN(&graph, "dc", edge_id) < int(dc*accuracy) ){
+                    SETEAN(&graph, "weight", edges_len, int(weight*accuracy));
+                    SETEAN(&graph, "dc", edges_len, int(dc*accuracy));
+                    
+                    igraph_eit_destroy(&eit);
+                    igraph_es_destroy(&es);
+                    return edges_len;
+                }
+            }
+            IGRAPH_VIT_NEXT(eit);
+        }
+
+        igraph_eit_destroy(&eit);
+        igraph_es_destroy(&es);
+        return edges_len;
+    }
+    */
     
     igraph_vector_int_t Graph::get_vertices_colors(){
         igraph_vector_int_t vc;
@@ -174,13 +228,14 @@ namespace eod{
                             igraph_get_eids(&(sub_graph -> graph), &edge_id, &pair, NULL, 0, 0);
                             int edge_id_ind_tar = VECTOR(edge_id)[0];
                             double k_edge = double(EAN(&(sub_graph->graph), "weight", edge_id_ind_tar))/accuracy;
+                            double dc_edge = double(EAN(&graph, "dc", edge_id_ind))/accuracy;
                             
                             if( EAN(&graph, "fake", edge_id_ind) ){
                                 // IT IS FAKE                                    
                             }
                             else{                                                                
                                 // calc
-                                Dc += k_edge*(k1 * dc1 + k2 * dc2);                                
+                                Dc += dc_edge*k_edge*(k1 * dc1 + k2 * dc2);                                
                             }   
                             denominator += k_edge*(k1 + k2);
                         }

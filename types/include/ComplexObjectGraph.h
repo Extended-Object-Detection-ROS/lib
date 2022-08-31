@@ -16,7 +16,9 @@ namespace eod{
         Graph(const Graph&);
         
         int add_vectice(std::string object_name, int object_type, int obj_num = 0, double dc = 1, double weight = 1);
-        int add_edge(std::string relation_name, int relation_type, int o1, int o2, bool fake = false, double weight = 1);                        
+        int add_edge(std::string relation_name, int relation_type, int o1, int o2, bool fake = false, double weight = 1, double dc = 1);
+        
+        //int add_edge_replace(std::string relation_name, int relation_type, int o1, int o2, bool fake = false, double weight = 1, double dc = 1);
         
         std::vector<std::pair<std::vector<int>, double>> get_subisomorphisms(Graph * sub_graph);
         

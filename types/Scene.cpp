@@ -142,11 +142,11 @@ namespace eod{
                         //printf("score %f\n", score);
                         //printf("+\n");
                         if( score > 0.01){ // WARN 
-                            main_scene.add_edge(rel->Name, k, i, j, false, score);
+                            main_scene.add_edge(rel->Name, k, i, j, false, 1, score);
                             printf("Added base [%s] ---%i,%f--- [%s]\n",scene_objects[i]->name.c_str(), k, score, scene_objects[j]->name.c_str());
                         }
                         else{
-                            printf("Skipped [%s] ---%i,%f--- [%s]\n",scene_objects[i]->name.c_str(), k, score, scene_objects[j]->name.c_str());
+                            //printf("Skipped [%s] ---%i,%f--- [%s]\n",scene_objects[i]->name.c_str(), k, score, scene_objects[j]->name.c_str());
                         }
                         //printf("-\n");
                     }
