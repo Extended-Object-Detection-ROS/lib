@@ -20,6 +20,8 @@ namespace eod{
         
         double x, y, z, h, r;  
         
+        std::vector<ExtendedObjectInfo>* results();
+        
     private:
         SimpleObject* so;
         ComplexObjectGraph* co;
@@ -40,6 +42,14 @@ namespace eod{
         double threshold;
     };
     
+    /*
+    class OutputScene{
+    public:
+        double score;
+        std::vector<std::pair<SceneObject*, ExtendedObjectInfo*>>;
+    private:
+    };*/
+    
     class Scene{
     public:
         Scene();        
@@ -47,13 +57,15 @@ namespace eod{
         
         void add_object(SceneObject* obj);        
                 
-        std::vector<std::pair<double, std::vector<std::pair<SceneObject*, ExtendedObjectInfo*>>>> Identify(const InfoImage& frame, const InfoImage& depth, int seq);
+        void Identify(const InfoImage& frame, const InfoImage& depth, int seq);
         bool hasClass(std::string class_name);
         
         void add_relation(RelationShip* rel, double threshold);
         
         std::string name;
         int id;
+        
+        std::vector<std::pair<double, std::vector<std::pair<SceneObject*, ExtendedObjectInfo*>>>> results;
                 
     private:
         std::vector<SceneObject*> unique_classes;

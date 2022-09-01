@@ -51,6 +51,20 @@ namespace eod{
         }
     }
     
+    std::vector<ExtendedObjectInfo>* SceneObject::results(){        
+        if( so == NULL and co == NULL){
+            printf("SceneObject %s not initialized!\n",name.c_str());
+            return NULL;
+        }
+        else if( co == NULL){
+            return &(so->objects);
+            
+        }
+        else{
+            return &(co->complex_objects); // TODO
+        }
+    }
+    
     Scene::Scene(){       
     }
     
@@ -82,33 +96,33 @@ namespace eod{
         return false;
     }
     
-    std::vector<std::pair<double, std::vector<std::pair<SceneObject*, ExtendedObjectInfo*>>>> Scene::Identify(const InfoImage& frame, const InfoImage& depth, int seq){        
+    void Scene::Identify(const InfoImage& frame, const InfoImage& depth, int seq){        
+        results.clear();
         Graph observing_scene_graph(false);       
         std::vector<RegisteredRelation> new_relations;
         
         //printf("1\n");
         // 1. form observing scene graph
         // // 1.1. detecting objects of observing scene
-        std::vector<ExtendedObjectInfo> every_detections;
+        std::vector<ExtendedObjectInfo*> every_detections;
         std::vector<std::string> classes;
         for( auto& scene_obj : unique_classes){            
+                        
+            scene_obj->Identify(frame, depth, seq);
+            printf("Identifying <%s> : %i\n",scene_obj->class_name().c_str(), scene_obj->results()->size());
             
-            std::vector<ExtendedObjectInfo> res = scene_obj->Identify(frame, depth, seq);
-            //printf("?\n");
-            printf("Identifying <%s> : %i\n",scene_obj->class_name().c_str(), res.size());
-            every_detections.insert(every_detections.end(), res.begin(), res.end());            
-            for(size_t i = 0 ; i < res.size() ; i++ ) // this can be done more nicely
+            for(size_t i = 0 ; i < scene_obj->results()->size() ; i++ ){
+                ExtendedObjectInfo* eoi = &(scene_obj->results()->at(i));
+                
+                every_detections.push_back(eoi);
                 classes.push_back(scene_obj->class_name());
-            //printf("!!\n");
-            // // // 1.1.1 add vectices            
-            for( size_t i = 0 ;i < res.size(); i++){
-                observing_scene_graph.add_vectice(scene_obj->class_name(), scene_obj->ID(), i, res[i].total_score, 1);
-            }
+                
+                observing_scene_graph.add_vectice(scene_obj->class_name(), scene_obj->ID(), i, eoi->total_score, 1);
+            }            
         }
-        printf("%i every_detections\n",every_detections.size());
-        std::vector<std::pair<double, std::vector<std::pair<SceneObject*, ExtendedObjectInfo*>>>> results;        
+        printf("%i every_detections\n",every_detections.size());          
         if( every_detections.size() == 0 ){            
-            return results;
+            return;
         }
         
         //printf("1.2\n");
@@ -123,7 +137,7 @@ namespace eod{
                             // check same objects
                             if( new_rel.object_class1 == classes[i] && new_rel.object_class2 == classes[j] ){
                                 // TODO change on best score?
-                                double score = new_rel.relation->checkSoft(frame, &every_detections[i], &every_detections[j]);
+                                double score = new_rel.relation->checkSoft(frame, every_detections[i], every_detections[j]);
                                 if( score > new_rel.threshold ){
                                     find_appr = true;
                                     break;
@@ -133,7 +147,7 @@ namespace eod{
                         if( find_appr )
                             continue;
                         
-                        rel.first->extractParams(frame, &every_detections[i], &every_detections[j]);
+                        rel.first->extractParams(frame, every_detections[i], every_detections[j]);
                         printf("New relation %i between %s and %s \n",new_relations.size(), classes[i].c_str(), classes[j].c_str());
                         // copy extracted parameters and store it                        
                         new_relations.push_back(RegisteredRelation(rel.first->copy(), classes[i], classes[j], rel.second));
@@ -210,13 +224,13 @@ namespace eod{
                 // maps[i].first[j] - no vectice in main_scene
                 std::pair<SceneObject*, ExtendedObjectInfo*> obj_pair;
                 obj_pair.first = scene_objects[maps[i].first[j]];
-                obj_pair.second = &every_detections[j];
+                obj_pair.second = every_detections[j];
                 printf("\t[%i] --> [%i] (%s)\n",j, maps[i].first[j], obj_pair.first->name.c_str());
 
                 scene.second.push_back(obj_pair);
             }
             results.push_back(scene);
         }                
-        return results;
+        //return results;
     }
 }
