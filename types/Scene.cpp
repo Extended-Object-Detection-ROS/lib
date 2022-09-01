@@ -54,9 +54,10 @@ namespace eod{
     Scene::Scene(){       
     }
     
-    Scene::Scene(std::string name_, int id_){
+    Scene::Scene(std::string name_, int id_, double prob){
         name = name_;
         id = id_;     
+        probability = prob;
         scene_base_graph = Graph(false);
     }    
     
@@ -121,7 +122,7 @@ namespace eod{
                         for( auto& new_rel : new_relations ){
                             // check same objects
                             if( new_rel.object_class1 == classes[i] && new_rel.object_class2 == classes[j] ){
-                                // 
+                                // TODO change on best score?
                                 double score = new_rel.relation->checkSoft(frame, &every_detections[i], &every_detections[j]);
                                 if( score > new_rel.threshold ){
                                     find_appr = true;
@@ -197,11 +198,12 @@ namespace eod{
         printf("Isomorphisms size: %i\n",maps.size());
                 
         printf("obs: %s main: %s\n",observing_scene_graph.is_simple() ? "simple" : "notsimple", main_scene.is_simple() ? "simple" : "notsimple");
-        
-        
+                
         for( size_t i = 0 ; i < maps.size() ; i++ ){            
             std::pair<double,std::vector<std::pair<SceneObject*, ExtendedObjectInfo*>>> scene;
             scene.first = maps[i].second;           
+            if( scene.first < probability )
+                continue;
             printf("Scene %i %f\n", i, scene.first);
             for( size_t j = 0 ; j < maps[i].first.size() ; j++ ){
                 // j - no vectice in observing_scene_graph
@@ -217,7 +219,4 @@ namespace eod{
         }                
         return results;
     }
-    
-    
-    
 }

@@ -43,7 +43,7 @@ namespace eod{
     class Scene{
     public:
         Scene();        
-        Scene(std::string name, int id);
+        Scene(std::string name, int id, double prob);
         
         void add_object(SceneObject* obj);        
                 
@@ -53,15 +53,16 @@ namespace eod{
         void add_relation(RelationShip* rel, double threshold);
         
         std::string name;
-        int id;        
-        
-        
+        int id;
+                
     private:
         std::vector<SceneObject*> unique_classes;
         std::vector<SceneObject*> scene_objects;
         std::vector<std::pair<RelationShip*, double>> relations;
         
         Graph scene_base_graph;
+        
+        double probability;
         
     };    
 }
