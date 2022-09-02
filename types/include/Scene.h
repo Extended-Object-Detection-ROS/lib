@@ -66,10 +66,12 @@ namespace eod{
         int id;
         
         std::vector<std::pair<double, std::vector<std::pair<SceneObject*, ExtendedObjectInfo*>>>> results;
-                
+        
+        std::vector<SceneObject*> scene_objects;
+        
     private:
         std::vector<SceneObject*> unique_classes;
-        std::vector<SceneObject*> scene_objects;
+        
         std::vector<std::pair<RelationShip*, double>> relations;
         
         Graph scene_base_graph;
