@@ -179,7 +179,6 @@ namespace eod{
         
         return objects;
     }
-
     
     vector<ExtendedObjectInfo> SimpleObject::IdentifySoft(const InfoImage& frame, const InfoImage& depth, int seq){
         ExtendedObjectInfo fake_empty_rect = ExtendedObjectInfo(0,0,frame.size().width, frame.size().height);
@@ -260,10 +259,10 @@ namespace eod{
                 }
             }            
             else if(mode_attributes[i].first.first == EXTRACT){
-                if( mode_attributes[0].first.second == RGB)
-                    mode_attributes[0].second->Extract(frame, &objects);
-                else if( mode_attributes[0].first.second == DEPTH)
-                    mode_attributes[0].second->Extract(depth, &objects);
+                if( mode_attributes[i].first.second == RGB)
+                    mode_attributes[i].second->Extract(frame, &objects);
+                else if( mode_attributes[i].first.second == DEPTH)
+                    mode_attributes[i].second->Extract(depth, &objects);
             }
             fake_empty_rect.setScoreWeight(0, mode_attributes[i].second->Weight);                                                
         }
