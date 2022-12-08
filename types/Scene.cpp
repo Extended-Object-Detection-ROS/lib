@@ -133,13 +133,16 @@ namespace eod{
                     for( auto& rel : relations ){                        
                         // NOTE: now I try to store all relations, but maybe in future it will better to compare new extracted relation with previour ones (maybe not)
                         bool find_appr = false;
-                        for( auto& new_rel : new_relations ){
+                        //for( auto& new_rel : new_relations ){
+                        for( size_t k = 0 ; k < new_relations.size(); k++){
+                            auto new_rel = new_relations[k];
                             // check same objects
                             if( new_rel.object_class1 == classes[i] && new_rel.object_class2 == classes[j] ){
                                 // TODO change on best score?
                                 double score = new_rel.relation->checkSoft(frame, every_detections[i], every_detections[j]);
                                 if( score > new_rel.threshold ){
-                                    find_appr = true;
+                                    observing_scene_graph.add_edge(rel.first->Name, k, i, j, false, 1, score);
+                                    find_appr = true;                                    
                                     break;
                                 }                                
                             }
