@@ -120,6 +120,8 @@ namespace eod{
             return EI_STR_CHECK_A;
         if(name == "unittranslation")
             return UNIT_TRANS_EXTR_A;
+        if(name == "squareobjectdistance")
+            return SQUARE_OBJ_DIST_EXTR_A;
         
         printf("Unknown attribute type %s!",name.c_str());
         return UNK_A;

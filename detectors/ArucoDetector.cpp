@@ -61,8 +61,7 @@ namespace eod{
         if( seq != 0)
             prev_seq = seq;
         return rects;       
-    }
-          
+    }          
         
     bool ArucoAttribute::Check2(const InfoImage& image,ExtendedObjectInfo& rect){
         return false;        
