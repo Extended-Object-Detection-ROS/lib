@@ -172,6 +172,7 @@ namespace eod{
             AttributeTypes type = getAttributeTypeFromName(type_name);
             
             if (type == UNK_A){
+                printf("Not found attribute with name %s\n",type_name.c_str());
                 attr = attr->NextSiblingElement("Attribute");
                 continue;
             }
@@ -537,9 +538,16 @@ namespace eod{
                 tmpA = new UnitTranslationExtracter();
                 break;
             }
+            case SQUARE_OBJ_DIST_EXTR_A:
+            {
+                double length = 0;
+                attr->Attribute("length", &length);
+                tmpA = new SquareObjectDistanceAttribute(length);
+                break;
+            }
             
             default:
-            {
+            {                
                 attr = attr->NextSiblingElement("Attribute");
                 continue;
             }
