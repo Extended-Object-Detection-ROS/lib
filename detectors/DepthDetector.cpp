@@ -1,6 +1,7 @@
 #include "DepthDetector.h"
 #include "geometry_utils.h"
 #include "ObjectBase.h"
+#include "contour_utils.h"
 
 using namespace std;
 using namespace cv;
@@ -74,6 +75,13 @@ namespace eod{
                 imshow("depth", image2draw);
                 waitKey(1);
                 */
+            }
+            else if( mode == MASK){
+                Rect rect_of_depth_image = Rect(0, 0, image.size().width, image.size().height);
+                Mat cropped = image(rect.getRect() & rect_of_depth_image); 
+                Mat mask = contour_to_mask(shift_contours(rect.contour, rect.tl()), cropped.size());
+                distance = mat_median(cropped, true, mask);
+                
             }
             else{
                 printf("Unknown mode in DepthAttribute!\n");

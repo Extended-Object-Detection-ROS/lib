@@ -38,7 +38,7 @@ namespace eod{
     
     cv::Mat createClosenessMap(std::vector<ExtendedObjectInfo>* rect1, std::vector<ExtendedObjectInfo>* rect2, double iou_threshold_d);                
  
-    double mat_median( cv::Mat channel, bool mask_zeros = false );
+    double mat_median( cv::Mat channel, bool mask_zeros = false,  cv::Mat custom_mask = cv::Mat() );
     
     cv::Vec3d get_translation(const cv::Point& point, const cv::Mat& camMat, double dist = 1.0);
     

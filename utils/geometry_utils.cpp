@@ -141,12 +141,16 @@ namespace eod{
         return closenessMapD;
     }
     
-    double mat_median( cv::Mat channel, bool mask_zeros ){
-        Mat mask;
+    double mat_median( cv::Mat channel, bool mask_zeros, cv::Mat custom_mask){
+        Mat mask = Mat::zeros(channel.size(), CV_8UC1);
         if( mask_zeros ){
             cv::inRange( channel, 0, 0, mask);
             cv::bitwise_not(mask, mask);
         }
+        if( !custom_mask.empty())
+            cv::bitwise_and(mask, custom_mask, mask);
+        
+        imshow("mask median debug", mask);
         
         int m = (channel.rows*channel.cols) / 2;
         int bin = 0;
@@ -158,10 +162,12 @@ namespace eod{
         bool uniform = true;
         bool accumulate = false;
         cv::Mat hist;
-        if( mask_zeros )
-            cv::calcHist( &channel, 1, 0, mask, hist, 1, &histSize, &histRange, uniform, accumulate );
-        else
-            cv::calcHist( &channel, 1, 0, cv::Mat(), hist, 1, &histSize, &histRange, uniform, accumulate );
+        
+        
+        //if( mask_zeros )
+        cv::calcHist( &channel, 1, 0, mask, hist, 1, &histSize, &histRange, uniform, accumulate );
+//         else
+//             cv::calcHist( &channel, 1, 0, cv::Mat(), hist, 1, &histSize, &histRange, uniform, accumulate );
 
         for ( int i = 0; i < histSize && med < 0.0; ++i )
         {
