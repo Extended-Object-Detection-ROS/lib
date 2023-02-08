@@ -18,7 +18,7 @@ namespace eod{
         /// </summary>
         DnnAttribute();
         
-        DnnAttribute(std::string framework_name, std::string weights_file, std::string config_file, int inpWidth, int inpHeight, std::string labelMap, bool forceCuda =false);
+        DnnAttribute(std::string framework_name, std::string weights_file, std::string config_file, int inpWidth, int inpHeight, std::string labelMap, bool forceCuda =false, std::vector<std::string> additional_layers = std::vector<std::string>(0), double maskProbability = 0.75);
         
         /// <summary>
         /// Detects aruco markers with 
@@ -42,6 +42,9 @@ namespace eod{
         std::string label_file;
         int inpWidth;
         int inpHeight;
+        std::vector<std::string> process_layers_names;
+        std::vector<std::string> process_layers_types;
+        double maskProbability;
         
     private:        
         

@@ -362,15 +362,19 @@ namespace eod{
                 }                
                                 
                 int inpWidth = 300;
-                int inpHeight = 300;
-                
+                int inpHeight = 300;                
                 attr->Attribute("inputWidth", &inpWidth);                
                 attr->Attribute("inputHeight", &inpHeight);    
                                                 
                 int forceCuda = 0;
-                attr->Attribute("forceCuda", &forceCuda);                
+                attr->Attribute("forceCuda", &forceCuda);      
                 
-                tmpA = new DnnAttribute(framework, weights, config, inpWidth, inpHeight, labels_str, (forceCuda != 0));
+                vector<string> additional_layers = getStringVectorAttribute(attr, "additional_layers");
+                                
+                double maskProbability = 0.75;
+                attr->Attribute("maskProbability",&maskProbability);
+                
+                tmpA = new DnnAttribute(framework, weights, config, inpWidth, inpHeight, labels_str, (forceCuda != 0), additional_layers, maskProbability);
                 break;
             }
             case QR_A:
