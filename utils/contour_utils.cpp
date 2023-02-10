@@ -80,5 +80,9 @@ namespace eod{
         return mask;
     }
     
+//     int calc_mask_area(const cv::Mat& mask){
+//         return countNonZero(mask);
+//     }
+    
     
 }
