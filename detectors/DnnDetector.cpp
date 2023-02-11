@@ -233,8 +233,8 @@ namespace eod{
                                 Mat hierarchy;
                                 mask.convertTo(mask, CV_8U);                                
                                 findContours(mask, contours, hierarchy, RETR_CCOMP, CHAIN_APPROX_SIMPLE);
-                                                                                                
-                                tmp.contour.push_back(shift_contour(contours[0], -tmp.tl()));                                
+                                if( contours.size())
+                                    tmp.contour.push_back(shift_contour(contours[0], -tmp.tl()));                                
                             }
                             
                             saved_answer.push_back(tmp);
