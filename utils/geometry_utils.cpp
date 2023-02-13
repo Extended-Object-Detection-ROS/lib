@@ -1,4 +1,5 @@
 #include "geometry_utils.h"
+#include "drawing_utils.h"
 
 using namespace cv;
 using namespace std;
@@ -141,35 +142,34 @@ namespace eod{
         return closenessMapD;
     }
     
-    double mat_median( cv::Mat channel, bool mask_zeros ){
-        Mat mask;
+    double mat_median( const cv::Mat& channel, bool mask_zeros, cv::Mat custom_mask, int max_dist_cm){
+        Mat mask = Mat::zeros(channel.size(), CV_8UC1);        
         if( mask_zeros ){
             cv::inRange( channel, 0, 0, mask);
             cv::bitwise_not(mask, mask);
         }
-        
-        int m = (channel.rows*channel.cols) / 2;
+        if( !custom_mask.empty())
+            cv::bitwise_and(mask, custom_mask, mask);                
+                
+        int m = countNonZero(mask)/2;
         int bin = 0;
         double med = -1.0;
 
-        int histSize = 65536;
-        float range[] = { 0, 65536 };
+        int histSize = std::min(max_dist_cm, 65536);//16^2
+        float range[] = { 0, histSize };
         const float* histRange = { range };
         bool uniform = true;
         bool accumulate = false;
-        cv::Mat hist;
-        if( mask_zeros )
-            cv::calcHist( &channel, 1, 0, mask, hist, 1, &histSize, &histRange, uniform, accumulate );
-        else
-            cv::calcHist( &channel, 1, 0, cv::Mat(), hist, 1, &histSize, &histRange, uniform, accumulate );
-
+        cv::Mat hist;                        
+        cv::calcHist( &channel, 1, 0, mask, hist, 1, &histSize, &histRange, uniform, accumulate );
+        
         for ( int i = 0; i < histSize && med < 0.0; ++i )
         {
-            bin += cvRound( hist.at< float >( i ) );
+            bin += cvRound( hist.at<float>( i ) );                        
             if ( bin > m && med < 0.0 ){
-                med = i;            
+                med = i;                   
             }
-        }
+        }        
         return med;
     }
     

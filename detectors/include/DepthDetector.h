@@ -5,14 +5,14 @@
 
 namespace eod{
     
-    enum DEPTH_EXTRACT_MODE {ALL_BOX, HALF_SIZE_BOX, CENTER_PX};
+    enum DEPTH_EXTRACT_MODE {ALL_BOX, HALF_SIZE_BOX, CENTER_PX, MASK};
 
     class DepthAttribute : public Attribute{
     public:
         
         DepthAttribute();        
         
-        DepthAttribute(int mode );
+        DepthAttribute(int mode, double max_dist_m );
         
         std::vector<ExtendedObjectInfo> Detect2(const InfoImage& image, int seq);
         
@@ -22,7 +22,7 @@ namespace eod{
         
     private:        
         int mode;
-        
+        double max_dist_m;
     };
     
 }
