@@ -53,7 +53,7 @@ namespace eod{
     class Scene{
     public:
         Scene();        
-        Scene(std::string name, int id, double prob);
+        Scene(std::string name, int id, double prob, std::string frame_id);
         
         void add_object(SceneObject* obj);        
                 
@@ -64,6 +64,7 @@ namespace eod{
         
         std::string name;
         int id;
+        std::string frame_id;
         
         std::vector<std::pair<double, std::vector<std::pair<SceneObject*, ExtendedObjectInfo*>>>> results;
         
@@ -77,6 +78,7 @@ namespace eod{
         Graph scene_base_graph;
         
         double probability;
+        
         
     };    
 }

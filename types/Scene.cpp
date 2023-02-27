@@ -68,11 +68,12 @@ namespace eod{
     Scene::Scene(){       
     }
     
-    Scene::Scene(std::string name_, int id_, double prob){
+    Scene::Scene(std::string name_, int id_, double prob, std::string frame_id_){
         name = name_;
         id = id_;     
         probability = prob;
         scene_base_graph = Graph(false);
+        frame_id = frame_id_;
     }    
     
     void Scene::add_object(SceneObject* obj){                

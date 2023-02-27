@@ -1080,8 +1080,9 @@ bool ObjectBase::loadSceneXML(TiXmlDocument *doc){
         scene->Attribute("ID",&ID);
         double prob;
         scene->Attribute("Probability",&prob);
+        std::string frame_id = scene->Attribute("frame_id");
         
-        Scene *sc = new Scene(name, ID, prob);
+        Scene *sc = new Scene(name, ID, prob, frame_id);
         
         TiXmlElement *so = scene->FirstChildElement("SimpleObject");
         double x, y, z, h, r;
