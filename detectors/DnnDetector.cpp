@@ -45,7 +45,7 @@ namespace eod{
         smatch matcherName;
         const regex reEntry("item \\{([\\S\\s]*?)\\}");
         const regex reId(" [0-9]+");
-        const regex reDispName("\"[a-z\\s]+\"");
+        const regex reDispName("\"[A-Za-z\\s]+\"");
         
         string entry;
 
