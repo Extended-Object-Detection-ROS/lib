@@ -13,6 +13,14 @@ namespace eod{
         return shifted_contour;
     }
     
+    std::vector<std::vector< cv::Point> > shift_contours(std::vector<std::vector <cv::Point> > &contour, cv::Point shift){
+        vector<vector<Point> > shifted_contour;
+        for( auto& cnt : contour ){
+            shifted_contour.push_back(shift_contour(cnt, shift));
+        }
+        return shifted_contour;
+    }
+    
     vector< Point> intersect_contours(vector <Point>& contour1, vector <Point>& contour2){
         return merge_contours(contour1, contour2, 0);
     }
@@ -26,16 +34,20 @@ namespace eod{
         Rect work_area = boundingRect( contour1 ) | boundingRect( contour2 );        
         
         Mat merged = Mat::zeros(work_area.size(), CV_8UC1);        
-        Mat contour1_im = Mat::zeros(work_area.size(), CV_8UC1);
-        Mat contour2_im = Mat::zeros(work_area.size(), CV_8UC1);
+        //Mat contour1_im = Mat::zeros(work_area.size(), CV_8UC1);
+        //Mat contour2_im = Mat::zeros(work_area.size(), CV_8UC1);
         
         //draw
         vector<vector<Point> > shifted1;
         shifted1.push_back(shift_contour(contour1, work_area.tl()));
-        drawContours( contour1_im, shifted1, -1, 255, -1);
+        //drawContours( contour1_im, shifted1, -1, 255, -1);
+        Mat contour1_im  = contour_to_mask(shifted1, work_area.size());
+        
+        
         vector<vector<Point> > shifted2;
         shifted2.push_back(shift_contour(contour2, work_area.tl()));
-        drawContours( contour2_im, shifted2, -1, 255, -1);
+        //drawContours( contour2_im, shifted2, -1, 255, -1);
+        Mat contour2_im  = contour_to_mask(shifted2, work_area.size());
         
         //imshow("contour1 debug", contour1_im);
         //imshow("contour2 debug", contour2_im);        
@@ -61,6 +73,16 @@ namespace eod{
         else
             return vector<Point>() ;
     }
+    
+    cv::Mat contour_to_mask(const std::vector<std::vector<cv::Point> > &contour, const cv::Size source){
+        Mat mask = Mat::zeros(source, CV_8UC1);
+        drawContours( mask, contour, -1, 255, -1);
+        return mask;
+    }
+    
+//     int calc_mask_area(const cv::Mat& mask){
+//         return countNonZero(mask);
+//     }
     
     
 }

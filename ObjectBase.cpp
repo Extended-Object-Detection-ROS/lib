@@ -167,6 +167,7 @@ namespace eod{
             AttributeTypes type = getAttributeTypeFromName(type_name);
             
             if (type == UNK_A){
+                printf("Not found attribute with name %s\n",type_name.c_str());
                 attr = attr->NextSiblingElement("Attribute");
                 continue;
             }
@@ -356,15 +357,19 @@ namespace eod{
                 }                
                                 
                 int inpWidth = 300;
-                int inpHeight = 300;
-                
+                int inpHeight = 300;                
                 attr->Attribute("inputWidth", &inpWidth);                
                 attr->Attribute("inputHeight", &inpHeight);    
                                                 
                 int forceCuda = 0;
-                attr->Attribute("forceCuda", &forceCuda);                
+                attr->Attribute("forceCuda", &forceCuda);      
                 
-                tmpA = new DnnAttribute(framework, weights, config, inpWidth, inpHeight, labels_str, (forceCuda != 0));
+                vector<string> additional_layers = getStringVectorAttribute(attr, "additional_layers");
+                                
+                double maskProbability = 0.75;
+                attr->Attribute("maskProbability",&maskProbability);
+                
+                tmpA = new DnnAttribute(framework, weights, config, inpWidth, inpHeight, labels_str, (forceCuda != 0), additional_layers, maskProbability);
                 break;
             }
             case QR_A:
@@ -470,8 +475,10 @@ namespace eod{
             case DEPTH_A:
             {                
                 int mode = 0;                
+                double max_dist_m = 12;
                 attr->Attribute("mode", &mode);
-                tmpA = new DepthAttribute(mode);
+                attr->Attribute("max_dist_m", &max_dist_m);
+                tmpA = new DepthAttribute(mode, max_dist_m);
                 break;
             }
             case ROUGH_DIST_A:
@@ -532,9 +539,16 @@ namespace eod{
                 tmpA = new UnitTranslationExtracter();
                 break;
             }
+            case SQUARE_OBJ_DIST_EXTR_A:
+            {
+                double length = 0;
+                attr->Attribute("length", &length);
+                tmpA = new SquareObjectDistanceAttribute(length);
+                break;
+            }
             
             default:
-            {
+            {                
                 attr = attr->NextSiblingElement("Attribute");
                 continue;
             }

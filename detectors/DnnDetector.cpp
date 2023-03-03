@@ -3,6 +3,7 @@
 #include "DnnDetector.h"
 #include <regex>
 #include <fstream> 
+#include "contour_utils.h"
 
 using namespace std;
 using namespace cv;
@@ -10,22 +11,6 @@ using namespace dnn;
 
 namespace eod{
     
-    vector<String> getOutputsNames(const Net& net)
-	{
-	    vector<String> names;  // was static
-	    if (names.empty()) // commented because of https://answers.opencv.org/question/202612/using-two-dnn-networks-causes-crash/
-	    {
-	        //Get the indices of the output layers, i.e. the layers with unconnected outputs
-	        vector<int> outLayers = net.getUnconnectedOutLayers();
-	        //get the names of all the layers in the network
-	        vector<String> layersNames = net.getLayerNames();
-	        // Get the names of the output layers in names
-	        names.resize(outLayers.size());
-	        for (size_t i = 0; i < outLayers.size(); ++i)
-	        names[i] = layersNames[outLayers[i] - 1];
-	    }
-	    return names;
-	}
 	
 	bool readLabelsMap(string fileName, map<int, string> &labelsMap){
         // Read file into a string        
@@ -81,7 +66,7 @@ namespace eod{
         Type = DNN_A;        
     }
     
-    DnnAttribute::DnnAttribute(string framework_name, string weights_file, string config_file, int inpWidth_, int inpHeight_, string labelmapfile, bool forceCuda ){
+    DnnAttribute::DnnAttribute(string framework_name, string weights_file, string config_file, int inpWidth_, int inpHeight_, string labelmapfile, bool forceCuda, std::vector<std::string> additional_layers, double maskProbability_ ){
         Type = DNN_A;          
         
         transform(framework_name.begin(), framework_name.end(), framework_name.begin(),[](unsigned char c){ return tolower(c); });
@@ -126,6 +111,31 @@ namespace eod{
         inpWidth = inpWidth_;
         inpHeight = inpHeight_;            
         isLabelMap = readLabelsMap(labelmapfile, labelMap);
+        
+        //process_layers_names = getOutputsNames(net);
+        process_layers_names = net.getUnconnectedOutLayersNames();
+        
+        auto it = additional_layers.begin();
+        while( it != additional_layers.end() ){
+            //printf("Checking %s...\n", it->c_str());
+            if( net.getLayerId(*it) == -1 ){
+                printf("DnnAttribute: no additional layer %s in net! Layer will be skipped.\n", it->c_str());
+                it = additional_layers.erase(it);                
+            }
+            else
+                ++it;
+        }
+        
+        process_layers_names.insert( process_layers_names.end(), additional_layers.begin(), additional_layers.end() );     
+        
+        for( const auto& name : process_layers_names){
+            int id = net.getLayerId(name);
+            process_layers_types.push_back(net.getLayer(id)->type);
+            //printf("Layer type %s\n",process_layers_types.back().c_str());
+        }
+        
+        maskProbability = maskProbability_;
+        
     }
     
     vector<ExtendedObjectInfo> DnnAttribute::Detect2(const InfoImage& image, int seq){
@@ -135,21 +145,23 @@ namespace eod{
             if( framework == DN_DNN_FW )
                 blobFromImage(image, blob, 1/255.0, Size(inpWidth,inpHeight), Scalar(0,0,0), true, false);
             
-            else if( framework == TF_DNN_FW )
+            else if( framework == TF_DNN_FW ){
                 blobFromImage(image, blob, 1.0, Size(inpWidth,inpHeight), Scalar(0,0,0), true, false);
+                //blobFromImage(image, blob, 1.0, Size(image.cols, image.rows), Scalar(), true, false);      
+            }
             
             net.setInput(blob);        
             // output net
             vector<Mat> outs;        
-            net.forward(outs, getOutputsNames(net));        
-            
-            std::vector<int> outLayers = net.getUnconnectedOutLayers(); // was static
-            std::string outLayerType = net.getLayer(outLayers[0])->type; // was static
+            net.forward(outs, process_layers_names);        
+                        
                             
             saved_answer.clear();
             for (int i = 0; i < outs.size(); i++) {
+                
                 float* data = (float*)outs[i].data;
-                 if (outLayerType == "Region"){                                     
+                std::string outLayerType = process_layers_types[i];
+                if (outLayerType == "Region"){// darknet style                
                     for (int j = 0; j < outs[i].rows; ++j, data += outs[i].cols)
                     {
                         Mat scores = outs[i].row(j).colRange(5, outs[i].cols);
@@ -178,7 +190,7 @@ namespace eod{
                     }
         
                 }
-                else if (outLayerType == "DetectionOutput"){
+                else if (outLayerType == "DetectionOutput"){// tf style
                     float* data = (float*)outs[i].data;
                     for (size_t k = 0; k < outs[i].total(); k += 7)
                     {
@@ -203,18 +215,32 @@ namespace eod{
                             }
                             ExtendedObjectInfo tmp = ExtendedObjectInfo(Rect(left, top, width, height));
                             tmp.setScoreWeight(confidence, Weight);                            
-                            int pos = (int)(data[k + 1]);
-                            set_extracted_info(tmp, "class_id", (int)(data[k + 1]));                            
+                            int class_id = (int)(data[k + 1]);
+                            set_extracted_info(tmp, "class_id", class_id);                            
                             
                             if(isLabelMap){                                
-                                set_extracted_info(tmp, "class_label", labelMap[(int)(data[k + 1])]);                                
+                                set_extracted_info(tmp, "class_label", labelMap[class_id]);                                
+                            }
+                            
+                            auto mask_layer = std::find(process_layers_types.begin(), process_layers_types.end(), "Sigmoid");
+                            if( mask_layer != process_layers_types.end() ){
+                                int mask_index = mask_layer - process_layers_types.begin();
+                                Mat mask(outs[mask_index].size[2], outs[mask_index].size[3], CV_32F, outs[mask_index].ptr<float>(k,class_id));
+                                resize(mask, mask, Size(tmp.width, tmp.height));
+                                mask = (mask > maskProbability);
+                                
+                                vector<vector<Point> > contours;
+                                Mat hierarchy;
+                                mask.convertTo(mask, CV_8U);                                
+                                findContours(mask, contours, hierarchy, RETR_CCOMP, CHAIN_APPROX_SIMPLE);
+                                if( contours.size())
+                                    tmp.contour.push_back(shift_contour(contours[0], -tmp.tl()));                                
                             }
                             
                             saved_answer.push_back(tmp);
-                        }
-                        
+                        }                        
                     }                        
-                }                
+                }        
             }
             prev_seq = seq;
             return saved_answer;

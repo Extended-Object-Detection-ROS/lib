@@ -9,6 +9,8 @@ namespace eod{
     
     cv::Point drawFilledRectangleWithText(cv::Mat image, cv::Point topleft, std::string text, cv::Scalar col);
     
+    cv::Mat drawOneChannelHist(const cv::Mat hist, int hist_h = 100);
+    
 }
 
 #endif

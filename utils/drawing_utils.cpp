@@ -24,4 +24,18 @@ namespace eod{
         addWeighted(col, alpha, roi, 1.0 - alpha , 0.0, roi); 
     }
     
+    Mat drawOneChannelHist(const Mat hist, int hist_h){
+        
+        int histSize = hist.rows;
+        Mat hist_image(hist_h, histSize, CV_8UC1, Scalar(0) );
+        Mat n_hist;        
+        normalize(hist, n_hist, 0, hist_image.rows, NORM_MINMAX, -1, Mat() );
+        
+        for( int i = 1; i < histSize; i++ ){
+            line( hist_image, Point( (i-1), hist_h - cvRound(n_hist.at<float>(i-1)) ) ,
+                  Point( (i), hist_h - cvRound(n_hist.at<float>(i)) ),
+                  Scalar(255), 2, 8, 0  );
+        }        
+        return hist_image;
+    }
 }

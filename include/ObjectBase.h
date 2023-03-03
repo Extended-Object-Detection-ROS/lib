@@ -48,7 +48,7 @@ File: Class realises loading simple_simple_objects parameters from XML file
 #include "ExtractedInfoIdChecker.h"
 #include "ExtractedInfoStringChecker.h"
 #include "UnitTranslationExtracter.h"
-
+#include "SquareObjectDistanceDetector.h"
 
 #include "Filtering.h"
 
