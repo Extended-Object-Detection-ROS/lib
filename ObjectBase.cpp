@@ -546,7 +546,16 @@ namespace eod{
                 tmpA = new SquareObjectDistanceAttribute(length);
                 break;
             }
-            
+#if (USE_TORCH)            
+            case TORCH_A:
+            {
+                string model_path = getPathAttribute(attr, "model_path");
+                int input_size = 0;
+                attr->Attribute("input_size", &input_size);
+                tmpA = new TorchAttribute(model_path, input_size);
+                break;
+            }
+#endif            
             default:
             {                
                 attr = attr->NextSiblingElement("Attribute");
