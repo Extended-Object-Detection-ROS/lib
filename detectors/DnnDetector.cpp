@@ -94,8 +94,17 @@ namespace eod{
             }
             inited = true;
         }                
+        else if( framework_name == "onnx"){
+            framework = ONNX_DNN_FW;
+            net = readNetFromONNX(weights_file);
+            if( net.empty() ){
+                printf("Unable to load ONNX net in DnnAttribute\n");
+                return;
+            }
+            inited = true;            
+        }
         else{
-            printf("Error: unknown DNN framework '%s' in DnnAtribute\n",framework_name.c_str());
+            printf("Error: unknown DNN framework '%s' in DnnAttribute\n",framework_name.c_str());
             return;
         }     
         
@@ -131,7 +140,7 @@ namespace eod{
         for( const auto& name : process_layers_names){
             int id = net.getLayerId(name);
             process_layers_types.push_back(net.getLayer(id)->type);
-            //printf("Layer type %s\n",process_layers_types.back().c_str());
+            printf("DNN layer type %s\n",process_layers_types.back().c_str());
         }
         
         maskProbability = maskProbability_;
@@ -141,6 +150,10 @@ namespace eod{
     vector<ExtendedObjectInfo> DnnAttribute::Detect2(const InfoImage& image, int seq){
         if( prev_seq != seq || seq == 0){        
             // input net
+            
+            Mat resized_image;
+            resize(image, resized_image, Size(inpWidth, inpHeight), INTER_LINEAR);
+            
             Mat blob;        
             if( framework == DN_DNN_FW )
                 blobFromImage(image, blob, 1/255.0, Size(inpWidth,inpHeight), Scalar(0,0,0), true, false);
@@ -148,6 +161,9 @@ namespace eod{
             else if( framework == TF_DNN_FW ){
                 blobFromImage(image, blob, 1.0, Size(inpWidth,inpHeight), Scalar(0,0,0), true, false);
                 //blobFromImage(image, blob, 1.0, Size(image.cols, image.rows), Scalar(), true, false);      
+            }
+            else if( framework == ONNX_DNN_FW){
+                blobFromImage(resized_image, blob, 1.0, Size(inpWidth,inpHeight), Scalar(0,0,0), true, false);
             }
             
             net.setInput(blob);        

@@ -7,8 +7,9 @@
 namespace eod{       
     
     enum DNN_FRMWRK{
-        TF_DNN_FW,// tensorflow
-        DN_DNN_FW,// darknet
+        TF_DNN_FW, // tensorflow
+        DN_DNN_FW, // darknet
+        ONNX_DNN_FW, // ONNX is the best way to export from torch?
     };
     
     class DnnAttribute : public Attribute{
