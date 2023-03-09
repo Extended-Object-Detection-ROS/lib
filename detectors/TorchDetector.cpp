@@ -30,7 +30,8 @@ namespace eod{
         
         printf("FORWARD!\n");
                         
-        at::Tensor output = module.forward(inputs).toTensor();
+        //at::Tensor output = module.forward(inputs).toTensor();
+        auto output = module.forward(inputs);//.toTensor();
         
         //print("Output sizes %li\n", output.sizes()[0]);
         
