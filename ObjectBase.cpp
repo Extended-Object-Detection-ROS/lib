@@ -547,12 +547,12 @@ namespace eod{
                 break;
             }
 #if (USE_TORCH)            
-            case TORCH_A:
+            case TORCH_YOLOV7_A:
             {
                 string model_path = getPathAttribute(attr, "model_path");
-                int input_size = 0;
+                int input_size = 640;
                 attr->Attribute("input_size", &input_size);
-                tmpA = new TorchAttribute(model_path, input_size);
+                tmpA = new TorchYOLOv7Attribute(model_path, input_size);
                 break;
             }
 #endif            

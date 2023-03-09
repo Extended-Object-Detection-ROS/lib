@@ -55,7 +55,7 @@ namespace eod{
         EI_STR_CHECK_A,
         UNIT_TRANS_EXTR_A,
         SQUARE_OBJ_DIST_EXTR_A,
-        TORCH_A,
+        TORCH_YOLOV7_A,
     };
     
     AttributeTypes getAttributeTypeFromName(std::string name);

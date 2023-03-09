@@ -122,8 +122,8 @@ namespace eod{
             return UNIT_TRANS_EXTR_A;
         if(name == "squareobjectdistance")
             return SQUARE_OBJ_DIST_EXTR_A;
-        if(name == "torch")
-            return TORCH_A;
+        if(name == "torchyolov7")
+            return TORCH_YOLOV7_A;
         
         printf("Unknown attribute type %s!",name.c_str());
         return UNK_A;
