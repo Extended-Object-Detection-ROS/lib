@@ -13,7 +13,7 @@ namespace eod{
         resize(blob, blob, Size(size, size), INTER_LINEAR);        
         at::Tensor tensor = torch::from_blob(blob.data, {1, size, size, 3 }, at::kByte);
         tensor = tensor.toType(c10::kFloat).div(255);
-        tensor = tensor.permute({0,3,1,2});
+        tensor = tensor.permute({0,3,1,2});        
         return tensor;
     }
     
@@ -25,10 +25,9 @@ namespace eod{
     }
     
     vector<ExtendedObjectInfo> TorchYOLOv7Attribute::Detect2(const InfoImage& image, int seq){        
-        std::vector<ExtendedObjectInfo> answer;
+        torch::NoGradGuard no_grad;
         
-        Mat blob;
-        resize(image, blob, Size(input_size_, input_size_), INTER_LINEAR);
+        std::vector<ExtendedObjectInfo> answer;                
         
         std::vector<torch::jit::IValue> inputs;
         inputs.push_back(tensor_from_mat(image, input_size_));
@@ -65,23 +64,27 @@ namespace eod{
             
             // shape: n * 6, x (0), y(1), w(2), h(3), score(4), class index(5)
             det = torch::cat({det.slice(1, 0, 4), max_conf_score, max_conf_index}, 1);
+            auto det_cpu = det.cpu();
             
-            const auto& det_array = det.accessor<float, 2>();
+            const auto& det_array = det_cpu.accessor<float, 2>();
             for(int i = 0; i < det.size(0) ; i++){
+                //printf("Result is %f %f %f %f\n", det_array[i][0], det_array[i][1], det_array[i][2], det_array[i][3]);
+                int x = int(det_array[i][0] /input_size_ * image.cols);
+                int y = int(det_array[i][1] /input_size_* image.rows);
+                int x1 = int(det_array[i][2] /input_size_* image.cols);
+                int y1 = int(det_array[i][3] /input_size_* image.rows);
                 
-                int x = int(det_array[i][0] * image.cols);
-                int y = int(det_array[i][1] * image.rows);
-                int w = int(det_array[i][2] * image.cols);
-                int h = int(det_array[i][3] * image.rows);
-                
-                ExtendedObjectInfo tmp = ExtendedObjectInfo(Rect(x, y, w, h));
+                ExtendedObjectInfo tmp = ExtendedObjectInfo(Rect(Point(x,y), Point(x1,y1)));
                 tmp.setScoreWeight(det_array[i][4], Weight);
                 set_extracted_info(tmp, "class_id", (int)det_array[i][5]); 
                                 
                 answer.push_back(tmp);
             }
                         
-        }                
+        }
+        else{
+            printf("Nothing to detect!\n");
+        }
         return answer;
     }
     
