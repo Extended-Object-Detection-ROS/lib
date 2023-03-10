@@ -14,7 +14,8 @@ namespace eod{
         
     enum YOLOV7_TYPE {BOX, POSE, SEG};
     
-    at::Tensor tensor_from_mat(const cv::Mat& image, int size);
+    at::Tensor tensor_from_mat(const cv::Mat& image);
+    std::vector<float> LetterboxImage(const cv::Mat& src, cv::Mat& dst, const cv::Size& out_size);
     
     class TorchYOLOv7Attribute : public Attribute{
     public: 
