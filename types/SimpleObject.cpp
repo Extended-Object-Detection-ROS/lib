@@ -346,6 +346,10 @@ namespace eod{
    }
    
    void SimpleObject::transform_eoi(std::vector<ExtendedObjectInfo> &rects, const InfoImage& src, const InfoImage& dst){
+       if( src.empty() || dst.empty()){
+           printf("Error! On of channel data is empty, can't convert!");
+           return;
+       }
        for( auto& rect : rects){
            // rect
            Point new_tl = transform_between_channels(rect.tl(), src.K(), dst.K());
