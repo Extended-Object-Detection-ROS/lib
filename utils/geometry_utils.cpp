@@ -194,6 +194,7 @@ namespace eod{
         return sqrt( dx*dx + dy*dy + dz*dz);
     }
     
+    // shortest distance between borders
     double rect_distance(Rect r1, Rect r2){
         bool left = r2.br().x < r1.tl().x;
         bool right = r1.br().x < r2.tl().x;
@@ -217,6 +218,12 @@ namespace eod{
         if( top )
             return r2.tl().y - r1.br().y;
         return 0;
-
     }
+    
+    cv::Point transform_between_channels(const cv::Point& point, const cv::Mat& src, const cv::Mat& dst){
+        auto tvec = get_translation(point, src);
+        return reverse_translation(tvec, dst);         
+    }
+    
+    
 }

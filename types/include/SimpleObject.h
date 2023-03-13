@@ -102,6 +102,11 @@ namespace eod{
         void defaultInit();
                 
         std::vector<std::pair< std::pair<AttributeMode, AttributeChannel>, Attribute*> > mode_attributes;
+        
+        /// <summary>
+        /// Transform rects and vectors from one camera parameters to another
+        /// </summary>	
+        void transform_eoi(std::vector<ExtendedObjectInfo> &rects, const InfoImage& src, const InfoImage& dst);
 
         unsigned int image_samples;
         int borderX, borderY;
