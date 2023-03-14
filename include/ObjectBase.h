@@ -49,6 +49,9 @@ File: Class realises loading simple_simple_objects parameters from XML file
 #include "ExtractedInfoStringChecker.h"
 #include "UnitTranslationExtracter.h"
 #include "SquareObjectDistanceDetector.h"
+#if (USE_TORCH)
+#include "TorchYOLOv7Detector.h"
+#endif
 
 #include "Filtering.h"
 
