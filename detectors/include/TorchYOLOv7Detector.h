@@ -20,7 +20,7 @@ namespace eod{
     class TorchYOLOv7Attribute : public Attribute{
     public: 
         
-        TorchYOLOv7Attribute(std::string model_path, int input_size);
+        TorchYOLOv7Attribute(std::string model_path, int input_size, std::string lales_path);
         
         std::vector<ExtendedObjectInfo> Detect2(const InfoImage& image, int seq);
                 
@@ -31,6 +31,7 @@ namespace eod{
         int input_size_;
         YOLOV7_TYPE net_type;
         torch::jit::script::Module module;
+        std::map<int, std::string> labelsMap;
         
     };
     

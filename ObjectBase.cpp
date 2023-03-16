@@ -552,7 +552,8 @@ namespace eod{
                 string model_path = getPathAttribute(attr, "model_path");
                 int input_size = 640;
                 attr->Attribute("input_size", &input_size);
-                tmpA = new TorchYOLOv7Attribute(model_path, input_size);
+                string labels_path = getPathAttribute(attr, "labels");
+                tmpA = new TorchYOLOv7Attribute(model_path, input_size, labels_path);
                 break;
             }
 #endif            

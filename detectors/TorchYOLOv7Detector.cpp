@@ -1,11 +1,26 @@
 #if (USE_TORCH)
 #include "TorchYOLOv7Detector.h"
-
+#include <fstream> 
 
 using namespace std;
 using namespace cv;
 
 namespace eod{
+    
+    bool readLabelsMapTxt(string filename, map<int, string> &labelsMap){
+        std::ifstream file(filename);
+        if (file.is_open()) {
+            std::string str; 
+            int counter = 0;
+            while (std::getline(file, str)){
+                labelsMap[counter] = str;
+                counter++;
+            }
+            file.close();
+            return true;
+        }
+        return false;
+    }
     
     at::Tensor tensor_from_mat(const cv::Mat& image){
         Mat blob;        
@@ -42,11 +57,12 @@ namespace eod{
         return pad_info;
     }
     
-    TorchYOLOv7Attribute::TorchYOLOv7Attribute(std::string model_path, int input_size){
+    TorchYOLOv7Attribute::TorchYOLOv7Attribute(std::string model_path, int input_size, std::string lales_path){
         Type = TORCH_YOLOV7_A;
         net_type = BOX;
         module = torch::jit::load(model_path);
         input_size_ = input_size;
+        readLabelsMapTxt(lales_path, labelsMap);
     }
     
     vector<ExtendedObjectInfo> TorchYOLOv7Attribute::Detect2(const InfoImage& image, int seq){        
@@ -121,7 +137,17 @@ namespace eod{
                 
                 ExtendedObjectInfo tmp = ExtendedObjectInfo(Rect(x,y,w,h));
                 tmp.setScoreWeight(det_array[i][4], Weight);
-                set_extracted_info(tmp, "class_id", (int)det_array[i][5]); 
+                int class_id = (int)det_array[i][5];
+                set_extracted_info(tmp, "class_id", class_id); 
+                
+                if( labelsMap.size() ){
+                    if( labelsMap.find(class_id) != labelsMap.end() ){
+                        set_extracted_info(tmp, "class_label", labelsMap[class_id]);
+                    }
+                    else{
+                        set_extracted_info(tmp, "class_label", "unknown");
+                    }
+                }
                                 
                 answer.push_back(tmp);
             }
