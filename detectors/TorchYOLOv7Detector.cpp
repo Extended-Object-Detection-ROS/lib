@@ -24,9 +24,7 @@ namespace eod{
     
     at::Tensor tensor_from_mat(const cv::Mat& image){
         Mat blob;        
-        cvtColor(image, blob, COLOR_BGR2RGB); 
-        //blob.convertTo(blob, CV_32FC3, 1.0f / 255.0f);
-        //resize(blob, blob, Size(size, size), INTER_LINEAR);        
+        cvtColor(image, blob, COLOR_BGR2RGB);         
         at::Tensor tensor = torch::from_blob(blob.data, {1, image.rows, image.cols, 3 }, at::kByte);
         tensor = tensor.toType(c10::kFloat).div(255);
         tensor = tensor.permute({0,3,1,2}).contiguous();        
@@ -57,32 +55,31 @@ namespace eod{
         return pad_info;
     }
     
+    // =~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~
+    // YOLO v7 Basic Attribute
+    // =~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~
+    
     TorchYOLOv7Attribute::TorchYOLOv7Attribute(std::string model_path, int input_size, std::string lales_path){
-        Type = TORCH_YOLOV7_A;
-        net_type = BOX;
+        Type = TORCH_YOLOV7_A;        
         module = torch::jit::load(model_path);
         input_size_ = input_size;
         readLabelsMapTxt(lales_path, labelsMap);
     }
     
-    vector<ExtendedObjectInfo> TorchYOLOv7Attribute::Detect2(const InfoImage& image, int seq){        
+    TorchYOLOv7Attribute::TorchYOLOv7Attribute(){
+        
+    }
+    
+    vector<ExtendedObjectInfo> TorchYOLOv7Attribute::Detect2(const InfoImage& image, int seq){                        
         torch::NoGradGuard no_grad;
         
         std::vector<ExtendedObjectInfo> answer;                
         
         std::vector<torch::jit::IValue> inputs;
         Mat letter_box_image;
-        std::vector<float> pad_info = LetterboxImage(image, letter_box_image, cv::Size(input_size_, input_size_));
-        //printf("Padding w %f padding h %f scale %f\n",pad_info[0], pad_info[1], pad_info[2]);
-        //imshow("letterbox", letter_box_image);
+        std::vector<float> pad_info = LetterboxImage(image, letter_box_image, cv::Size(input_size_, input_size_));        
         
-        inputs.push_back(tensor_from_mat(letter_box_image));
-        
-        //printf("FORWARD!\n");                    
-        /*
-         * output shape is [batch = 1, n_detections, 5 + n_classes]
-         * for each detection comes [x_center, y_center, w, h, p_obj, p_class1, p_class2, ..., p_classN]
-         */
+        inputs.push_back(tensor_from_mat(letter_box_image));                
         auto output = module.forward(inputs).toTuple()->elements()[0].toTensor();
         
         // postprocess
@@ -114,18 +111,6 @@ namespace eod{
             
             const auto& det_array = det_cpu.accessor<float, 2>();
             for(int i = 0; i < det.size(0) ; i++){
-                //printf("Result is %f %f %f %f\n", det_array[i][0], det_array[i][1], det_array[i][2], det_array[i][3]);
-//                 int x = int(det_array[i][0] /input_size_ * image.cols);
-//                 int y = int(det_array[i][1] /input_size_* image.rows);
-//                 int x1 = int(det_array[i][2] /input_size_* image.cols);
-//                 int y1 = int(det_array[i][3] /input_size_* image.rows);
-                
-                ExtendedObjectInfo not_scaled(Rect(int(det_array[i][0] - det_array[i][2]/2), 
-                                                   int(det_array[i][1] -det_array[i][3]/2), 
-                                                    int(det_array[i][2]),
-                                                    int(det_array[i][3])));
-                //ExtendedObjectInfo not_scaled(Rect(int(det_array[i][0]), int(det_array[i][1]), det_array[i][2],det_array[i][3]));
-                not_scaled.draw(letter_box_image, Scalar(0,0,255));
                 
                 int xc = (det_array[i][0] - pad_info[0])/pad_info[2];
                 int yc = (det_array[i][1] - pad_info[1])/pad_info[2];
@@ -150,22 +135,119 @@ namespace eod{
                 }
                                 
                 answer.push_back(tmp);
-            }
-            //imshow("letterbox_results", letter_box_image);
-                        
+            }                                    
         }
-//         else{
-//             printf("Nothing to detect!\n");
-//         }
         return answer;
     }
-    
-    
+        
     bool TorchYOLOv7Attribute::Check2(const InfoImage& image,ExtendedObjectInfo& rect){
         return false;        
     }
     
     void TorchYOLOv7Attribute::Extract2(const InfoImage& image, ExtendedObjectInfo& rect){
+    }
+    
+    // =~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~
+    // YOLO v7 KeyPoint Attribute
+    // =~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~
+    
+    TorchYOLOv7KeypointAttribute::TorchYOLOv7KeypointAttribute(std::string model_path, int input_size, std::string lables_path, int num_class, int num_points){
+        Type = TORCH_YOLOV7_KPT_A;
+        module = torch::jit::load(model_path);
+        input_size_ = input_size;
+        num_class_ = num_class;
+        num_points_ = num_points;
+        
+    }
+    
+    vector<ExtendedObjectInfo> TorchYOLOv7KeypointAttribute::Detect2(const InfoImage& image, int seq){                        
+        torch::NoGradGuard no_grad;
+        
+        std::vector<ExtendedObjectInfo> answer;                
+        
+        std::vector<torch::jit::IValue> inputs;
+        Mat letter_box_image;
+        std::vector<float> pad_info = LetterboxImage(image, letter_box_image, cv::Size(input_size_, input_size_));        
+        
+        inputs.push_back(tensor_from_mat(letter_box_image));                
+        auto output = module.forward(inputs).toTuple()->elements()[0].toTensor();
+        
+        // postprocess
+        int item_attr_size = 5;        
+        
+        // get candidates which object confidence > threshold
+        auto conf_mask = output.select(2, 4).ge(Probability).unsqueeze(2);                
+        
+        if( conf_mask.size(0) == 0)
+            return answer;
+                
+        auto det = torch::masked_select(output[0], conf_mask[0]).view({-1, item_attr_size + num_class_ + num_points_ * 3}); // allows only 1-batched output
+        
+        if (det.size(0) != 0){
+            // compute overall score = obj_conf * cls_conf, similar to x[:, 5:] *= x[:, 4:5]
+            
+            
+            at::Tensor max_conf_score, max_conf_index;
+            if( num_class_ != 1 ){
+                
+                det.slice(1, item_attr_size, item_attr_size + num_class_) *= det.select(1, 4).unsqueeze(1);
+                
+                // [best class only] get the max classes score at each result (e.g. elements 5-84)
+                std::tuple<torch::Tensor, torch::Tensor> max_classes = torch::max(det.slice(1, item_attr_size, item_attr_size + num_class_), 1);
+
+                // class score
+                max_conf_score = std::get<0>(max_classes);
+                // index
+                max_conf_index = std::get<1>(max_classes);
+
+                max_conf_score = max_conf_score.to(torch::kFloat).unsqueeze(1);
+                max_conf_index = max_conf_index.to(torch::kFloat).unsqueeze(1);
+            }
+            else{
+                max_conf_score = det.select(1, 4).unsqueeze(1);
+                max_conf_index = torch::zeros(max_conf_score.sizes());
+            }
+            
+            // shape: n * 6, x (0), y(1), w(2), h(3), score(4), class index(5)
+            det = torch::cat({det.slice(1, 0, 4), max_conf_score, max_conf_index}, 1);
+            auto det_cpu = det.cpu();
+            
+            const auto& det_array = det_cpu.accessor<float, 2>();
+            for(int i = 0; i < det.size(0) ; i++){
+                
+                int xc = (det_array[i][0] - pad_info[0])/pad_info[2];
+                int yc = (det_array[i][1] - pad_info[1])/pad_info[2];
+                int w = (det_array[i][2])/pad_info[2];
+                int h = (det_array[i][3])/pad_info[2];
+                
+                int x = xc - w/2;
+                int y = yc - h/2;
+                
+                ExtendedObjectInfo tmp = ExtendedObjectInfo(Rect(x,y,w,h));
+                tmp.setScoreWeight(det_array[i][4], Weight);
+                int class_id = (int)det_array[i][5];
+                set_extracted_info(tmp, "class_id", class_id); 
+                
+                if( labelsMap.size() ){
+                    if( labelsMap.find(class_id) != labelsMap.end() ){
+                        set_extracted_info(tmp, "class_label", labelsMap[class_id]);
+                    }
+                    else{
+                        set_extracted_info(tmp, "class_label", "unknown");
+                    }
+                }
+                                
+                answer.push_back(tmp);
+            }                                    
+        }
+        return answer;
+    }
+    
+    bool TorchYOLOv7KeypointAttribute::Check2(const InfoImage& image,ExtendedObjectInfo& rect){
+        return false;        
+    }
+    
+    void TorchYOLOv7KeypointAttribute::Extract2(const InfoImage& image, ExtendedObjectInfo& rect){
     }
     
     

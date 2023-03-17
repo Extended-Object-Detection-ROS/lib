@@ -124,6 +124,8 @@ namespace eod{
             return SQUARE_OBJ_DIST_EXTR_A;
         if(name == "torchyolov7")
             return TORCH_YOLOV7_A;
+        if(name == "torchyolov7kpt")
+            return TORCH_YOLOV7_KPT_A;
         
         printf("Unknown attribute type %s!",name.c_str());
         return UNK_A;
