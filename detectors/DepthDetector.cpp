@@ -60,6 +60,8 @@ namespace eod{
                 //distance = mean(cropped).val[0];
             }
             else if( mode == CENTER_PX ){
+                /*
+                 * old stuff, not rect is already in depth cannel coordinates
                 if(rect.tvec.size() == 0){
                     printf("DepthAttribute in mode CENTER_PX(2) can't obtain distance without translation vector\n");
                     return;
@@ -69,8 +71,10 @@ namespace eod{
                     return;
                 }
                 Point center_registered = reverse_translation(rect.tvec[0], image.K());     
-                                
                 distance = image.at<char16_t>(center_registered);                                
+                */
+                
+                distance = image.at<char16_t>(rect.getCenter());
                 
                 /*
                 printf("distance at (%i, %i): %f\n", center_registered.x, center_registered.y, distance);                

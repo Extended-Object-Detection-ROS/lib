@@ -30,7 +30,7 @@ namespace eod{
         smatch matcherName;
         const regex reEntry("item \\{([\\S\\s]*?)\\}");
         const regex reId(" [0-9]+");
-        const regex reDispName("\"[a-z\\s]+\"");
+        const regex reDispName("\"[A-Za-z\\s]+\"");
         
         string entry;
 
@@ -78,9 +78,7 @@ namespace eod{
         
         if( framework_name == "tensorflow" || framework_name == "tf" ){
             framework = TF_DNN_FW;
-            net = readNetFromTensorflow(weights_file, config_file);            
-            net.setPreferableBackend(DNN_BACKEND_OPENCV);
-            net.setPreferableTarget(DNN_TARGET_CPU);
+            net = readNetFromTensorflow(weights_file, config_file);                        
             if( net.empty() ){
                 printf("Unable to load tensorflow net in DnnAttribute\n");
                 return;
@@ -89,9 +87,7 @@ namespace eod{
         }
         else if( framework_name == "darknet" ){
             framework = DN_DNN_FW;
-            net = readNetFromDarknet(config_file, weights_file);
-            net.setPreferableBackend(DNN_BACKEND_OPENCV);
-            net.setPreferableTarget(DNN_TARGET_CPU);
+            net = readNetFromDarknet(config_file, weights_file);            
             if( net.empty() ){
                 printf("Unable to load darknet net in DnnAttribute\n");
                 return;
@@ -106,6 +102,10 @@ namespace eod{
         if( forceCuda ){
             net.setPreferableBackend(cv::dnn::DNN_BACKEND_CUDA);
             net.setPreferableTarget(cv::dnn::DNN_TARGET_CUDA);
+        }
+        else{
+            net.setPreferableBackend(DNN_BACKEND_OPENCV);
+            net.setPreferableTarget(DNN_TARGET_CPU);
         }
     
         inpWidth = inpWidth_;

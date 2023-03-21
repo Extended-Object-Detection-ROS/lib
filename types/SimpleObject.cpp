@@ -87,88 +87,97 @@ namespace eod{
                     objects[i].mergeAllData(merging_policy);
             }
             // else TODO how about to use checker on whole image in such case
-            auto it = objects.begin();
-            while (it != objects.end() ){   
-                //it->calcTotalScore();
-                it->mergeAllData(merging_policy);
-                if( it->total_score < Probability ){
-                    it = objects.erase(it);
-                }
-                else
-                    ++it;
-            }    
-            return objects;
+//             auto it = objects.begin();
+//             while (it != objects.end() ){   
+//                 //it->calcTotalScore();
+//                 it->mergeAllData(merging_policy);
+//                 if( it->total_score < Probability ){
+//                     it = objects.erase(it);
+//                 }
+//                 else
+//                     ++it;
+//             }    
+//             return objects;
         }
-                
-        // more than one
-        vector<ExtendedObjectInfo> prev;
-        for (size_t i = 0; i < mode_attributes.size(); i++){
-            if( mode_attributes[i].first.first == DETECT ){
-                vector<ExtendedObjectInfo> rects;
-                if( mode_attributes[i].first.second == RGB)
-                    rects = mode_attributes[i].second->Detect(frame, seq);
-                else if( mode_attributes[i].first.second == DEPTH)
-                    rects = mode_attributes[i].second->Detect(depth, seq);
-                
-                if( rects.size()  == 0 ){
-                    objects.clear();
-                    return objects;
-                }
-                if( i == 0 ){
-                    prev = rects;
-                    objects = rects;
-                }
-                else{
-                    prev = objects;   
-                    Mat_<double> closenessMapD = createClosenessMap(&prev, &rects, iou_threshold_d);
-                    Mat mask(closenessMapD.size(), CV_8UC1, Scalar(255,255,255));            
-                    objects.clear();
-                    while( true ){
-                        double min, max = 0;
-                        Point min_loc, max_loc;
-                        minMaxLoc(closenessMapD, &min, &max, &min_loc, &max_loc, mask);
-                        if( max == 0 ) break;                               
-                            
-                        ExtendedObjectInfo newone;
-                        if( merging_policy == INTERSECTION_MP )
-                            newone = prev[max_loc.y] & rects[max_loc.x];   
-                        else if( merging_policy == UNION_MP )
-                            newone = prev[max_loc.y] | rects[max_loc.x];   
-                        
-                        objects.push_back(newone); 
-                        mask.row(max_loc.y).setTo(Scalar(0,0,0));                                    
-                        mask.col(max_loc.x).setTo(Scalar(0,0,0));                                
-                    }
-                    mask.release();
-                    closenessMapD.release();
-                    if( objects.size() == 0 ){                    
+        else{
+            // more than one
+            vector<ExtendedObjectInfo> prev;
+            for (size_t i = 0; i < mode_attributes.size(); i++){
+                // transform EOI to another channel coords if needed
+                if( i != 0 && mode_attributes[i].first.second != mode_attributes[i-1].first.second){
+                    if( mode_attributes[i].first.second == RGB)
+                        transform_eoi(objects, depth, frame);
+                    else
+                        transform_eoi(objects, frame, depth);
+                }            
+                // do detect, check and extract
+                if( mode_attributes[i].first.first == DETECT ){
+                    vector<ExtendedObjectInfo> rects;
+                    if( mode_attributes[i].first.second == RGB)
+                        rects = mode_attributes[i].second->Detect(frame, seq);
+                    else if( mode_attributes[i].first.second == DEPTH)
+                        rects = mode_attributes[i].second->Detect(depth, seq);
+                    
+                    if( rects.size()  == 0 ){
+                        objects.clear();
                         return objects;
                     }
-                    prev.clear();                                 
+                    if( i == 0 ){
+                        prev = rects;
+                        objects = rects;
+                    }
+                    else{
+                        prev = objects;   
+                        Mat_<double> closenessMapD = createClosenessMap(&prev, &rects, iou_threshold_d);
+                        Mat mask(closenessMapD.size(), CV_8UC1, Scalar(255,255,255));            
+                        objects.clear();
+                        while( true ){
+                            double min, max = 0;
+                            Point min_loc, max_loc;
+                            minMaxLoc(closenessMapD, &min, &max, &min_loc, &max_loc, mask);
+                            if( max == 0 ) break;                               
+                                
+                            ExtendedObjectInfo newone;
+                            if( merging_policy == INTERSECTION_MP )
+                                newone = prev[max_loc.y] & rects[max_loc.x];   
+                            else if( merging_policy == UNION_MP )
+                                newone = prev[max_loc.y] | rects[max_loc.x];   
+                            
+                            objects.push_back(newone); 
+                            mask.row(max_loc.y).setTo(Scalar(0,0,0));                                    
+                            mask.col(max_loc.x).setTo(Scalar(0,0,0));                                
+                        }
+                        mask.release();
+                        closenessMapD.release();
+                        if( objects.size() == 0 ){                    
+                            return objects;
+                        }
+                        prev.clear();                                 
+                    }
                 }
-            }
-            else if(mode_attributes[i].first.first == CHECK){              
-                if( mode_attributes[i].first.second == RGB)
-                    mode_attributes[i].second->Check(frame, &objects);
-                else if( mode_attributes[i].first.second == DEPTH)
-                    mode_attributes[i].second->Check(depth, &objects);
-                if( objects.size() == 0 ){
-                    return objects;                           
+                else if(mode_attributes[i].first.first == CHECK){              
+                    if( mode_attributes[i].first.second == RGB)
+                        mode_attributes[i].second->Check(frame, &objects);
+                    else if( mode_attributes[i].first.second == DEPTH)
+                        mode_attributes[i].second->Check(depth, &objects);
+                    if( objects.size() == 0 ){
+                        return objects;                           
+                    }
+                }           
+                else if(mode_attributes[i].first.first == EXTRACT){                   
+                    if( mode_attributes[i].first.second == RGB)
+                        mode_attributes[i].second->Extract(frame, &objects);
+                    else if( mode_attributes[i].first.second == DEPTH)
+                        mode_attributes[i].second->Extract(depth, &objects);
                 }
-            }           
-            else if(mode_attributes[i].first.first == EXTRACT){                   
-                if( mode_attributes[i].first.second == RGB)
-                    mode_attributes[i].second->Extract(frame, &objects);
-                else if( mode_attributes[i].first.second == DEPTH)
-                    mode_attributes[i].second->Extract(depth, &objects);
             }
         }
-        for( size_t i = 0 ; i < objects.size(); i++)
-            //objects[i].calcTotalScore();
+        
+        // final process
+        for( size_t i = 0 ; i < objects.size(); i++){
             objects[i].mergeAllData(merging_policy);
             auto it = objects.begin();
-            while (it != objects.end() ){
-                //it->calcTotalScore();
+            while (it != objects.end() ){                
                 it->mergeAllData(merging_policy);
                 if( it->total_score < Probability ){
                     it = objects.erase(it);
@@ -176,7 +185,12 @@ namespace eod{
                 else
                     ++it;
             }
-        
+        }
+        // reconvert back to RGB
+        if( mode_attributes.back().first.second != RGB ){
+            transform_eoi(objects, depth, frame);
+        }
+            
         return objects;
     }
     
@@ -185,7 +199,15 @@ namespace eod{
         vector<ExtendedObjectInfo> prev;
         
         objects.clear();
-        for (size_t i = 0; i < mode_attributes.size(); i++){            
+        for (size_t i = 0; i < mode_attributes.size(); i++){     
+            // transform EOI to another channel coords if needed
+            if( i != 0 && mode_attributes[i].first.second != mode_attributes[i-1].first.second){
+                if( mode_attributes[i].first.second == RGB)
+                    transform_eoi(objects, depth, frame);
+                else
+                    transform_eoi(objects, frame, depth);
+            }
+            // do detect, check and extract
             if( mode_attributes[i].first.first == DETECT ){                                
                 if( i == 0 ){
                     if( mode_attributes[0].first.second == RGB)
@@ -277,7 +299,11 @@ namespace eod{
             }
             else
                 ++it;
-        }        
+        }       
+        // reconvert back to RGB
+        if( mode_attributes.back().first.second != RGB ){
+            transform_eoi(objects, depth, frame);
+        }
         return objects;
     }
       
@@ -317,6 +343,30 @@ namespace eod{
             prevBr = drawFilledRectangleWithText(image, Point(obj->tl().x, prevBr.y), attributeName + extracted_info, col);
             
         }        
+   }
+   
+   void SimpleObject::transform_eoi(std::vector<ExtendedObjectInfo> &rects, const InfoImage& src, const InfoImage& dst){
+       if( src.empty() || dst.empty()){
+           printf("Error! On of channel data is empty, can't convert!");
+           return;
+       }
+       for( auto& rect : rects){
+           // rect
+           Point new_tl = transform_between_channels(rect.tl(), src.K(), dst.K());
+           Point new_br = transform_between_channels(rect.br(), src.K(), dst.K());
+           rect.x = new_tl.x;
+           rect.y = new_tl.y;
+           rect.width = new_br.x - new_tl.x;
+           rect.height = new_br.y - new_tl.y;
+           // contour
+           for( auto& cc: rect.contour){
+               for( auto& c: cc){
+                   c = transform_between_channels(c, src.K(), dst.K());
+               }
+           }                      
+           // tvec & rvec - should not be converted as already in 3d
+       }
+       
    }
 
 }

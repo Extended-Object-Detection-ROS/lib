@@ -29,7 +29,7 @@ namespace eod{
         }
         */
         if( seq == 0 || seq != prev_seq ){
-            saved_answer = Detect2(image, seq);
+            saved_answer = Detect2(image, seq); // TODO [optimization] This should be changed on &, like Detect2(image, seq, saved_answer)
             for( size_t i = 0 ; i < saved_answer.size() ; i++ ){
                 saved_answer[i].normalize(image.size().width, image.size().height);
             }
@@ -122,6 +122,10 @@ namespace eod{
             return UNIT_TRANS_EXTR_A;
         if(name == "squareobjectdistance")
             return SQUARE_OBJ_DIST_EXTR_A;
+        if(name == "torchyolov7")
+            return TORCH_YOLOV7_A;
+        if(name == "torchyolov7kpt")
+            return TORCH_YOLOV7_KPT_A;
         
         printf("Unknown attribute type %s!",name.c_str());
         return UNK_A;

@@ -48,6 +48,8 @@ namespace eod{
     
     double rect_distance(cv::Rect, cv::Rect);
         
+    cv::Point transform_between_channels(const cv::Point& point, const cv::Mat& src, const cv::Mat& dst);
+    
 }
 
 #endif

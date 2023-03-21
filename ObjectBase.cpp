@@ -551,7 +551,29 @@ namespace eod{
                 tmpA = new SquareObjectDistanceAttribute(length);
                 break;
             }
-            
+#if (USE_TORCH)            
+            case TORCH_YOLOV7_A:
+            {
+                string model_path = getPathAttribute(attr, "model_path");
+                int input_size = 640;
+                attr->Attribute("input_size", &input_size);
+                string labels_path = getPathAttribute(attr, "labels");
+                tmpA = new TorchYOLOv7Attribute(model_path, input_size, labels_path);
+                break;
+            }
+            case TORCH_YOLOV7_KPT_A:
+            {
+                string model_path = getPathAttribute(attr, "model_path");
+                int input_size = 640;
+                attr->Attribute("input_size", &input_size);
+                string labels_path = getPathAttribute(attr, "labels");
+                int num_class = 1 , num_points = 17;
+                attr->Attribute("num_class", &num_class);
+                attr->Attribute("num_points", &num_points);
+                tmpA = new TorchYOLOv7KeypointAttribute(model_path, input_size, labels_path, num_class, num_points);
+                break;
+            }
+#endif            
             default:
             {                
                 attr = attr->NextSiblingElement("Attribute");
