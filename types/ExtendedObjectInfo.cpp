@@ -124,6 +124,12 @@ namespace eod{
         if( contour.size() > 0)            
             drawContours( image, contour, 0, col, 1, 8);                
         
+        if( keypoints.size() > 0 ){
+            for( auto& kpt: keypoints){
+                circle(image, kpt, 2, col, cv::FILLED, cv::LINE_8);
+            }
+        }
+        
     }
     
     double getRange(ExtendedObjectInfo a, ExtendedObjectInfo b){

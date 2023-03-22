@@ -13,6 +13,18 @@ namespace eod{
         INTERSECTION_MP,
     };
     
+    class KeyPoint : public cv::Point {
+    public:
+        KeyPoint(int x, int y, float score, std::string label = "") : cv::Point(x, y){
+            this->score = score;
+            this->label = label;
+        }
+        float score;
+        std::string label;
+    private:        
+        
+    };
+    
     class ExtendedObjectInfo : public cv::Rect {
     public:        
         // constructors stuff
@@ -73,7 +85,9 @@ namespace eod{
         //translation vectors
         std::vector<cv::Vec3d> tvec;        
         // rotation vectors
-        std::vector<cv::Vec3d> rvec;        
+        std::vector<cv::Vec3d> rvec;      
+        
+        std::vector<KeyPoint> keypoints;
         
         void initVars();       
     private:            

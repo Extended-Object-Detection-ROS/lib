@@ -184,9 +184,7 @@ namespace eod{
         auto det = torch::masked_select(output[0], conf_mask[0]).view({-1, item_attr_size + num_class_ + num_points_ * 3}); // allows only 1-batched output
         
         if (det.size(0) != 0){
-            // compute overall score = obj_conf * cls_conf, similar to x[:, 5:] *= x[:, 4:5]
-            
-            
+                                    
             at::Tensor max_conf_score, max_conf_index;
             if( num_class_ != 1 ){
                 
@@ -209,7 +207,7 @@ namespace eod{
             }
             
             // shape: n * 6, x (0), y(1), w(2), h(3), score(4), class index(5)
-            det = torch::cat({det.slice(1, 0, 4), max_conf_score, max_conf_index}, 1);
+            det = torch::cat({det.slice(1, 0, 4), max_conf_score, max_conf_index, det.slice(1,item_attr_size + num_class_, det.size(1))}, 1);
             auto det_cpu = det.cpu();
             
             const auto& det_array = det_cpu.accessor<float, 2>();
@@ -235,6 +233,14 @@ namespace eod{
                     else{
                         set_extracted_info(tmp, "class_label", "unknown");
                     }
+                }
+                
+                for( int j = 0 ; j < num_points_ ; j++ ){
+                    int x = (det_array[i][item_attr_size + num_class_ + j*3]- pad_info[0])/pad_info[2];
+                    int y = (det_array[i][item_attr_size + num_class_ + j*3 + 1] - pad_info[1])/pad_info[2];
+                    float kpt_score = det_array[i][item_attr_size + num_class_ + j*3 + 2];
+                    
+                    tmp.keypoints.push_back(eod::KeyPoint(x, y, kpt_score));
                 }
                                 
                 answer.push_back(tmp);

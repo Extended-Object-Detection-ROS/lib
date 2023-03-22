@@ -59,7 +59,7 @@ namespace eod{
         if( !inited )
             return res;
         
-        vector<KeyPoint> keypoints;
+        vector<cv::KeyPoint> keypoints;
         detector->detect( image, keypoints);
         
         for( size_t i = 0 ; i < keypoints.size() ; i++ ){
