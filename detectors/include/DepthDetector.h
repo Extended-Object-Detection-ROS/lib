@@ -23,6 +23,7 @@ namespace eod{
     private:        
         int mode;
         double max_dist_m;
+        int save_cntr = 0;
     };
     
 }

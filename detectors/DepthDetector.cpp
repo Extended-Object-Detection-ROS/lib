@@ -52,6 +52,7 @@ namespace eod{
                     return;
                 }                                            
                 distance = mat_median(cropped, true, Mat(), max_dist_m*1000);                  
+                imwrite("/tmp/saved_depth_"+std::to_string(save_cntr++)+".png", cropped);
             }
             else if( mode == CENTER_PX ){                
                 distance = image.at<char16_t>(rect.getCenter());
