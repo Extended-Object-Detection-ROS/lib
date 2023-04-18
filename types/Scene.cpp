@@ -234,7 +234,8 @@ namespace eod{
                 scene.second.push_back(obj_pair);
             }
             results.push_back(scene);
-        }                
+        }  
+        printf("Scenes done\n");
         //return results;
     }
 }
