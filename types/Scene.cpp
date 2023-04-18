@@ -134,22 +134,29 @@ namespace eod{
                     for( auto& rel : relations ){                        
                         // NOTE: now I try to store all relations, but maybe in future it will better to compare new extracted relation with previour ones (maybe not)
                         bool find_appr = false;
-                        //for( auto& new_rel : new_relations ){
+                        double max_score = 0;
+                        int best_rel = -1;
                         for( size_t k = 0 ; k < new_relations.size(); k++){
                             auto new_rel = new_relations[k];
                             // check same objects
-                            if( new_rel.object_class1 == classes[i] && new_rel.object_class2 == classes[j] ){
-                                // TODO change on best score?
-                                double score = new_rel.relation->checkSoft(frame, every_detections[i], every_detections[j]);
-                                if( score > new_rel.threshold ){
-                                    observing_scene_graph.add_edge(rel.first->Name, k, i, j, false, 1, score);
+                            if( new_rel.object_class1 == classes[i] && new_rel.object_class2 == classes[j] ){                                
+                                double new_score = new_rel.relation->checkSoft(frame, every_detections[i], every_detections[j]);
+                                if( new_score > new_rel.threshold ){
+                                    if( new_score > max_score ){
+                                        max_score = new_score;
+                                        best_rel = k;
+                                    }
+                                    
+                                    //observing_scene_graph.add_edge(rel.first->Name, k, i, j, false, 1, score);
                                     find_appr = true;                                    
-                                    break;
+                                    //break;
                                 }                                
                             }
-                        }
-                        if( find_appr )
+                        }                        
+                        if( find_appr ){
+                            observing_scene_graph.add_edge(rel.first->Name, best_rel, i, j, false, 1, max_score);
                             continue;
+                        }
                         
                         rel.first->extractParams(frame, every_detections[i], every_detections[j]);
                         printf("New relation %i (%s) between %s and %s \n",new_relations.size(), rel.first->params_as_str().c_str() , classes[i].c_str(), classes[j].c_str());
