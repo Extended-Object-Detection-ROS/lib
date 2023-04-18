@@ -152,7 +152,7 @@ namespace eod{
                             continue;
                         
                         rel.first->extractParams(frame, every_detections[i], every_detections[j]);
-                        printf("New relation %i between %s and %s \n",new_relations.size(), classes[i].c_str(), classes[j].c_str());
+                        printf("New relation %i (%s) between %s and %s \n",new_relations.size(), rel.first->params_as_str().c_str() , classes[i].c_str(), classes[j].c_str());
                         // copy extracted parameters and store it                        
                         new_relations.push_back(RegisteredRelation(rel.first->copy(), classes[i], classes[j], rel.second));
                         // also add relations on observing scene
@@ -235,7 +235,7 @@ namespace eod{
             }
             results.push_back(scene);
         }  
-        printf("Scenes done\n");
+        printf("~~~~~~~~~~~Scenes done~~~~~~~~~~~~~\n");
         //return results;
     }
 }

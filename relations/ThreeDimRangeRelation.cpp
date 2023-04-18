@@ -92,4 +92,8 @@ namespace eod{
         return (RelationShip*)copie;
     }
     
+    std::string ThreeDimRangeRelation::params_as_str(){
+        return std::to_string(dist);
+    }
+    
 }

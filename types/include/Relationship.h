@@ -63,6 +63,11 @@ namespace eod{
           return NULL;
       }
       
+      virtual std::string params_as_str(){
+          printf("params_as_str not implemented!\n");
+          return "";
+      }
+      
       bool setName(const char*);
 	
     private:
