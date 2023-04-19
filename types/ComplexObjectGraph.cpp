@@ -229,13 +229,15 @@ namespace eod{
                             int edge_id_ind_tar = VECTOR(edge_id)[0];
                             double k_edge = double(EAN(&(sub_graph->graph), "weight", edge_id_ind_tar))/accuracy;
                             double dc_edge = double(EAN(&graph, "dc", edge_id_ind))/accuracy;
+                            double dc_edge_sub = double(EAN(&sub_graph->graph, "dc", edge_id_ind_tar))/accuracy;
+                            
                             
                             if( EAN(&graph, "fake", edge_id_ind) ){
                                 // IT IS FAKE                                    
                             }
                             else{                                                                
                                 // calc
-                                Dc += dc_edge*k_edge*(k1 * dc1 + k2 * dc2);                                
+                                Dc += dc_edge_sub*dc_edge*k_edge*(k1 * dc1 + k2 * dc2);                                
                             }   
                             denominator += k_edge*(k1 + k2);
                         }

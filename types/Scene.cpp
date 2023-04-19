@@ -115,10 +115,12 @@ namespace eod{
             for(size_t i = 0 ; i < scene_obj->results()->size() ; i++ ){
                 ExtendedObjectInfo* eoi = &(scene_obj->results()->at(i));
                 
-                every_detections.push_back(eoi);
-                classes.push_back(scene_obj->class_name());
+                if( eoi->tvec.size() > 0){
+                    every_detections.push_back(eoi);
+                    classes.push_back(scene_obj->class_name());
                 
-                observing_scene_graph.add_vectice(scene_obj->class_name(), scene_obj->ID(), i, eoi->total_score, 1);
+                    observing_scene_graph.add_vectice(scene_obj->class_name(), scene_obj->ID(), i, eoi->total_score, 1);
+                }
             }            
         }
         printf("%i every_detections\n",every_detections.size());          
