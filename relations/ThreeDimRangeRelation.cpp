@@ -71,6 +71,9 @@ namespace eod{
                 //printf("%f = norm_distribution(%f, %f, %f)\n",score, dist, distance, prob);
                 return score;                
             }
+            else if(sub_type == CLOSED_RANGE){
+                return double(checkRelation(image, A, B));
+            }
             else{
                 printf("ThreeDimRangeRelation has unknown sub type!\n");
                 return 0;
@@ -83,8 +86,14 @@ namespace eod{
         return 0;
     }
     
-    void ThreeDimRangeRelation::extractParams(const cv::Mat& image, ExtendedObjectInfo* A, ExtendedObjectInfo* B){
-        dist = range_v3d(A->tvec[0], B->tvec[0]);
+    bool ThreeDimRangeRelation::extractParams(const cv::Mat& image, ExtendedObjectInfo* A, ExtendedObjectInfo* B){
+        if( sub_type == PROB_RANGE ){
+            dist = range_v3d(A->tvec[0], B->tvec[0]);
+            return true;
+        }
+        if( sub_type == CLOSED_RANGE ){
+            return checkRelation(image, A, B);
+        }
     }
     
     RelationShip* ThreeDimRangeRelation::copy(){
@@ -93,7 +102,9 @@ namespace eod{
     }
     
     std::string ThreeDimRangeRelation::params_as_str(){
-        return std::to_string(dist);
+        if( sub_type == PROB_RANGE )
+            return std::to_string(dist);
+        return "";
     }
     
 }

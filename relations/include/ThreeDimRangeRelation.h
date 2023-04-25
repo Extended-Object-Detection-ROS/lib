@@ -19,7 +19,7 @@ namespace eod{
         
         double checkSoft(const cv::Mat& image, ExtendedObjectInfo* A, ExtendedObjectInfo* B);
         
-        void extractParams(const cv::Mat& image, ExtendedObjectInfo* A, ExtendedObjectInfo* B);
+        bool extractParams(const cv::Mat& image, ExtendedObjectInfo* A, ExtendedObjectInfo* B);
         
         std::string params_as_str();
         

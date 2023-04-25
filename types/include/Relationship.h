@@ -51,7 +51,7 @@ namespace eod{
       /// <returns>True or false</returns>	      
       virtual bool checkRelation(const cv::Mat& image, ExtendedObjectInfo* A, ExtendedObjectInfo* B) = 0;
       
-      virtual void extractParams(const cv::Mat& image, ExtendedObjectInfo* A, ExtendedObjectInfo* B){printf("extractParams not implemented!\n");}
+      virtual bool extractParams(const cv::Mat& image, ExtendedObjectInfo* A, ExtendedObjectInfo* B){printf("extractParams not implemented!\n");}
       
       virtual double checkSoft(const cv::Mat& image, ExtendedObjectInfo* A, ExtendedObjectInfo* B){
           return 0;

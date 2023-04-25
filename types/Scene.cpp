@@ -134,14 +134,14 @@ namespace eod{
             for( size_t j = i+1 ; j < every_detections.size() ; j++ ){
                 if( i != j ){// rudiment
                     for( auto& rel : relations ){                        
-                        // NOTE: now I try to store all relations, but maybe in future it will better to compare new extracted relation with previour ones (maybe not)
+                        // NOTE: now I try to store all relations, but maybe in future it will better to compare new extracted relation with previous ones (maybe not)
                         bool find_appr = false;
                         double max_score = 0;
                         int best_rel = -1;
                         for( size_t k = 0 ; k < new_relations.size(); k++){
                             auto new_rel = new_relations[k];
-                            // check same objects
-                            if( new_rel.object_class1 == classes[i] && new_rel.object_class2 == classes[j] ){                                
+                            // check type and objects it operates
+                            if( new_rel.relation->Name == rel.first->Name && new_rel.object_class1 == classes[i] && new_rel.object_class2 == classes[j] ){                                
                                 double new_score = new_rel.relation->checkSoft(frame, every_detections[i], every_detections[j]);
                                 if( new_score > new_rel.threshold ){
                                     if( new_score > max_score ){
@@ -157,15 +157,17 @@ namespace eod{
                         }                        
                         if( find_appr ){
                             observing_scene_graph.add_edge(rel.first->Name, best_rel, i, j, false, 1, max_score);
+                            printf("Existing relation used (%s %s) between %s and %s\n", rel.first->Name.c_str(), rel.first->params_as_str().c_str() , classes[i].c_str(), classes[j].c_str());
                             continue;
                         }
                         
-                        rel.first->extractParams(frame, every_detections[i], every_detections[j]);
-                        printf("New relation %i (%s) between %s and %s \n",new_relations.size(), rel.first->params_as_str().c_str() , classes[i].c_str(), classes[j].c_str());
-                        // copy extracted parameters and store it                        
-                        new_relations.push_back(RegisteredRelation(rel.first->copy(), classes[i], classes[j], rel.second));
-                        // also add relations on observing scene
-                        observing_scene_graph.add_edge(rel.first->Name, new_relations.size()-1, i, j, false, 1);
+                        if( rel.first->extractParams(frame, every_detections[i], every_detections[j])){
+                            printf("New relation %i (%s %s) between %s and %s \n",new_relations.size(), rel.first->Name.c_str(), rel.first->params_as_str().c_str() , classes[i].c_str(), classes[j].c_str());
+                            // copy extracted parameters and store it                        
+                            new_relations.push_back(RegisteredRelation(rel.first->copy(), classes[i], classes[j], rel.second));
+                            // also add relations on observing scene
+                            observing_scene_graph.add_edge(rel.first->Name, new_relations.size()-1, i, j, false, 1);
+                        }
                     }
                 }
             }
@@ -192,7 +194,7 @@ namespace eod{
                         //printf("+\n");
                         if( score > new_relations[k].threshold){ // WARN 
                             main_scene.add_edge(rel->Name, k, i, j, false, 1, score);
-                            printf("Added base [%s] ---%i,%f--- [%s]\n",scene_objects[i]->name.c_str(), k, score, scene_objects[j]->name.c_str());
+                            printf("Added base [%s] ---%i,%s,%f--- [%s]\n",scene_objects[i]->name.c_str(), k, rel->Name.c_str(), score, scene_objects[j]->name.c_str());
                         }
                         else{
                             //printf("Skipped [%s] ---%i,%f--- [%s]\n",scene_objects[i]->name.c_str(), k, score, scene_objects[j]->name.c_str());
