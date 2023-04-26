@@ -85,8 +85,8 @@ namespace eod{
         scene_base_graph.add_vectice(obj->name, id, scene_objects.size()-1, 1, 1);                        
     }
     
-    void Scene::add_relation(RelationShip* rel, double threshold){
-        relations.push_back(std::make_pair(rel, threshold));
+    void Scene::add_relation(RelationShip* rel, double threshold_create, double threshold_match){
+        relations.push_back(std::make_pair(rel, std::make_pair(threshold_create,threshold_match)));
     }
     
     bool Scene::hasClass(std::string class_name){
@@ -128,12 +128,13 @@ namespace eod{
             return;
         }
         
-        //printf("1.2\n");
-        // // 1.2. define relations on observing scene        
-        defineRelationsOneByone(frame, new_relations, every_detections, observing_scene_graph, classes);
         
+        // // 1.2. define relations on observing scene        
+        defineRelationsOneByone(frame, new_relations, every_detections, observing_scene_graph, classes);        
         printf("New relations size %i\n",new_relations.size());
-        //printf("2\n");
+        
+        
+        
         // 2. compose main scene by observing scene objects and relations        
         // NOTE: maybe better also to delete extra object from main scene (which is not presented on observing one) - it should be done, because it will reduce relation checking step
         Graph main_scene = Graph(scene_base_graph);   
@@ -152,7 +153,7 @@ namespace eod{
                         double score = rel->checkSoft(frame, &(scene_objects[i]->eoi), &(scene_objects[j]->eoi));
                         //printf("score %f\n", score);
                         //printf("+\n");
-                        if( score > new_relations[k].threshold){ // WARN 
+                        if( score > new_relations[k].threshold_match){ // WARN (every relation is added)
                             main_scene.add_edge(rel->Name, k, i, j, false, 1, score);
                             printf("Added base [%s] ---%i,%s,%f--- [%s]\n",scene_objects[i]->name.c_str(), k, rel->Name.c_str(), score, scene_objects[j]->name.c_str());
                         }
@@ -210,6 +211,12 @@ namespace eod{
         //return results;
     }
     
+    void Scene::defineRelationTogether(const InfoImage& frame, std::vector<RegisteredRelation>& new_relations, const std::vector<ExtendedObjectInfo*>& every_detections, Graph& observing_scene_graph, const std::vector<std::string>& classes){
+        // PLAN
+        // get all distances
+        
+    }
+    
     
     void Scene::defineRelationsOneByone(const InfoImage& frame, std::vector<RegisteredRelation>& new_relations, const std::vector<ExtendedObjectInfo*>& every_detections, Graph& observing_scene_graph, const std::vector<std::string>& classes){
         for( size_t i = 0 ; i < every_detections.size() ; i++ ){
@@ -224,7 +231,7 @@ namespace eod{
                         // check type and objects it operates
                         if( new_rel.relation->Name == rel.first->Name && new_rel.object_class1 == classes[i] && new_rel.object_class2 == classes[j] ){                                
                             double new_score = new_rel.relation->checkSoft(frame, every_detections[i], every_detections[j]);
-                            if( new_score > new_rel.threshold ){
+                            if( new_score > new_rel.threshold_create ){
                                 if( new_score > max_score ){
                                     max_score = new_score;
                                     best_rel = k;
@@ -238,7 +245,7 @@ namespace eod{
                     }                        
                     if( find_appr ){
                         observing_scene_graph.add_edge(rel.first->Name, best_rel, i, j, false, 1, max_score);
-                        printf("Existing relation used (%s %s) between %s and %s\n", rel.first->Name.c_str(), rel.first->params_as_str().c_str() , classes[i].c_str(), classes[j].c_str());
+                        printf("Existing relation used (%s %s [%.2f]) between %s and %s\n", rel.first->Name.c_str(), rel.first->params_as_str().c_str(), max_score, classes[i].c_str(), classes[j].c_str());
                         continue;
                     }
                     

@@ -1146,11 +1146,12 @@ bool ObjectBase::loadSceneXML(TiXmlDocument *doc){
         while(R){
             
             std::string relation_name = R->Attribute("Class");
-            double thresh = 0;
-            R->Attribute("Threshold", &thresh);
+            double thresh_create = 0, thresh_match = 0;
+            R->Attribute("ThresholdCreate", &thresh_create);
+            R->Attribute("ThresholdMatch", &thresh_match);
             RelationShip* rel =  getByNameR(relation_name);
             if(rel){
-                sc->add_relation(rel, thresh);
+                sc->add_relation(rel, thresh_create, thresh_match);
             }
             else{
                 printf("Can't find relation %s for scene %s!\n", relation_name.c_str(), name.c_str());
@@ -1293,3 +1294,4 @@ ComplexObjectGraph* ObjectBase::getByNameCO(std::string name){
 #endif
 
 }
+

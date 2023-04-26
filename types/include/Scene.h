@@ -30,16 +30,18 @@ namespace eod{
     
     class RegisteredRelation{
     public:
-        RegisteredRelation(RelationShip* rel, std::string o1, std::string o2, double thresh){
+        RegisteredRelation(RelationShip* rel, std::string o1, std::string o2, std::pair<double, double> thresh){
             relation = rel;
             object_class1 = o1;
             object_class2 = o2;
-            threshold = thresh;
+            threshold_create = thresh.first;
+            threshold_match = thresh.second;
         }
         RelationShip* relation;
         std::string object_class1;
         std::string object_class2;
-        double threshold;
+        double threshold_create;
+        double threshold_match;
     };
     
     /*
@@ -60,7 +62,7 @@ namespace eod{
         void Identify(const InfoImage& frame, const InfoImage& depth, int seq);
         bool hasClass(std::string class_name);
         
-        void add_relation(RelationShip* rel, double threshold);
+        void add_relation(RelationShip* rel, double threshold_create, double threshold_match);
         
         std::string name;
         int id;
@@ -73,7 +75,7 @@ namespace eod{
     private:
         std::vector<SceneObject*> unique_classes;
         
-        std::vector<std::pair<RelationShip*, double>> relations;
+        std::vector<std::pair<RelationShip*, std::pair<double, double>>> relations;
         
         Graph scene_base_graph;
         
@@ -81,6 +83,7 @@ namespace eod{
         
         void defineRelationsOneByone(const InfoImage& frame, std::vector<RegisteredRelation>& new_relations, const std::vector<ExtendedObjectInfo*>& every_detections, Graph& observing_scene_graph, const std::vector<std::string>& classes);
         
+        void defineRelationTogether(const InfoImage& frame, std::vector<RegisteredRelation>& new_relations, const std::vector<ExtendedObjectInfo*>& every_detections, Graph& observing_scene_graph, const std::vector<std::string>& classes);
         
     };    
 }
