@@ -130,48 +130,8 @@ namespace eod{
         
         //printf("1.2\n");
         // // 1.2. define relations on observing scene        
-        for( size_t i = 0 ; i < every_detections.size() ; i++ ){
-            for( size_t j = i+1 ; j < every_detections.size() ; j++ ){
-                if( i != j ){// rudiment
-                    for( auto& rel : relations ){                        
-                        // NOTE: now I try to store all relations, but maybe in future it will better to compare new extracted relation with previous ones (maybe not)
-                        bool find_appr = false;
-                        double max_score = 0;
-                        int best_rel = -1;
-                        for( size_t k = 0 ; k < new_relations.size(); k++){
-                            auto new_rel = new_relations[k];
-                            // check type and objects it operates
-                            if( new_rel.relation->Name == rel.first->Name && new_rel.object_class1 == classes[i] && new_rel.object_class2 == classes[j] ){                                
-                                double new_score = new_rel.relation->checkSoft(frame, every_detections[i], every_detections[j]);
-                                if( new_score > new_rel.threshold ){
-                                    if( new_score > max_score ){
-                                        max_score = new_score;
-                                        best_rel = k;
-                                    }
-                                    
-                                    //observing_scene_graph.add_edge(rel.first->Name, k, i, j, false, 1, score);
-                                    find_appr = true;                                    
-                                    //break;
-                                }                                
-                            }
-                        }                        
-                        if( find_appr ){
-                            observing_scene_graph.add_edge(rel.first->Name, best_rel, i, j, false, 1, max_score);
-                            printf("Existing relation used (%s %s) between %s and %s\n", rel.first->Name.c_str(), rel.first->params_as_str().c_str() , classes[i].c_str(), classes[j].c_str());
-                            continue;
-                        }
-                        
-                        if( rel.first->extractParams(frame, every_detections[i], every_detections[j])){
-                            printf("New relation %i (%s %s) between %s and %s \n",new_relations.size(), rel.first->Name.c_str(), rel.first->params_as_str().c_str() , classes[i].c_str(), classes[j].c_str());
-                            // copy extracted parameters and store it                        
-                            new_relations.push_back(RegisteredRelation(rel.first->copy(), classes[i], classes[j], rel.second));
-                            // also add relations on observing scene
-                            observing_scene_graph.add_edge(rel.first->Name, new_relations.size()-1, i, j, false, 1);
-                        }
-                    }
-                }
-            }
-        }
+        defineRelationsOneByone(frame, new_relations, every_detections, observing_scene_graph, classes);
+        
         printf("New relations size %i\n",new_relations.size());
         //printf("2\n");
         // 2. compose main scene by observing scene objects and relations        
@@ -249,4 +209,49 @@ namespace eod{
         printf("~~~~~~~~~~~Scenes done~~~~~~~~~~~~~\n");
         //return results;
     }
+    
+    
+    void Scene::defineRelationsOneByone(const InfoImage& frame, std::vector<RegisteredRelation>& new_relations, const std::vector<ExtendedObjectInfo*>& every_detections, Graph& observing_scene_graph, const std::vector<std::string>& classes){
+        for( size_t i = 0 ; i < every_detections.size() ; i++ ){
+            for( size_t j = i+1 ; j < every_detections.size() ; j++ ){                
+                for( auto& rel : relations ){                        
+                    // NOTE: now I try to store all relations, but maybe in future it will better to compare new extracted relation with previous ones (maybe not)
+                    bool find_appr = false;
+                    double max_score = 0;
+                    int best_rel = -1;
+                    for( size_t k = 0 ; k < new_relations.size(); k++){
+                        auto new_rel = new_relations[k];
+                        // check type and objects it operates
+                        if( new_rel.relation->Name == rel.first->Name && new_rel.object_class1 == classes[i] && new_rel.object_class2 == classes[j] ){                                
+                            double new_score = new_rel.relation->checkSoft(frame, every_detections[i], every_detections[j]);
+                            if( new_score > new_rel.threshold ){
+                                if( new_score > max_score ){
+                                    max_score = new_score;
+                                    best_rel = k;
+                                }
+                                
+                                //observing_scene_graph.add_edge(rel.first->Name, k, i, j, false, 1, score);
+                                find_appr = true;                                    
+                                //break;
+                            }                                
+                        }
+                    }                        
+                    if( find_appr ){
+                        observing_scene_graph.add_edge(rel.first->Name, best_rel, i, j, false, 1, max_score);
+                        printf("Existing relation used (%s %s) between %s and %s\n", rel.first->Name.c_str(), rel.first->params_as_str().c_str() , classes[i].c_str(), classes[j].c_str());
+                        continue;
+                    }
+                    
+                    if( rel.first->extractParams(frame, every_detections[i], every_detections[j])){
+                        printf("New relation %i (%s %s) between %s and %s \n",new_relations.size(), rel.first->Name.c_str(), rel.first->params_as_str().c_str() , classes[i].c_str(), classes[j].c_str());
+                        // copy extracted parameters and store it                        
+                        new_relations.push_back(RegisteredRelation(rel.first->copy(), classes[i], classes[j], rel.second));
+                        // also add relations on observing scene
+                        observing_scene_graph.add_edge(rel.first->Name, new_relations.size()-1, i, j, false, 1);
+                    }
+                }
+            }
+        }
+    }
+    
 }

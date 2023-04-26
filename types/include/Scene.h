@@ -79,6 +79,8 @@ namespace eod{
         
         double probability;
         
+        void defineRelationsOneByone(const InfoImage& frame, std::vector<RegisteredRelation>& new_relations, const std::vector<ExtendedObjectInfo*>& every_detections, Graph& observing_scene_graph, const std::vector<std::string>& classes);
+        
         
     };    
 }
