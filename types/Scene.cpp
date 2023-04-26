@@ -132,36 +132,38 @@ namespace eod{
         // // 1.2. define relations on observing scene        
         defineRelationsOneByone(frame, new_relations, every_detections, observing_scene_graph, classes);        
         printf("New relations size %i\n",new_relations.size());
-        
+        if( new_relations.size() == 0 )
+            return;
         
         
         // 2. compose main scene by observing scene objects and relations        
         // NOTE: maybe better also to delete extra object from main scene (which is not presented on observing one) - it should be done, because it will reduce relation checking step
         Graph main_scene = Graph(scene_base_graph);   
         //printf("graph: %i %i\n", main_scene.get_vert_len(), main_scene.get_edges_len());
-        for( size_t k = 0 ; k < new_relations.size(); k++){
-            RelationShip* rel = new_relations[k].relation;
-            for( size_t i = 0 ; i < scene_objects.size() ; i++ ){
-                if( scene_objects[i]->class_name() != new_relations[k].object_class1 )
-                    continue;
-                for( size_t j = i+1 ; j < scene_objects.size() ; j++ ){
+        
+        for( size_t i = 0 ; i < scene_objects.size() ; i++ ){
+                
+            for( size_t j = i+1 ; j < scene_objects.size() ; j++ ){
+                double max_score = 0;
+                int best_rel = 0;
+                for( size_t k = 0 ; k < new_relations.size(); k++){                    
+                    if( scene_objects[i]->class_name() != new_relations[k].object_class1 )
+                        continue;
                     if( scene_objects[j]->class_name() != new_relations[k].object_class2 )
                         continue;
-                    if( i != j ){// rudiment
-                        //printf("Checking %s...\n",rel->Name.c_str());
-                        //printf("$\n");
-                        double score = rel->checkSoft(frame, &(scene_objects[i]->eoi), &(scene_objects[j]->eoi));
-                        //printf("score %f\n", score);
-                        //printf("+\n");
-                        if( score > new_relations[k].threshold_match){ // WARN (every relation is added)
-                            main_scene.add_edge(rel->Name, k, i, j, false, 1, score);
-                            printf("Added base [%s] ---%i,%s,%f--- [%s]\n",scene_objects[i]->name.c_str(), k, rel->Name.c_str(), score, scene_objects[j]->name.c_str());
-                        }
-                        else{
-                            //printf("Skipped [%s] ---%i,%f--- [%s]\n",scene_objects[i]->name.c_str(), k, score, scene_objects[j]->name.c_str());
-                        }
-                        //printf("-\n");
+                    RelationShip* rel = new_relations[k].relation;
+                                        
+                    double score = rel->checkSoft(frame, &(scene_objects[i]->eoi), &(scene_objects[j]->eoi));
+                    if( score > max_score ){
+                        max_score = score;
+                        best_rel = k;
                     }
+                                        
+                }
+                RelationShip* rel = new_relations[best_rel].relation;
+                if( max_score > new_relations[best_rel].threshold_match){ 
+                    main_scene.add_edge(rel->Name, best_rel, i, j, false, 1, max_score);
+                    printf("Added base [%s] ---%i,%s,%f--- [%s]\n",scene_objects[i]->name.c_str(), best_rel, rel->Name.c_str(), max_score, scene_objects[j]->name.c_str());
                 }
             }
         }
