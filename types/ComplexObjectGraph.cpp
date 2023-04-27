@@ -5,6 +5,26 @@
 
 namespace eod{
     
+    igraph_bool_t compare_vertexes(const igraph_t *graph1,
+                                     const igraph_t *graph2,
+                                     const igraph_integer_t v1_num,
+                                     const igraph_integer_t v2_num,
+                                     void *arg){
+        
+        return igraph_bool_t(VAN(graph1, "obj_type", v1_num) == VAN(graph2, "obj_type", v2_num) );
+        
+    }
+    
+    igraph_bool_t compare_edges(const igraph_t *graph1,
+                                     const igraph_t *graph2,
+                                     const igraph_integer_t e1_num,
+                                     const igraph_integer_t e2_num,
+                                     void *arg){
+        
+        return igraph_bool_t(EAN(graph1, "rel_type", e1_num) == EAN(graph2, "rel_type", e2_num) );
+        
+    }
+    
     Graph::Graph(bool directed){
         vertices_len = 0;
         edges_len = 0;
@@ -172,12 +192,15 @@ namespace eod{
         igraph_vector_ptr_t maps;
         igraph_vector_ptr_init(&maps, 0);
         
+        /*
         igraph_vector_int_t vert1 = this->get_vertices_colors();
         igraph_vector_int_t vert2 = sub_graph->get_vertices_colors();
         igraph_vector_int_t edg1 = this->get_edges_colors();
         igraph_vector_int_t edg2 = sub_graph->get_edges_colors();
-
         igraph_get_subisomorphisms_vf2(&graph, &(sub_graph->graph), &vert1, &vert2, &edg1, &edg2, &maps, 0, 0, 0);
+        */
+        // by adding compare functions there is no need to colorize graph
+        igraph_get_subisomorphisms_vf2(&graph, &(sub_graph->graph), 0, 0, 0, 0, &maps, compare_vertexes, compare_edges, 0);
         
         std::vector<std::pair<std::vector<int>, double>> vect_maps;
         
