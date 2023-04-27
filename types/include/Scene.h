@@ -1,6 +1,7 @@
 #ifndef SCENE_H
 #define SCENE_H
 
+#include "Graph.h"
 #include "ComplexObjectGraph.h"
 
 namespace eod{
