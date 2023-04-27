@@ -1,7 +1,36 @@
 #include "Graph.h"
+#include <stdlib.h>
+#include <algorithm>
 
 #ifdef USE_IGRAPH
 namespace eod{
+    
+    std::vector<double> parse_packed_str_d(std::string packed, std::string delimiter = ":"){
+        size_t pos = 0;        
+        std::vector<double> output;
+        while ((pos = packed.find(delimiter)) != std::string::npos) {
+            std::string token = packed.substr(0, pos);
+            output.push_back(atof(token.c_str()));
+            packed.erase(0, pos + delimiter.length());
+        }
+        if( !packed.empty() )
+            output.push_back(atof(packed.c_str()));
+        return output;
+    }
+    
+    std::vector<double> parse_packed_str_i(std::string packed, std::string delimiter = ":"){
+        size_t pos = 0;        
+        std::vector<double> output;
+        while ((pos = packed.find(delimiter)) != std::string::npos) {
+            std::string token = packed.substr(0, pos);
+            output.push_back(atoi(token.c_str()));
+            packed.erase(0, pos + delimiter.length());
+            //printf("%s-",token.c_str());
+        }
+        if( !packed.empty() )
+            output.push_back(atoi(packed.c_str()));
+        return output;
+    }
     
     igraph_bool_t compare_vertexes(const igraph_t *graph1,
                                      const igraph_t *graph2,
@@ -19,7 +48,30 @@ namespace eod{
                                      const igraph_integer_t e2_num,
                                      void *arg){
         
-        return igraph_bool_t(EAN(graph1, "rel_type", e1_num) == EAN(graph2, "rel_type", e2_num) );
+        // check if it is multi-edge
+        bool m1 = EAN(graph1, "multi", e1_num);
+        bool m2 = EAN(graph2, "multi", e2_num);
+        
+        if( !m1 and !m2 )
+            return igraph_bool_t(EAN(graph1, "rel_type", e1_num) == EAN(graph2, "rel_type", e2_num) );
+        else if(m1 and m2){
+            printf("Both edges are multi, you sure?\n");
+            return igraph_bool_t(false); // TODO maybe sometimes will be needed
+        }
+        else{
+            if(m1){
+                auto types = parse_packed_str_i(EAS(graph1, "rel_type", e1_num));
+                int type = EAN(graph2, "rel_type", e2_num);
+                bool same = std::find(types.begin(), types.end(), type) != types.end();                
+                //printf("Same: %s\n", same ? "true" : "false");
+                return igraph_bool_t( same );
+            }
+            else{
+                auto types = parse_packed_str_i(EAS(graph2, "rel_type", e2_num));
+                int type = EAN(graph1, "rel_type", e1_num);
+                return igraph_bool_t( std::find(types.begin(), types.end(), type) != types.end() );
+            }            
+        }
         
     }
     
@@ -35,8 +87,8 @@ namespace eod{
         edges_len = other.edges_len;
         igraph_copy(&graph, &(other.graph));
         accuracy = other.accuracy;
-        vertices_colors = other.vertices_colors;
-        edges_colors = other.edges_colors;
+        //vertices_colors = other.vertices_colors;
+        //edges_colors = other.edges_colors;
     }
     
     /*
@@ -71,7 +123,7 @@ namespace eod{
         SETVAN(&graph, "dc", vertices_len, int(dc*accuracy));
         SETVAN(&graph, "weight", vertices_len, int(weight*accuracy));
         
-        vertices_colors.push_back(object_type);
+        //vertices_colors.push_back(object_type);
         
         //printf("Added %i vertice\n", vertices_len);
         vertices_len++;        
@@ -81,19 +133,71 @@ namespace eod{
     int Graph::add_edge(std::string relation_name, int relation_type, int o1, int o2, bool fake, double weight, double dc){
         //printf("Trying to added edge between vertices %i and %i\n", o1, o2);
         
-        igraph_add_edge(&graph, o1, o2);
+        igraph_add_edge(&graph, o1, o2);        
         SETEAS(&graph, "rel_name", edges_len, relation_name.c_str());
         SETEAN(&graph, "rel_type", edges_len, relation_type);
+        //SETEAB(&graph, "fake", edges_len, igraph_bool_t(fake));
         SETEAN(&graph, "fake", edges_len, int(fake));
         SETEAN(&graph, "weight", edges_len, int(weight*accuracy));
         SETEAN(&graph, "dc", edges_len, int(dc*accuracy));
+        //SETEAB(&graph, "multi", edges_len, igraph_bool_t(false));
+        SETEAN(&graph, "multi", edges_len, int(false));
         
-        edges_colors.push_back(relation_type);
+        //edges_colors.push_back(relation_type);
         
         edges_len++;
         return edges_len;
     }
     
+    /*
+     * Function that makes an 'multiedge' which is paked in one real edge, to make VF2 work
+     */
+    void Graph::add_multi_edge(std::string relation_name, int relation_type, int o1, int o2, double weight, double dc){
+        // check edge exist
+        igraph_vector_t pair;
+        igraph_vector_init(&pair, 2);
+        VECTOR(pair)[0] = o1;
+        VECTOR(pair)[1] = o2;
+        igraph_vector_t edge_id;
+        igraph_vector_init(&edge_id, 0);        
+        igraph_get_eids(&graph, &edge_id, &pair, NULL, 0, 0);
+        // add new
+        if( VECTOR(edge_id)[0] == -1 ){
+            printf("Adding new...\n");
+            igraph_add_edge(&graph, o1, o2);            
+//             SETEAB(&graph, "multi", edges_len, igraph_bool_t(true));
+//             SETEAB(&graph, "fake", edges_len, igraph_bool_t(false));
+            SETEAN(&graph, "multi", edges_len, int(true));
+            SETEAN(&graph, "fake", edges_len, int(false));
+            
+            SETEAS(&graph, "rel_name", edges_len, relation_name.c_str());
+            SETEAS(&graph, "rel_type", edges_len, std::to_string(relation_type).c_str());
+            SETEAS(&graph, "weight", edges_len, std::to_string(weight).substr(0,4).c_str());
+            SETEAS(&graph, "dc", edges_len, std::to_string(dc).substr(0,4).c_str());
+            
+            edges_len++;
+        }
+        // update existing
+        else if(igraph_vector_size(&edge_id) == 1){
+            int eid = VECTOR(edge_id)[0];
+            printf("There are...\n");
+            
+            std::string rel_name = EAS(&graph, "rel_name", eid);
+            SETEAS(&graph, "rel_name", eid, (rel_name+":"+relation_name).c_str());
+            std::string rel_type = EAS(&graph, "rel_type", eid);
+            SETEAS(&graph, "rel_type", eid, (rel_type+":"+std::to_string(relation_type)).c_str());
+            std::string weight_ = EAS(&graph, "weight", eid);
+            SETEAS(&graph, "weight", eid, (weight_+":"+std::to_string(weight).substr(0,4)).c_str());
+            std::string dc_ = EAS(&graph, "dc", eid);
+            SETEAS(&graph, "dc", eid, (dc_+":"+std::to_string(dc).substr(0,4)).c_str());
+            
+        }
+        else{
+            printf("Error! There are more than one relation, despite it already is multiedge!!");
+        }                        
+    }
+    
+    /*
     igraph_vector_int_t Graph::get_vertices_colors(){
         igraph_vector_int_t vc;
         igraph_vector_int_init(&vc, vertices_len);
@@ -124,7 +228,7 @@ namespace eod{
         }
         return info;
     }
-    
+    */
     /*
      * Returns:
      * vector of sub isomorphisms:
@@ -184,7 +288,7 @@ namespace eod{
                         VECTOR(pair)[0] = vect_maps[i].first[j1];
                         VECTOR(pair)[1] = vect_maps[i].first[j2];
                         igraph_get_eids(&graph, &edge_id, &pair, NULL, 0, 0);
-                        int edge_id_ind = VECTOR(edge_id)[0];
+                        int edge_id_ind = VECTOR(edge_id)[0];// takin' first edge only, so it is important for graph to be simple
                         if( edge_id_ind != -1){                        
                             double dc1 = double(VAN(&graph, "dc", vect_maps[i].first[j1]))/accuracy;
                             double dc2 = double(VAN(&graph, "dc", vect_maps[i].first[j2]))/accuracy;
@@ -196,17 +300,39 @@ namespace eod{
                             VECTOR(pair)[1] = j2;
                             igraph_get_eids(&(sub_graph -> graph), &edge_id, &pair, NULL, 0, 0);
                             int edge_id_ind_tar = VECTOR(edge_id)[0];
+                            
                             double k_edge = double(EAN(&(sub_graph->graph), "weight", edge_id_ind_tar))/accuracy;
-                            double dc_edge = double(EAN(&graph, "dc", edge_id_ind))/accuracy;
                             double dc_edge_sub = double(EAN(&sub_graph->graph, "dc", edge_id_ind_tar))/accuracy;
                             
+                            double dc_edge;
                             
+                            if(! EAN(&graph, "multi", edge_id_ind) ){
+                                dc_edge = double(EAN(&graph, "dc", edge_id_ind))/accuracy;
+                            }
+                            else{
+                                //dc_edge = 1; // just for test
+                                auto indexes = parse_packed_str_i(EAS(&graph, "rel_type", edge_id_ind));
+                                auto dcs = parse_packed_str_d(EAS(&graph, "dc", edge_id_ind));
+                                
+                                int target_type = EAN(&sub_graph->graph, "rel_type", edge_id_ind_tar);
+                                
+                                auto it = std::find(indexes.begin(), indexes.end(), target_type);
+                                if( it != indexes.end() ){
+                                    int index = it - indexes.begin();
+                                    dc_edge = dcs[index];
+                                }
+                                else{
+                                    printf("Error! Main graph does not contain specifiec enge corresssponing second\n");
+                                }
+                                
+                            }
+                                                                                    
                             if( EAN(&graph, "fake", edge_id_ind) ){
                                 // IT IS FAKE                                    
                             }
                             else{                                                                
                                 // calc
-                                Dc += dc_edge_sub*dc_edge*k_edge*(k1 * dc1 + k2 * dc2);                                
+                                Dc += dc_edge*k_edge*(k1 * dc1 + k2 * dc2);                                
                             }   
                             denominator += k_edge*(k1 + k2);
                         }

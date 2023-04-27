@@ -144,8 +144,8 @@ namespace eod{
         for( size_t i = 0 ; i < scene_objects.size() ; i++ ){
                 
             for( size_t j = i+1 ; j < scene_objects.size() ; j++ ){
-                double max_score = 0;
-                int best_rel = 0;
+                //double max_score = 0;
+                //int best_rel = 0;
                 for( size_t k = 0 ; k < new_relations.size(); k++){                    
                     if( scene_objects[i]->class_name() != new_relations[k].object_class1 )
                         continue;
@@ -154,21 +154,23 @@ namespace eod{
                     RelationShip* rel = new_relations[k].relation;
                                         
                     double score = rel->checkSoft(frame, &(scene_objects[i]->eoi), &(scene_objects[j]->eoi));
+                    /*
                     if( score > max_score ){
                         max_score = score;
                         best_rel = k;
-                    }
+                    }*/
                                         
-                }
-                RelationShip* rel = new_relations[best_rel].relation;
-                if( max_score > new_relations[best_rel].threshold_match){ 
-                    main_scene.add_edge(rel->Name, best_rel, i, j, false, 1, max_score);
-                    printf("Added base [%s] ---%i,%s,%f--- [%s]\n",scene_objects[i]->name.c_str(), best_rel, rel->Name.c_str(), max_score, scene_objects[j]->name.c_str());
+                //}
+                    //RelationShip* rel = new_relations[best_rel].relation;
+                    if( score > new_relations[k].threshold_match){ 
+                        main_scene.add_multi_edge(rel->Name, k, i, j, 1, score);
+                        printf("Added base [%s] ---%i,%s,%f--- [%s]\n",scene_objects[i]->name.c_str(), k, rel->Name.c_str(), score, scene_objects[j]->name.c_str());
+                    }
                 }
             }
         }
         
-        //printf("3\n");
+        printf("3\n");
         // 3. find subisomorphism of observing to main
         std::vector<std::pair<std::vector<int>, double>> maps = main_scene.get_subisomorphisms(&observing_scene_graph);
         
@@ -185,8 +187,8 @@ namespace eod{
                 
         printf("observing_scene_graph: %i, %i\n",observing_scene_graph.get_vert_len(), observing_scene_graph.get_edges_len());
         printf("main_scene: %i %i\n",main_scene.get_vert_len(), main_scene.get_edges_len());
-        printf("obs: %s\n",observing_scene_graph.get_color_info().c_str());
-        printf("main: %s\n",main_scene.get_color_info().c_str());
+        //printf("obs: %s\n",observing_scene_graph.get_color_info().c_str());
+        //printf("main: %s\n",main_scene.get_color_info().c_str());
         printf("Isomorphisms size: %i\n",maps.size());
                 
         printf("obs: %s main: %s\n",observing_scene_graph.is_simple() ? "simple" : "notsimple", main_scene.is_simple() ? "simple" : "notsimple");

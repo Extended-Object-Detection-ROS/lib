@@ -17,7 +17,10 @@ namespace eod{
         Graph(const Graph&);
         
         int add_vectice(std::string object_name, int object_type, int obj_num = 0, double dc = 1, double weight = 1);
+        
         int add_edge(std::string relation_name, int relation_type, int o1, int o2, bool fake = false, double weight = 1, double dc = 1);                
+        
+        void add_multi_edge(std::string relation_name, int relation_type, int o1, int o2, double weight, double dc);
         
         std::vector<std::pair<std::vector<int>, double>> get_subisomorphisms(Graph * sub_graph);
         
@@ -31,7 +34,7 @@ namespace eod{
             return edges_len;
         }
         
-        std::string get_color_info();
+        //std::string get_color_info();
         
         bool is_simple();
         
@@ -40,11 +43,11 @@ namespace eod{
         igraph_t graph;
         
         // colors, needed for VF2                
-        std::vector<int> vertices_colors;
-        std::vector<int> edges_colors;
+        //std::vector<int> vertices_colors;
+        //std::vector<int> edges_colors;
         
-        igraph_vector_int_t get_vertices_colors();
-        igraph_vector_int_t get_edges_colors();
+        //igraph_vector_int_t get_vertices_colors();
+        //igraph_vector_int_t get_edges_colors();
         
         int vertices_len;
         int edges_len;
