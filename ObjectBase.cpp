@@ -425,7 +425,15 @@ namespace eod{
                     continue;
                 }
                 
-                tmpA = new NotAttribute(aA);                
+                int method_;
+                attr->Attribute("method", &method_);
+                NotAttributeMethod method = (NotAttributeMethod)method_;
+                double iou;
+                if( method == NotAttributeMethod::NAM_DETECT){
+                    attr->Attribute("iou", &iou);
+                }
+                
+                tmpA = new NotAttribute(aA, method, iou);
                 break;
             }
             case LOG_OR_A:

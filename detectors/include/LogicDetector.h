@@ -31,11 +31,13 @@ namespace eod{
     // ------------------------
     // NOT
     // ------------------------
+    enum NotAttributeMethod {NAM_CHECK, NAM_DETECT};
+    
     class NotAttribute : public Attribute{
     public:
         
         NotAttribute();
-        NotAttribute(Attribute*);
+        NotAttribute(Attribute*, NotAttributeMethod method = NotAttributeMethod::NAM_CHECK, double iou = 0.75);
         
         std::vector<ExtendedObjectInfo> Detect2(const InfoImage& image, int seq);
         
@@ -44,7 +46,10 @@ namespace eod{
         void Extract2(const InfoImage& image, ExtendedObjectInfo& rect);
         
     private:
-        Attribute* attribute;        
+        Attribute* attribute;       
+        
+        NotAttributeMethod method;
+        double iou;
     };
     
     

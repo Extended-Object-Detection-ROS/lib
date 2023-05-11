@@ -88,12 +88,15 @@ namespace eod{
         attribute = NULL;                
         inited = false;
         Type = LOG_NOT_A;
+        method = NotAttributeMethod::NAM_CHECK;
     }
     
-    NotAttribute::NotAttribute(Attribute* a){
+    NotAttribute::NotAttribute(Attribute* a, NotAttributeMethod method_, double iou_){
         attribute = a;        
         inited = true;
         Type = LOG_NOT_A;
+        method = method_;
+        iou = iou_;
     }
     
     vector<ExtendedObjectInfo> NotAttribute::Detect2(const InfoImage& image, int seq){                
@@ -110,14 +113,27 @@ namespace eod{
     }
     
     bool NotAttribute::Check2(const InfoImage& image, ExtendedObjectInfo& rect){
-        bool rv = !attribute->Check2(image, rect);
-        if( rv == false){
-            rect.scores_with_weights.pop_back();
+        if( method == NotAttributeMethod::NAM_CHECK){
+            bool rv = !attribute->Check2(image, rect);
+            if( rv == false){
+                rect.scores_with_weights.pop_back();
+            }
+            else{
+                rect.setScoreWeight(1, Weight);
+            }
+            return rv;
         }
-        else{
-            rect.setScoreWeight(1, Weight);
+        if( method == NotAttributeMethod::NAM_DETECT){
+            vector<ExtendedObjectInfo> rects = attribute->Detect2(image, image.seq());
+            for( auto& eoi : rects ){
+                if( intersectionOverUnion(&rect, &eoi) >= iou ){
+                    return false;
+                }
+            }
+            return true;
         }
-        return rv;
+        printf("Error in NotAttribute, unknown value %i\n", method);
+        return false;
     }    
     
     void NotAttribute::Extract2(const InfoImage& image, ExtendedObjectInfo& rect){

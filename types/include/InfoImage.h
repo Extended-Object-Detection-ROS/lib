@@ -13,17 +13,24 @@ namespace eod{
     public:
         InfoImage();
         InfoImage(cv::Mat image);
-        InfoImage(cv::Mat image, cv::Mat K, cv::Mat D);
+        InfoImage(cv::Mat image, cv::Mat K, cv::Mat D, int seq = 0);
                 
         const cv::Mat& K() const {return K_;}
         const cv::Mat& D() const {return D_;}
+        const int seq() const {return seq_;}
+        
+        void set_seq(int seq){
+            seq_ = seq;
+        }
         
         virtual ~InfoImage();
                         
     private:
         
         cv::Mat K_;
-        cv::Mat D_;                
+        cv::Mat D_;   
+        
+        int seq_;
     };
     
     
