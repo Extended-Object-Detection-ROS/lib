@@ -187,8 +187,10 @@ namespace eod{
             }
         }
         // reconvert back to RGB
-        if( mode_attributes.back().first.second != RGB ){
-            transform_eoi(objects, depth, frame);
+        if( objects.size() > 0 ){
+            if( mode_attributes.back().first.second != RGB ){
+                transform_eoi(objects, depth, frame);
+            }
         }
             
         return objects;
@@ -301,8 +303,10 @@ namespace eod{
                 ++it;
         }       
         // reconvert back to RGB
-        if( mode_attributes.back().first.second != RGB ){
-            transform_eoi(objects, depth, frame);
+        if( objects.size() > 0 ){
+            if( mode_attributes.back().first.second != RGB ){
+                transform_eoi(objects, depth, frame);
+            }
         }
         return objects;
     }
