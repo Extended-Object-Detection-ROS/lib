@@ -1,6 +1,20 @@
 #include "Scene.h"
+#include "geometry_utils.h"
 
 namespace eod{
+    
+    
+    double calc_size_sim(const SceneObject& sc_obj, const ExtendedObjectInfo& vis_obj, const InfoImage& info_im){
+        double vis_h, vis_w;
+        cv::Vec3d tl = get_translation(vis_obj.tl(), info_im.K(), vis_obj.tvec[0][2]);
+        cv::Vec3d br = get_translation(vis_obj.br(), info_im.K(), vis_obj.tvec[0][2]);
+        
+        vis_h = br[1] - tl[1];
+        vis_w = br[0] - tl[0];
+        
+    }    
+    
+    // SceneObject
     
     SceneObject::SceneObject(std::string name_, double x_, double y_, double z_, double h_, double r_){
         name = name_;        
@@ -200,12 +214,15 @@ namespace eod{
                 continue;
             printf("Scene %i %f\n", i, scene.first);
             for( size_t j = 0 ; j < maps[i].first.size() ; j++ ){
-                // j - no vectice in observing_scene_graph
-                // maps[i].first[j] - no vectice in main_scene
+                // j - no of vectice in observing_scene_graph
+                // maps[i].first[j] - no of vectice in main_scene
                 std::pair<SceneObject*, ExtendedObjectInfo*> obj_pair;
                 obj_pair.first = scene_objects[maps[i].first[j]];
                 obj_pair.second = every_detections[j];
                 printf("\t[%i] --> [%i] (%s)\n",j, maps[i].first[j], obj_pair.first->name.c_str());
+                
+                // try calc score here
+                //double dc_object = obj_pair.second.total_score;
 
                 scene.second.push_back(obj_pair);
             }
@@ -214,13 +231,13 @@ namespace eod{
         printf("~~~~~~~~~~~Scenes done~~~~~~~~~~~~~\n");
         //return results;
     }
+        
     
     void Scene::defineRelationTogether(const InfoImage& frame, std::vector<RegisteredRelation>& new_relations, const std::vector<ExtendedObjectInfo*>& every_detections, Graph& observing_scene_graph, const std::vector<std::string>& classes){
         // PLAN
         // get all distances
         
-    }
-    
+    }    
     
     void Scene::defineRelationsOneByone(const InfoImage& frame, std::vector<RegisteredRelation>& new_relations, const std::vector<ExtendedObjectInfo*>& every_detections, Graph& observing_scene_graph, const std::vector<std::string>& classes){
         for( size_t i = 0 ; i < every_detections.size() ; i++ ){
