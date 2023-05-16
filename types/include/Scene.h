@@ -29,6 +29,26 @@ namespace eod{
               
     };
     
+    
+    class SceneComparation{
+    public:
+        SceneComparation(){}        
+        virtual double compare(SceneObject* scene_obj, ExtendedObjectInfo* vis_obj) = 0;
+    private:        
+    };
+    
+    
+    class SizeSceneComparation : public SceneComparation{
+    public:
+        SizeSceneComparation(const InfoImage& info_im, double sigma_percent, double p_aligned = 0.5);
+        double compare(SceneObject* scene_obj, ExtendedObjectInfo* vis_obj);
+    private:
+        InfoImage info_im_;
+        double sigma_percent_;
+        double p_aligned_;
+    };
+    
+    
     class RegisteredRelation{
     public:
         RegisteredRelation(RelationShip* rel, std::string o1, std::string o2, std::pair<double, double> thresh){

@@ -6,6 +6,9 @@
 
 namespace eod{
     
+    
+    
+    
     /*
      * This class is wrap around igraph's C-style functions
      */
@@ -23,6 +26,9 @@ namespace eod{
         void add_multi_edge(std::string relation_name, int relation_type, int o1, int o2, double weight, double dc);
         
         std::vector<std::pair<std::vector<int>, double>> get_subisomorphisms(Graph * sub_graph);
+        
+        template <class S, class V>
+        std::vector<std::pair<std::vector<int>, double>> get_subisomorphisms_scene(Graph * sub_graph, const std::vector<S*>* scenes_objects, const std::vector<V*>* visual_objects, double (*cmp_func)(S*, V*));
         
         std::string get_vertice_params(int id, int* object_type, int* obj_num);
         

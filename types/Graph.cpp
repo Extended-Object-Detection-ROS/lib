@@ -340,6 +340,124 @@ namespace eod{
         return vect_maps;                
     }
     
+    template <class S, class V>
+    std::vector<std::pair<std::vector<int>, double>> Graph::get_subisomorphisms_scene(Graph * sub_graph, const std::vector<S*>* scenes_objects, const std::vector<V*>* visual_objects, double (*cmp_func)(S*, V*))
+    {
+        igraph_vector_ptr_t maps;
+        igraph_vector_ptr_init(&maps, 0);
+        
+        /*
+        igraph_vector_int_t vert1 = this->get_vertices_colors();
+        igraph_vector_int_t vert2 = sub_graph->get_vertices_colors();
+        igraph_vector_int_t edg1 = this->get_edges_colors();
+        igraph_vector_int_t edg2 = sub_graph->get_edges_colors();
+        igraph_get_subisomorphisms_vf2(&graph, &(sub_graph->graph), &vert1, &vert2, &edg1, &edg2, &maps, 0, 0, 0);
+        */
+        // by adding compare functions there is no need to colorize graph
+        igraph_get_subisomorphisms_vf2(&graph, &(sub_graph->graph), 0, 0, 0, 0, &maps, compare_vertexes, compare_edges, 0);
+        
+        std::vector<std::pair<std::vector<int>, double>> vect_maps;
+        
+        int n_subis = igraph_vector_ptr_size(&maps);
+        for(size_t i = 0; i < n_subis; i++ ){
+            igraph_vector_t *temp = (igraph_vector_t*) VECTOR(maps)[i];
+            std::vector<int> map;
+            
+            int n_map = igraph_vector_size(temp);
+            for(size_t j = 0; j < n_map; j++){
+                // j of graph2 --> VECTOR(*temp)[j] of graph1;
+                map.push_back(VECTOR(*temp)[j]);
+            }
+            vect_maps.push_back(std::pair<std::vector<int>,double>(map, 0));      
+            igraph_vector_destroy(temp);
+            igraph_free(temp);
+        }
+        igraph_vector_ptr_destroy(&maps);       
+        
+        // get Dc
+        //std::vector<double> Dcs;
+        
+        igraph_vector_t pair;
+        igraph_vector_init(&pair, 2);
+        igraph_vector_t edge_id;
+        igraph_vector_init(&edge_id, 0);
+        
+        for( size_t i = 0 ; i < vect_maps.size() ; i++ ){
+            double Dc = 0;
+            //int edges_cnt = 0;
+            double denominator = 0; // TODO calc on graph init
+            for( size_t j1 = 0; j1 < vect_maps[i].first.size(); j1++ ){
+                for( size_t j2 = j1+1; j2 < vect_maps[i].first.size(); j2++ ){
+                    //if( j1 != j2 ){
+                        VECTOR(pair)[0] = vect_maps[i].first[j1];
+                        VECTOR(pair)[1] = vect_maps[i].first[j2];
+                        igraph_get_eids(&graph, &edge_id, &pair, NULL, 0, 0);
+                        int edge_id_ind = VECTOR(edge_id)[0];// takin' first edge only, so it is important for graph to be simple
+                        if( edge_id_ind != -1){                        
+                            double dc1 = double(VAN(&graph, "dc", vect_maps[i].first[j1]))/accuracy;
+                            double dc2 = double(VAN(&graph, "dc", vect_maps[i].first[j2]))/accuracy;
+                            double k1 = double(VAN(&(sub_graph->graph), "weight", j1))/accuracy;
+                            double k2 = double(VAN(&(sub_graph->graph), "weight", j2))/accuracy;
+                            
+                            // calc super dc
+                            double dc1_add = cmp_func((*scenes_objects)[j1], 
+                                                     (*visual_objects)[vect_maps[i].first[j1]]);
+                            
+                            double dc2_add = cmp_func((*scenes_objects)[j2], 
+                                                     (*visual_objects)[vect_maps[i].first[j2]]);
+                            
+                            dc1 *= dc1_add;
+                            dc2 *= dc2_add;
+                            
+                            
+                            // extract edge w from target graph
+                            VECTOR(pair)[0] = j1;
+                            VECTOR(pair)[1] = j2;
+                            igraph_get_eids(&(sub_graph -> graph), &edge_id, &pair, NULL, 0, 0);
+                            int edge_id_ind_tar = VECTOR(edge_id)[0];
+                            
+                            double k_edge = double(EAN(&(sub_graph->graph), "weight", edge_id_ind_tar))/accuracy;
+                            double dc_edge_sub = double(EAN(&sub_graph->graph, "dc", edge_id_ind_tar))/accuracy;
+                            
+                            double dc_edge;
+                            
+                            if(! EAN(&graph, "multi", edge_id_ind) ){
+                                dc_edge = double(EAN(&graph, "dc", edge_id_ind))/accuracy;
+                            }
+                            else{
+                                //dc_edge = 1; // just for test
+                                auto indexes = parse_packed_str_i(EAS(&graph, "rel_type", edge_id_ind));
+                                auto dcs = parse_packed_str_d(EAS(&graph, "dc", edge_id_ind));
+                                
+                                int target_type = EAN(&sub_graph->graph, "rel_type", edge_id_ind_tar);
+                                
+                                auto it = std::find(indexes.begin(), indexes.end(), target_type);
+                                if( it != indexes.end() ){
+                                    int index = it - indexes.begin();
+                                    dc_edge = dcs[index];
+                                }
+                                else{
+                                    printf("Error! Main graph does not contain specifiec enge corresssponing second\n");
+                                }                                
+                            }
+                                                                                    
+                            if( EAN(&graph, "fake", edge_id_ind) ){
+                                // IT IS FAKE                                    
+                            }
+                            else{                                                                
+                                // calc
+                                Dc += dc_edge*k_edge*(k1 * dc1 + k2 * dc2);                                
+                            }   
+                            denominator += k_edge*(k1 + k2);
+                        }
+                }
+            }                        
+            Dc /= denominator;                      
+            vect_maps[i].second = Dc;
+        }        
+        return vect_maps;                
+    }
+    
     std::string Graph::get_vertice_params(int id, int* object_type, int* obj_num){
         *object_type = VAN(&graph, "obj_type", id);
         *obj_num = VAN(&graph, "obj_num", id);

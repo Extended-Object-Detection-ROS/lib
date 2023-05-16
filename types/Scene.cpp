@@ -4,38 +4,44 @@
 
 namespace eod{
     
-    
-    double calc_size_sim(const SceneObject& sc_obj, const ExtendedObjectInfo& vis_obj, const InfoImage& info_im, double sigma_percent, double p_aligned = 0.5){
+    SizeSceneComparation::SizeSceneComparation(const InfoImage& info_im, double sigma_percent, double p_aligned){
+        info_im_ = info_im;
+        sigma_percent_ = sigma_percent;
+        p_aligned_ = p_aligned;
         
-        cv::Vec3d tl = get_translation(vis_obj.tl(), info_im.K(), vis_obj.tvec[0][2]);
-        cv::Vec3d br = get_translation(vis_obj.br(), info_im.K(), vis_obj.tvec[0][2]);
+    }
+    
+    double SizeSceneComparation::compare(SceneObject* sc_obj, ExtendedObjectInfo* vis_obj){
+        
+        cv::Vec3d tl = get_translation(vis_obj->tl(), info_im_.K(), vis_obj->tvec[0][2]);
+        cv::Vec3d br = get_translation(vis_obj->br(), info_im_.K(), vis_obj->tvec[0][2]);
         
         double vis_h = br[1] - tl[1];
         double vis_w = br[0] - tl[0];
                         
-        bool h_aligned = (vis_obj.x <= 0) || (vis_obj.x + vis_obj.height >= info_im.height());
-        bool w_aligned = (vis_obj.y <= 0) || (vis_obj.y + vis_obj.width >= info_im.width());
+        bool h_aligned = (vis_obj->x <= 0) || (vis_obj->x + vis_obj->height >= info_im_.height());
+        bool w_aligned = (vis_obj->y <= 0) || (vis_obj->y + vis_obj->width >= info_im_.width());
                        
-        double sc_obj_w = sc_obj.r*2;
+        double sc_obj_w = sc_obj->r*2;
         
-        double max_h = std::max(vis_h, sc_obj.h);
+        double max_h = std::max(vis_h, sc_obj->h);
         double max_w = std::max(vis_w, sc_obj_w);
-        double min_h = std::min(vis_h, sc_obj.h);
+        double min_h = std::min(vis_h, sc_obj->h);
         double min_w = std::min(vis_w, sc_obj_w);
                 
         double p_h, p_w;
-        p_h = norm_distribution(max_h, min_h, max_h * sigma_percent);
-        p_w = norm_distribution(max_w, min_w, max_w * sigma_percent);
+        p_h = norm_distribution(max_h, min_h, max_h * sigma_percent_);
+        p_w = norm_distribution(max_w, min_w, max_w * sigma_percent_);
         
         if( h_aligned ){
-            if( sc_obj.h > vis_h ){
-                p_h = std::max(p_aligned, p_h);
+            if( sc_obj->h > vis_h ){
+                p_h = std::max(p_aligned_, p_h);
             }            
         }
         
         if( w_aligned ){
             if( sc_obj_w > vis_w ){
-                p_w = std::max(p_aligned, p_w);
+                p_w = std::max(p_aligned_, p_w);
             }            
         }                
         return p_h * p_w;
@@ -213,7 +219,12 @@ namespace eod{
         
         printf("3\n");
         // 3. find subisomorphism of observing to main
-        std::vector<std::pair<std::vector<int>, double>> maps = main_scene.get_subisomorphisms(&observing_scene_graph);
+        //std::vector<std::pair<std::vector<int>, double>> maps = main_scene.get_subisomorphisms(&observing_scene_graph);
+        
+        
+        SizeSceneComparation size_cmp(frame, 0.1, 0.5);
+        
+        std::vector<std::pair<std::vector<int>, double>> maps = main_scene.get_subisomorphisms_scene(&observing_scene_graph, &scene_objects, &every_detections, size_cmp::compare);
         
         // 4. get data        
         //printf("4\n");
