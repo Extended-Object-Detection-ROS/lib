@@ -36,18 +36,15 @@ namespace eod{
                                      const igraph_t *graph2,
                                      const igraph_integer_t v1_num,
                                      const igraph_integer_t v2_num,
-                                     void *arg){
-        
-        return igraph_bool_t(VAN(graph1, "obj_type", v1_num) == VAN(graph2, "obj_type", v2_num) );
-        
+                                     void *arg){        
+        return igraph_bool_t(VAN(graph1, "obj_type", v1_num) == VAN(graph2, "obj_type", v2_num) );        
     }
     
     igraph_bool_t compare_edges(const igraph_t *graph1,
                                      const igraph_t *graph2,
                                      const igraph_integer_t e1_num,
                                      const igraph_integer_t e2_num,
-                                     void *arg){
-        
+                                     void *arg){        
         // check if it is multi-edge
         bool m1 = EAN(graph1, "multi", e1_num);
         bool m2 = EAN(graph2, "multi", e2_num);
@@ -71,8 +68,7 @@ namespace eod{
                 int type = EAN(graph1, "rel_type", e1_num);
                 return igraph_bool_t( std::find(types.begin(), types.end(), type) != types.end() );
             }            
-        }
-        
+        }        
     }
     
     Graph::Graph(bool directed){

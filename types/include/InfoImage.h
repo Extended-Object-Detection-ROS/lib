@@ -19,6 +19,14 @@ namespace eod{
         const cv::Mat& D() const {return D_;}
         
         virtual ~InfoImage();
+        
+        const int width() const{
+            return size().width;
+        }
+        
+        const int height() const{
+            return size().height;
+        }
                         
     private:
         
