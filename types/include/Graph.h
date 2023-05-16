@@ -3,6 +3,7 @@
 #include "igraph.h"
 #include <vector>
 #include <string>
+#include <opencv2/opencv.hpp>
 
 namespace eod{
     
@@ -25,10 +26,13 @@ namespace eod{
         
         void add_multi_edge(std::string relation_name, int relation_type, int o1, int o2, double weight, double dc);
         
-        std::vector<std::pair<std::vector<int>, double>> get_subisomorphisms(Graph * sub_graph);
+        std::vector<std::pair<std::vector<int>, double>> get_subisomorphisms(Graph * sub_graph, cv::Mat scores = cv::Mat());
         
+        /*
         template <class S, class V>
-        std::vector<std::pair<std::vector<int>, double>> get_subisomorphisms_scene(Graph * sub_graph, const std::vector<S*>* scenes_objects, const std::vector<V*>* visual_objects, double (*cmp_func)(S*, V*));
+        std::vector<std::pair<std::vector<int>, double>> get_subisomorphisms_scene(Graph * sub_graph, const std::vector<S*>* scenes_objects, const std::vector<V*>* visual_objects, double (*cmp_func)(S*, V*));*/
+        
+        //std::vector<std::pair<std::vector<int>, double>> get_subisomorphisms_scene(Graph * sub_grap);
         
         std::string get_vertice_params(int id, int* object_type, int* obj_num);
         

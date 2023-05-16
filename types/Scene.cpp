@@ -215,16 +215,19 @@ namespace eod{
                     }
                 }
             }
-        }
-        
-        printf("3\n");
+        }        
+        //printf("3\n");
+                
         // 3. find subisomorphism of observing to main
-        //std::vector<std::pair<std::vector<int>, double>> maps = main_scene.get_subisomorphisms(&observing_scene_graph);
         
+        // CALC WEIGHTS
         
-        SizeSceneComparation size_cmp(frame, 0.1, 0.5);
+        std::vector<std::pair<std::vector<int>, double>> maps = main_scene.get_subisomorphisms(&observing_scene_graph);
         
+        /*
+        SizeSceneComparation size_cmp(frame, 0.1, 0.5);        
         std::vector<std::pair<std::vector<int>, double>> maps = main_scene.get_subisomorphisms_scene(&observing_scene_graph, &scene_objects, &every_detections, size_cmp::compare);
+        */
         
         // 4. get data        
         //printf("4\n");
