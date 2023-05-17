@@ -27,26 +27,7 @@ namespace eod{
         SimpleObject* so;
         ComplexObjectGraph* co;
               
-    };
-    
-    
-    class SceneComparation{
-    public:
-        SceneComparation(){}        
-        virtual double compare(SceneObject* scene_obj, ExtendedObjectInfo* vis_obj) = 0;
-    private:        
-    };
-    
-    
-    class SizeSceneComparation : public SceneComparation{
-    public:
-        SizeSceneComparation(const InfoImage& info_im, double sigma_percent, double p_aligned = 0.5);
-        double compare(SceneObject* scene_obj, ExtendedObjectInfo* vis_obj);
-    private:
-        InfoImage info_im_;
-        double sigma_percent_;
-        double p_aligned_;
-    };
+    };            
     
     
     class RegisteredRelation{
@@ -93,6 +74,10 @@ namespace eod{
         
         std::vector<SceneObject*> scene_objects;
         
+        // temp like this: size similarity
+        bool use_size_sim = false;
+        double sigma_pc, aligned_p;
+        
     private:
         std::vector<SceneObject*> unique_classes;
         
@@ -105,6 +90,9 @@ namespace eod{
         void defineRelationsOneByone(const InfoImage& frame, std::vector<RegisteredRelation>& new_relations, const std::vector<ExtendedObjectInfo*>& every_detections, Graph& observing_scene_graph, const std::vector<std::string>& classes);
         
         void defineRelationTogether(const InfoImage& frame, std::vector<RegisteredRelation>& new_relations, const std::vector<ExtendedObjectInfo*>& every_detections, Graph& observing_scene_graph, const std::vector<std::string>& classes);
+        
+        
+        
         
     };    
 }

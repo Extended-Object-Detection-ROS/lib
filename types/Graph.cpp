@@ -233,7 +233,7 @@ namespace eod{
      *      score of isomorphism
      *  
      */
-    std::vector<std::pair<std::vector<int>, double>> Graph::get_subisomorphisms(Graph * sub_graph, cv::Mat scores){
+    std::vector<std::pair<std::vector<int>, double>> Graph::get_subisomorphisms(Graph * sub_graph, const cv::Mat& scores){
         
         igraph_vector_ptr_t maps;
         igraph_vector_ptr_init(&maps, 0);
@@ -290,6 +290,12 @@ namespace eod{
                             double dc2 = double(VAN(&graph, "dc", vect_maps[i].first[j2]))/accuracy;
                             double k1 = double(VAN(&(sub_graph->graph), "weight", j1))/accuracy;
                             double k2 = double(VAN(&(sub_graph->graph), "weight", j2))/accuracy;
+                            
+                            // additional DC
+                            if( !scores.empty() ){
+                                dc1 *= scores.at<double>(j1, vect_maps[i].first[j1]);
+                                dc2 *= scores.at<double>(j2, vect_maps[i].first[j2]);
+                            }
                             
                             // extract edge w from target graph
                             VECTOR(pair)[0] = j1;

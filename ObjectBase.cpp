@@ -1158,6 +1158,24 @@ bool ObjectBase::loadSceneXML(TiXmlDocument *doc){
             }            
             R = R->NextSiblingElement("Relation");
         }
+        
+        // TEMP like this
+        TiXmlElement *sim = scene->FirstChildElement("Similarity");
+        while(sim){
+            std::string type = sim->Attribute("Type");
+            if( type == "Size"){
+                double sigma = 0.1, aligned_p = 0.5;
+                sim->Attribute("Sigma", &thresh_create);
+                sim->Attribute("AlignedP", &thresh_match);
+                sc->use_size_sim = true;
+                sc->sigma_pc = sigma;
+                sc->aligned_p = aligned_p;
+            }
+            
+            
+            sim = sim->NextSiblingElement("Similarity");
+        }
+        
         scenes.push_back(sc);     
         scene = scene->NextSiblingElement("Scene");
     }            

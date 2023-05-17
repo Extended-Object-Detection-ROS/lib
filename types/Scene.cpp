@@ -3,15 +3,9 @@
 #include "math_utils.h"
 
 namespace eod{
-    
-    SizeSceneComparation::SizeSceneComparation(const InfoImage& info_im, double sigma_percent, double p_aligned){
-        info_im_ = info_im;
-        sigma_percent_ = sigma_percent;
-        p_aligned_ = p_aligned;
         
-    }
     
-    double SizeSceneComparation::compare(SceneObject* sc_obj, ExtendedObjectInfo* vis_obj){
+    double compare_sizes(SceneObject* sc_obj, ExtendedObjectInfo* vis_obj, const InfoImage& info_im_, double sigma_percent_, double p_aligned_){
         
         cv::Vec3d tl = get_translation(vis_obj->tl(), info_im_.K(), vis_obj->tvec[0][2]);
         cv::Vec3d br = get_translation(vis_obj->br(), info_im_.K(), vis_obj->tvec[0][2]);
@@ -188,8 +182,7 @@ namespace eod{
         Graph main_scene = Graph(scene_base_graph);   
         //printf("graph: %i %i\n", main_scene.get_vert_len(), main_scene.get_edges_len());
         
-        for( size_t i = 0 ; i < scene_objects.size() ; i++ ){
-                
+        for( size_t i = 0 ; i < scene_objects.size() ; i++ ){                
             for( size_t j = i+1 ; j < scene_objects.size() ; j++ ){
                 //double max_score = 0;
                 //int best_rel = 0;
@@ -216,18 +209,21 @@ namespace eod{
                 }
             }
         }        
-        //printf("3\n");
-                
         // 3. find subisomorphism of observing to main
+                
         
-        // CALC WEIGHTS
-        
-        std::vector<std::pair<std::vector<int>, double>> maps = main_scene.get_subisomorphisms(&observing_scene_graph);
-        
-        /*
-        SizeSceneComparation size_cmp(frame, 0.1, 0.5);        
-        std::vector<std::pair<std::vector<int>, double>> maps = main_scene.get_subisomorphisms_scene(&observing_scene_graph, &scene_objects, &every_detections, size_cmp::compare);
-        */
+        // 3.1. CALC ADDITIONAL WEIGHTS
+        if( use_size_sim ){
+            cv::Mat_<double> scores = cv::Mat_<double>(scene_objects.size(), every_detections.size());
+            for( size_t i = 0 ; i < scene_objects.size() ; i++ ){
+                for( size_t j = 0 ; j < every_detections.size() ; j++ ){
+                    scores[i][j] = compare_sizes(scene_objects[i], every_detections[j], frame, sigma_pc, aligned_p);
+                }
+            }
+        }
+                
+        // 3.2. Get Isomorphisms
+        std::vector<std::pair<std::vector<int>, double>> maps = main_scene.get_subisomorphisms(&observing_scene_graph, scores);                
         
         // 4. get data        
         //printf("4\n");

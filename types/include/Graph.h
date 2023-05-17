@@ -7,9 +7,7 @@
 
 namespace eod{
     
-    
-    
-    
+            
     /*
      * This class is wrap around igraph's C-style functions
      */
@@ -26,7 +24,7 @@ namespace eod{
         
         void add_multi_edge(std::string relation_name, int relation_type, int o1, int o2, double weight, double dc);
         
-        std::vector<std::pair<std::vector<int>, double>> get_subisomorphisms(Graph * sub_graph, cv::Mat scores = cv::Mat());
+        std::vector<std::pair<std::vector<int>, double>> get_subisomorphisms(Graph * sub_graph, const cv::Mat& scores = cv::Mat());
         
         /*
         template <class S, class V>
