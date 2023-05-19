@@ -293,6 +293,7 @@ namespace eod{
                             
                             // additional DC
                             if( !scores.empty() ){
+                                printf("dc %f %f",scores.at<double>(j1, vect_maps[i].first[j1]), scores.at<double>(j2, vect_maps[i].first[j2]));
                                 dc1 = (dc1 + scores.at<double>(j1, vect_maps[i].first[j1]))/2;
                                 dc2 = (dc2 + scores.at<double>(j2, vect_maps[i].first[j2]))/2;
                             }
@@ -342,6 +343,7 @@ namespace eod{
             }                        
             Dc /= denominator;                      
             vect_maps[i].second = Dc;
+            printf(" total %f\n",Dc);
         }        
         return vect_maps;                
     }

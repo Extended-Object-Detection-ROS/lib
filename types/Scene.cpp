@@ -10,11 +10,11 @@ namespace eod{
         cv::Vec3d tl = get_translation(vis_obj->tl(), info_im_.K(), vis_obj->tvec[0][2]);
         cv::Vec3d br = get_translation(vis_obj->br(), info_im_.K(), vis_obj->tvec[0][2]);
         
-        double vis_h = br[1] - tl[1];
-        double vis_w = br[0] - tl[0];
+        double vis_h = fabs(br[1] - tl[1]);
+        double vis_w = fabs(br[0] - tl[0]);
                         
-        bool h_aligned = (vis_obj->x <= 0) || (vis_obj->x + vis_obj->height >= info_im_.height());
-        bool w_aligned = (vis_obj->y <= 0) || (vis_obj->y + vis_obj->width >= info_im_.width());
+        bool h_aligned = (vis_obj->y <= 0) || (vis_obj->y + vis_obj->height >= info_im_.height());
+        bool w_aligned = (vis_obj->x <= 0) || (vis_obj->x + vis_obj->width >= info_im_.width());
                        
         double sc_obj_w = sc_obj->r*2;
         
@@ -36,8 +36,9 @@ namespace eod{
             if( sc_obj_w > vis_w ){
                 p_w = std::max(p_aligned_, p_w);
             }            
-        }                
-        return p_h * p_w;
+        }      
+        //printf("p_h = %f, p_w = %f\n", p_h, p_w);
+        return p_w;//(p_h + p_w)/2;
     }
     
     // SceneObject
