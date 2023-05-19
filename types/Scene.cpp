@@ -20,19 +20,18 @@ namespace eod{
         
         double max_h = std::max(vis_h, sc_obj->h);
         double max_w = std::max(vis_w, sc_obj_w);
-        double min_h = std::min(vis_h, sc_obj->h);
-        double min_w = std::min(vis_w, sc_obj_w);
+        //double min_h = std::min(vis_h, sc_obj->h);
+        //double min_w = std::min(vis_w, sc_obj_w);
                 
         double p_h, p_w;
-        p_h = norm_distribution(max_h, min_h, max_h * sigma_percent_);
-        p_w = norm_distribution(max_w, min_w, max_w * sigma_percent_);
+        p_h = norm_distribution(vis_h, sc_obj->h, max_h * sigma_percent_);
+        p_w = norm_distribution(vis_w, sc_obj_w, max_w * sigma_percent_);
         
         if( h_aligned ){
             if( sc_obj->h > vis_h ){
                 p_h = std::max(p_aligned_, p_h);
             }            
-        }
-        
+        }        
         if( w_aligned ){
             if( sc_obj_w > vis_w ){
                 p_w = std::max(p_aligned_, p_w);
@@ -213,8 +212,9 @@ namespace eod{
                 
         
         // 3.1. CALC ADDITIONAL WEIGHTS
+        cv::Mat_<double> scores;
         if( use_size_sim ){
-            cv::Mat_<double> scores = cv::Mat_<double>(scene_objects.size(), every_detections.size());
+            scores = cv::Mat_<double>(scene_objects.size(), every_detections.size());
             for( size_t i = 0 ; i < scene_objects.size() ; i++ ){
                 for( size_t j = 0 ; j < every_detections.size() ; j++ ){
                     scores[i][j] = compare_sizes(scene_objects[i], every_detections[j], frame, sigma_pc, aligned_p);

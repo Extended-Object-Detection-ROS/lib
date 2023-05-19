@@ -1165,8 +1165,8 @@ bool ObjectBase::loadSceneXML(TiXmlDocument *doc){
             std::string type = sim->Attribute("Type");
             if( type == "Size"){
                 double sigma = 0.1, aligned_p = 0.5;
-                sim->Attribute("Sigma", &thresh_create);
-                sim->Attribute("AlignedP", &thresh_match);
+                sim->Attribute("Sigma", &sigma);
+                sim->Attribute("AlignedP", &aligned_p);
                 sc->use_size_sim = true;
                 sc->sigma_pc = sigma;
                 sc->aligned_p = aligned_p;

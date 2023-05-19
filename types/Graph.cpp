@@ -293,8 +293,8 @@ namespace eod{
                             
                             // additional DC
                             if( !scores.empty() ){
-                                dc1 *= scores.at<double>(j1, vect_maps[i].first[j1]);
-                                dc2 *= scores.at<double>(j2, vect_maps[i].first[j2]);
+                                dc1 = (dc1 + scores.at<double>(j1, vect_maps[i].first[j1]))/2;
+                                dc2 = (dc2 + scores.at<double>(j2, vect_maps[i].first[j2]))/2;
                             }
                             
                             // extract edge w from target graph
