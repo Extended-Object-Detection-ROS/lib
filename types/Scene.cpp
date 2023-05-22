@@ -20,12 +20,10 @@ namespace eod{
         
         double max_h = std::max(vis_h, sc_obj->h);
         double max_w = std::max(vis_w, sc_obj_w);
-        //double min_h = std::min(vis_h, sc_obj->h);
-        //double min_w = std::min(vis_w, sc_obj_w);
                 
         double p_h, p_w;
-        p_h = norm_distribution(vis_h, sc_obj->h, max_h * sigma_percent_);
-        p_w = norm_distribution(vis_w, sc_obj_w, max_w * sigma_percent_);
+        p_h = norm_distribution(vis_h, sc_obj->h, sc_obj->h * sigma_percent_);
+        p_w = norm_distribution(vis_w, sc_obj_w, sc_obj_w * sigma_percent_);
         
         if( h_aligned ){
             if( sc_obj->h > vis_h ){
@@ -38,7 +36,8 @@ namespace eod{
             }            
         }      
         //printf("p_h = %f, p_w = %f\n", p_h, p_w);
-        return p_w;//(p_h + p_w)/2;
+        printf("%f and %f = %f\n", vis_w, sc_obj_w, p_w);
+        return (p_h + p_w)/2;
     }
     
     // SceneObject

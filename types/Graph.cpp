@@ -280,65 +280,68 @@ namespace eod{
             double denominator = 0; // TODO calc on graph init
             for( size_t j1 = 0; j1 < vect_maps[i].first.size(); j1++ ){
                 for( size_t j2 = j1+1; j2 < vect_maps[i].first.size(); j2++ ){
-                    //if( j1 != j2 ){
-                        VECTOR(pair)[0] = vect_maps[i].first[j1];
-                        VECTOR(pair)[1] = vect_maps[i].first[j2];
-                        igraph_get_eids(&graph, &edge_id, &pair, NULL, 0, 0);
-                        int edge_id_ind = VECTOR(edge_id)[0];// takin' first edge only, so it is important for graph to be simple
-                        if( edge_id_ind != -1){                        
-                            double dc1 = double(VAN(&graph, "dc", vect_maps[i].first[j1]))/accuracy;
-                            double dc2 = double(VAN(&graph, "dc", vect_maps[i].first[j2]))/accuracy;
-                            double k1 = double(VAN(&(sub_graph->graph), "weight", j1))/accuracy;
-                            double k2 = double(VAN(&(sub_graph->graph), "weight", j2))/accuracy;
+                    
+                    VECTOR(pair)[0] = vect_maps[i].first[j1];
+                    VECTOR(pair)[1] = vect_maps[i].first[j2];
+                    igraph_get_eids(&graph, &edge_id, &pair, NULL, 0, 0);
+                    int edge_id_ind = VECTOR(edge_id)[0];// takin' first edge only, so it is important for graph to be simple
+                    if( edge_id_ind != -1){                        
+//                         double dc1 = double(VAN(&graph, "dc", vect_maps[i].first[j1]))/accuracy;
+//                         double dc2 = double(VAN(&graph, "dc", vect_maps[i].first[j2]))/accuracy;
+                        double dc1 = double(VAN(&(sub_graph->graph), "dc", j1))/accuracy;
+                        double dc2 = double(VAN(&(sub_graph->graph), "dc", j2))/accuracy;
+                        double k1 = double(VAN(&(sub_graph->graph), "weight", j1))/accuracy;
+                        double k2 = double(VAN(&(sub_graph->graph), "weight", j2))/accuracy;
+                        
+                        // additional DC
+                        if( !scores.empty() ){
+//                             printf("dc %f %f",scores.at<double>(j1, vect_maps[i].first[j1]), scores.at<double>(j2, vect_maps[i].first[j2]));
+//                             dc1 = (dc1 + scores.at<double>(j1, vect_maps[i].first[j1]))/2;
+//                             dc2 = (dc2 + scores.at<double>(j2, vect_maps[i].first[j2]))/2;
+                            dc1 = (dc1 + scores.at<double>(vect_maps[i].first[j1], j1))/2;
+                            dc2 = (dc2 + scores.at<double>(vect_maps[i].first[j2], j2))/2;
+                        }                        
+                        // extract edge w from target graph
+                        VECTOR(pair)[0] = j1;
+                        VECTOR(pair)[1] = j2;
+                        igraph_get_eids(&(sub_graph -> graph), &edge_id, &pair, NULL, 0, 0);
+                        int edge_id_ind_tar = VECTOR(edge_id)[0];
+                        
+                        double k_edge = double(EAN(&(sub_graph->graph), "weight", edge_id_ind_tar))/accuracy;
+                        double dc_edge_sub = double(EAN(&sub_graph->graph, "dc", edge_id_ind_tar))/accuracy;
+                        
+                        double dc_edge;
+                        
+                        if(! EAN(&graph, "multi", edge_id_ind) ){
+                            dc_edge = double(EAN(&graph, "dc", edge_id_ind))/accuracy;
+                        }
+                        else{
+                            //dc_edge = 1; // just for test
+                            auto indexes = parse_packed_str_i(EAS(&graph, "rel_type", edge_id_ind));
+                            auto dcs = parse_packed_str_d(EAS(&graph, "dc", edge_id_ind));
                             
-                            // additional DC
-                            if( !scores.empty() ){
-                                printf("dc %f %f",scores.at<double>(j1, vect_maps[i].first[j1]), scores.at<double>(j2, vect_maps[i].first[j2]));
-                                dc1 = (dc1 + scores.at<double>(j1, vect_maps[i].first[j1]))/2;
-                                dc2 = (dc2 + scores.at<double>(j2, vect_maps[i].first[j2]))/2;
-                            }
+                            int target_type = EAN(&sub_graph->graph, "rel_type", edge_id_ind_tar);
                             
-                            // extract edge w from target graph
-                            VECTOR(pair)[0] = j1;
-                            VECTOR(pair)[1] = j2;
-                            igraph_get_eids(&(sub_graph -> graph), &edge_id, &pair, NULL, 0, 0);
-                            int edge_id_ind_tar = VECTOR(edge_id)[0];
-                            
-                            double k_edge = double(EAN(&(sub_graph->graph), "weight", edge_id_ind_tar))/accuracy;
-                            double dc_edge_sub = double(EAN(&sub_graph->graph, "dc", edge_id_ind_tar))/accuracy;
-                            
-                            double dc_edge;
-                            
-                            if(! EAN(&graph, "multi", edge_id_ind) ){
-                                dc_edge = double(EAN(&graph, "dc", edge_id_ind))/accuracy;
+                            auto it = std::find(indexes.begin(), indexes.end(), target_type);
+                            if( it != indexes.end() ){
+                                int index = it - indexes.begin();
+                                dc_edge = dcs[index];
                             }
                             else{
-                                //dc_edge = 1; // just for test
-                                auto indexes = parse_packed_str_i(EAS(&graph, "rel_type", edge_id_ind));
-                                auto dcs = parse_packed_str_d(EAS(&graph, "dc", edge_id_ind));
-                                
-                                int target_type = EAN(&sub_graph->graph, "rel_type", edge_id_ind_tar);
-                                
-                                auto it = std::find(indexes.begin(), indexes.end(), target_type);
-                                if( it != indexes.end() ){
-                                    int index = it - indexes.begin();
-                                    dc_edge = dcs[index];
-                                }
-                                else{
-                                    printf("Error! Main graph does not contain specifiec enge corresssponing second\n");
-                                }
-                                
+                                printf("Error! Main graph does not contain specifiec enge corresssponing second\n");
                             }
-                                                                                    
-                            if( EAN(&graph, "fake", edge_id_ind) ){
-                                // IT IS FAKE                                    
-                            }
-                            else{                                                                
-                                // calc
-                                Dc += dc_edge*k_edge*(k1 * dc1 + k2 * dc2);                                
-                            }   
-                            denominator += k_edge*(k1 + k2);
+                            
                         }
+                                                                                
+                        if( EAN(&graph, "fake", edge_id_ind) ){
+                            // IT IS FAKE                                    
+                        }
+                        else{                                                                
+                            // calc
+                            Dc += dc_edge*k_edge*(k1 * dc1 + k2 * dc2);                                
+                        }   
+                        denominator += k_edge*(k1 + k2);
+                    }
                 }
             }                        
             Dc /= denominator;                      
