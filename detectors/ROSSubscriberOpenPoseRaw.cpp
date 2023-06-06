@@ -4,9 +4,8 @@
 
 namespace eod{
     
-    ROSSubscriberOpenPoseRaw::ROSSubscriberOpenPoseRaw(std::string topic_name, float timelag) : ROSSubscriberBaseAttribute(topic_name){
-        Type = ROS_SUB_OPENPOSE_RAW_A;
-        timelag_ = timelag;
+    ROSSubscriberOpenPoseRaw::ROSSubscriberOpenPoseRaw(std::string topic_name, float timelag) : ROSSubscriberBaseAttribute(topic_name, timelag){
+        Type = ROS_SUB_OPENPOSE_RAW_A;        
     }
     
 //     void ROSSubscriberOpenPoseRaw::Connect2ROS(ros::NodeHandle nh){
@@ -22,19 +21,33 @@ namespace eod{
 //     }
     
     std::vector<ExtendedObjectInfo> ROSSubscriberOpenPoseRaw::Detect2(const InfoImage& image, int seq){
-        std::vector<ExtendedObjectInfo> results;
+        std::vector<ExtendedObjectInfo> results;        
         
-//         depthai_ros_extended_msgs::NeuralNetworkRawOutput msg_copy = last_msg;
-//         float lag = fabs(msg_copy.header.stamp.toSec() - image.timestamp() );
-//         if( lag > timelag_){
-//             printf("Message was skipped due old frame (lag = %.3f)\n", lag);
-//             return results;
-//         }
-//         if( msg_copy.header.frame_id != last_msg.header.frame_id ){
-//             printf("Message was skipped due other frame_id (%s)\n", msg_copy.header.frame_id.c_str());
-//             return results;
-//         }
-//         printf("Got msg\n");
+//         auto msgs = cache_->getInterval(ros::Time(image.timestamp()), ros::Time(image.timestamp() + timelag_));        
+//         printf("Len is %i\n", msgs.size());        
+//         for( const auto& msg : msgs ){
+//             if( msg->header.frame_id == image.frame_id() ){                
+//                 
+//                 printf("Good msg\n");
+//                 
+//                 return results;                                
+//             }
+//             else{
+//                 printf("Message was skipped due other frame_id\n");
+//             }
+//         }        
+//         printf("No appropriate time msgs\n");
+        
+        //printf("latests %f, image %f\n", cache_->getLatestTime().toSec(), image.timestamp());
+        
+        auto msg = cache_->getElemAfterTime(ros::Time(image.timestamp()));
+        if( msg == nullptr ){
+            printf("No msg\n");
+        }
+        else{
+            printf("yes msg\n");
+        }
+            
         
         return results;
     }

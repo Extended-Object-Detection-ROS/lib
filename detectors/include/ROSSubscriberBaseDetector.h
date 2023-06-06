@@ -25,7 +25,7 @@ namespace eod{
     class ROSSubscriberBaseAttribute : public ROSSubscriberSuperBaseAttribute{
        
     public:       
-        ROSSubscriberBaseAttribute(std::string topic_name);
+        ROSSubscriberBaseAttribute(std::string topic_name, float timelag);
               
         virtual std::vector<ExtendedObjectInfo> Detect2(const InfoImage& image, int seq) = 0;       
         virtual bool Check2(const InfoImage& image, ExtendedObjectInfo& rect) = 0;       
@@ -34,24 +34,35 @@ namespace eod{
         const std::string topic_name() const{return topic_name_;}
        
         void Connect2ROS(ros::NodeHandle nh);
+        
+        void callback(const boost::shared_ptr<T>&);        
        
     protected:    
         std::string topic_name_;
+        float timelag_;
        
         message_filters::Subscriber<T>* subscriber_;
         message_filters::Cache<T>* cache_;                     
     };
 
     template<class T>
-    ROSSubscriberBaseAttribute<T>::ROSSubscriberBaseAttribute(std::string topic_name){
+    ROSSubscriberBaseAttribute<T>::ROSSubscriberBaseAttribute(std::string topic_name, float timelag){
         Type = ROS_SUB_BASE_A;
         topic_name_ = topic_name;
+        timelag_ = timelag;
     }
     
     template<class T>
     void ROSSubscriberBaseAttribute<T>::Connect2ROS(ros::NodeHandle nh){
         subscriber_ = new message_filters::Subscriber<T>(nh, topic_name_, 1);         
         cache_ = new message_filters::Cache<T>(*subscriber_, 100);             
+        cache_->registerCallback(&ROSSubscriberBaseAttribute::callback, this);
+    }
+    
+    template<class T>
+    void ROSSubscriberBaseAttribute<T>::callback(const boost::shared_ptr<T>& msg){
+        printf("Got message\n");
+        //cache_->add(msg);
     }
    
 }

@@ -20,7 +20,7 @@ namespace eod{
         bool Check2(const InfoImage& image,ExtendedObjectInfo& rect);                
                             
     private:
-        float timelag_;
+        
             
         
     };
