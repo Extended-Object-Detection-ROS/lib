@@ -23,6 +23,8 @@ namespace eod{
     std::vector<ExtendedObjectInfo> ROSSubscriberOpenPoseRaw::Detect2(const InfoImage& image, int seq){
         std::vector<ExtendedObjectInfo> results;        
         
+        // NOTE: MAYBE WAIT HERE?
+        
 //         auto msgs = cache_->getInterval(ros::Time(image.timestamp()), ros::Time(image.timestamp() + timelag_));        
 //         printf("Len is %i\n", msgs.size());        
 //         for( const auto& msg : msgs ){
