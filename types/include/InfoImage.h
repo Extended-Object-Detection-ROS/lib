@@ -13,7 +13,7 @@ namespace eod{
     public:
         InfoImage();
         InfoImage(cv::Mat image);
-        InfoImage(cv::Mat image, cv::Mat K, cv::Mat D, int seq = 0);
+        InfoImage(cv::Mat image, cv::Mat K, cv::Mat D, int seq = 0, float timestamp = 0, std::string frame_id = "");
                 
         const cv::Mat& K() const {return K_;}
         const cv::Mat& D() const {return D_;}
@@ -24,6 +24,14 @@ namespace eod{
         }
         
         virtual ~InfoImage();
+        
+        const std::string frame_id() const{
+            return frame_id_;
+        }
+        
+        const float timestamp() const{
+            return timestamp_;
+        }
                         
     private:
         
@@ -31,6 +39,8 @@ namespace eod{
         cv::Mat D_;   
         
         int seq_;
+        float timestamp_;
+        std::string frame_id_;
     };
     
     

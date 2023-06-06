@@ -52,6 +52,10 @@ File: Class realises loading simple_simple_objects parameters from XML file
 #if (USE_TORCH)
 #include "TorchYOLOv7Detector.h"
 #endif
+#if (USE_ROS)
+#include "ROSSubscriberBaseDetector.h"
+#include "ROSSubscriberOpenPoseRaw.h"
+#endif
 
 #include "Filtering.h"
 

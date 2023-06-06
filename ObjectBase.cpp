@@ -576,6 +576,16 @@ namespace eod{
                 tmpA = new TorchYOLOv7KeypointAttribute(model_path, input_size, labels_path, num_class, num_points);
                 break;
             }
+#endif
+#if (USE_ROS)
+            case ROS_SUB_OPENPOSE_RAW_A:
+            {
+                string topic = attr->Attribute("topic");
+                double lag;
+                attr->Attribute("timelag", &lag);
+                tmpA = new ROSSubscriberOpenPoseRaw(topic, lag);
+                break;
+            }
 #endif            
             default:
             {                

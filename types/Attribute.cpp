@@ -126,6 +126,10 @@ namespace eod{
             return TORCH_YOLOV7_A;
         if(name == "torchyolov7kpt")
             return TORCH_YOLOV7_KPT_A;
+        if(name == "rossubcriberopenposeraw")
+            return ROS_SUB_OPENPOSE_RAW_A;
+        
+        
         
         printf("Unknown attribute type %s!",name.c_str());
         return UNK_A;

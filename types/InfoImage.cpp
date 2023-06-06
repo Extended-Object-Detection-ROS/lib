@@ -8,10 +8,12 @@ namespace eod{
         
     }
     
-    InfoImage::InfoImage(cv::Mat image, cv::Mat K__, cv::Mat D__, int seq) : cv::Mat(image) {
+    InfoImage::InfoImage(cv::Mat image, cv::Mat K__, cv::Mat D__, int seq, float timestamp, std::string frame_id) : cv::Mat(image) {
         K_ = cv::Mat(K__);
         D_ = cv::Mat(D__);
         seq_ = seq;
+        timestamp_ = timestamp;
+        frame_id_ = frame_id;
     }
     
     InfoImage::~InfoImage(){

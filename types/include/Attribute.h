@@ -56,7 +56,9 @@ namespace eod{
         UNIT_TRANS_EXTR_A,
         SQUARE_OBJ_DIST_EXTR_A,
         TORCH_YOLOV7_A,
-        TORCH_YOLOV7_KPT_A
+        TORCH_YOLOV7_KPT_A,
+        ROS_SUB_BASE_A,
+        ROS_SUB_OPENPOSE_RAW_A
     };
     
     AttributeTypes getAttributeTypeFromName(std::string name);
