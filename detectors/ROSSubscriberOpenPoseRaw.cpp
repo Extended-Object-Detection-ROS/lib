@@ -9,25 +9,32 @@ namespace eod{
         timelag_ = timelag;
     }
     
-    void ROSSubscriberOpenPoseRaw::callback(const depthai_ros_extended_msgs::NeuralNetworkRawOutput::ConstPtr& msg){
-        printf("Got msg!\n");
-        last_msg = *msg;
-    }
+//     void ROSSubscriberOpenPoseRaw::Connect2ROS(ros::NodeHandle nh){
+//         subscriber_ = new message_filters::Subscriber<depthai_ros_extended_msgs::NeuralNetworkRawOutput>(nh, topic_name_, 1); 
+//         
+//         cache_ = new message_filters::Cache<depthai_ros_extended_msgs::NeuralNetworkRawOutput>(*subscriber_, 100);
+//         cache_->registerCallback(&ROSSubscriberOpenPoseRaw::callback, this);
+//     }
+    
+//     void ROSSubscriberOpenPoseRaw::callback(const depthai_ros_extended_msgs::NeuralNetworkRawOutput::ConstPtr& msg){
+//         printf("Got msg!\n");
+//         last_msg = *msg;
+//     }
     
     std::vector<ExtendedObjectInfo> ROSSubscriberOpenPoseRaw::Detect2(const InfoImage& image, int seq){
         std::vector<ExtendedObjectInfo> results;
         
-        depthai_ros_extended_msgs::NeuralNetworkRawOutput msg_copy = last_msg;
-        float lag = fabs(msg_copy.header.stamp.toSec() - image.timestamp() );
-        if( lag > timelag_){
-            printf("Message was skipped due old frame (lag = %.3f)\n", lag);
-            return results;
-        }
-        if( msg_copy.header.frame_id != last_msg.header.frame_id ){
-            printf("Message was skipped due other frame_id (%s)\n", msg_copy.header.frame_id.c_str());
-            return results;
-        }
-        printf("Got msg\n");
+//         depthai_ros_extended_msgs::NeuralNetworkRawOutput msg_copy = last_msg;
+//         float lag = fabs(msg_copy.header.stamp.toSec() - image.timestamp() );
+//         if( lag > timelag_){
+//             printf("Message was skipped due old frame (lag = %.3f)\n", lag);
+//             return results;
+//         }
+//         if( msg_copy.header.frame_id != last_msg.header.frame_id ){
+//             printf("Message was skipped due other frame_id (%s)\n", msg_copy.header.frame_id.c_str());
+//             return results;
+//         }
+//         printf("Got msg\n");
         
         return results;
     }

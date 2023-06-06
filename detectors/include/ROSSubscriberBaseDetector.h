@@ -3,31 +3,56 @@
 
 #include "ObjectIdentifier.h"
 #include <ros/ros.h>
+#include <message_filters/subscriber.h>
+#include <message_filters/cache.h>
 
 namespace eod{
 
-   class ROSSubscriberBaseAttribute : public Attribute{
+    
+    class ROSSubscriberSuperBaseAttribute : public Attribute{
+    public:
+        ROSSubscriberSuperBaseAttribute(){}    
+        
+        virtual std::vector<ExtendedObjectInfo> Detect2(const InfoImage& image, int seq) = 0;       
+        virtual bool Check2(const InfoImage& image, ExtendedObjectInfo& rect) = 0;       
+        virtual void Extract2(const InfoImage& image, ExtendedObjectInfo& rect) = 0;
+        
+        virtual void Connect2ROS(ros::NodeHandle nh) = 0;
+        
+    };
+    
+    template<class T>
+    class ROSSubscriberBaseAttribute : public ROSSubscriberSuperBaseAttribute{
        
-   public:
+    public:       
+        ROSSubscriberBaseAttribute(std::string topic_name);
+              
+        virtual std::vector<ExtendedObjectInfo> Detect2(const InfoImage& image, int seq) = 0;       
+        virtual bool Check2(const InfoImage& image, ExtendedObjectInfo& rect) = 0;       
+        virtual void Extract2(const InfoImage& image, ExtendedObjectInfo& rect) = 0;
+                          
+        const std::string topic_name() const{return topic_name_;}
        
-       ROSSubscriberBaseAttribute(std::string topic_name);
+        void Connect2ROS(ros::NodeHandle nh);
        
-       virtual std::vector<ExtendedObjectInfo> Detect2(const InfoImage& image, int seq) = 0;
-       virtual bool Check2(const InfoImage& image, ExtendedObjectInfo& rect) = 0;
-       virtual void Extract2(const InfoImage& image, ExtendedObjectInfo& rect) = 0;
+    protected:    
+        std::string topic_name_;
        
-       template<class M>
-       void callback(const M& message);
-       
-       const std::string topic_name() const{return topic_name_;}
-       
-       ros::Subscriber subscriber;
-       
-   private:
-       
-       std::string topic_name_;
-       
-   };
+        message_filters::Subscriber<T>* subscriber_;
+        message_filters::Cache<T>* cache_;                     
+    };
+
+    template<class T>
+    ROSSubscriberBaseAttribute<T>::ROSSubscriberBaseAttribute(std::string topic_name){
+        Type = ROS_SUB_BASE_A;
+        topic_name_ = topic_name;
+    }
+    
+    template<class T>
+    void ROSSubscriberBaseAttribute<T>::Connect2ROS(ros::NodeHandle nh){
+        subscriber_ = new message_filters::Subscriber<T>(nh, topic_name_, 1);         
+        cache_ = new message_filters::Cache<T>(*subscriber_, 100);             
+    }
    
 }
 

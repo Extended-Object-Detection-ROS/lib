@@ -6,7 +6,7 @@
 
 namespace eod{
     
-    class ROSSubscriberOpenPoseRaw : public ROSSubscriberBaseAttribute{
+    class ROSSubscriberOpenPoseRaw : public ROSSubscriberBaseAttribute<depthai_ros_extended_msgs::NeuralNetworkRawOutput>{
     public:
         
         ROSSubscriberOpenPoseRaw(std::string topic_name, float timelag);
@@ -17,12 +17,11 @@ namespace eod{
         
         void Extract2(const InfoImage& image, ExtendedObjectInfo& rect);
         
-        bool Check2(const InfoImage& image,ExtendedObjectInfo& rect);
+        bool Check2(const InfoImage& image,ExtendedObjectInfo& rect);                
                             
     private:
         float timelag_;
-    
-        depthai_ros_extended_msgs::NeuralNetworkRawOutput last_msg;
+            
         
     };
     
