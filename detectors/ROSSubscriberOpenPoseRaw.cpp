@@ -8,49 +8,23 @@ namespace eod{
         Type = ROS_SUB_OPENPOSE_RAW_A;        
     }
     
-//     void ROSSubscriberOpenPoseRaw::Connect2ROS(ros::NodeHandle nh){
-//         subscriber_ = new message_filters::Subscriber<depthai_ros_extended_msgs::NeuralNetworkRawOutput>(nh, topic_name_, 1); 
-//         
-//         cache_ = new message_filters::Cache<depthai_ros_extended_msgs::NeuralNetworkRawOutput>(*subscriber_, 100);
-//         cache_->registerCallback(&ROSSubscriberOpenPoseRaw::callback, this);
-//     }
-    
-//     void ROSSubscriberOpenPoseRaw::callback(const depthai_ros_extended_msgs::NeuralNetworkRawOutput::ConstPtr& msg){
-//         printf("Got msg!\n");
-//         last_msg = *msg;
-//     }
-    
     std::vector<ExtendedObjectInfo> ROSSubscriberOpenPoseRaw::Detect2(const InfoImage& image, int seq){
+        ros::Time now = ros::Time::now();
         std::vector<ExtendedObjectInfo> results;        
-        
-        // NOTE: MAYBE WAIT HERE?
-        
-//         auto msgs = cache_->getInterval(ros::Time(image.timestamp()), ros::Time(image.timestamp() + timelag_));        
-//         printf("Len is %i\n", msgs.size());        
-//         for( const auto& msg : msgs ){
-//             if( msg->header.frame_id == image.frame_id() ){                
-//                 
-//                 printf("Good msg\n");
-//                 
-//                 return results;                                
-//             }
-//             else{
-//                 printf("Message was skipped due other frame_id\n");
-//             }
-//         }        
-//         printf("No appropriate time msgs\n");
-        
-        //printf("latests %f, image %f\n", cache_->getLatestTime().toSec(), image.timestamp());
-        
-        auto msg = cache_->getElemAfterTime(ros::Time(image.timestamp()));
-        if( msg == nullptr ){
-            printf("No msg\n");
-        }
-        else{
-            printf("yes msg\n");
-        }
             
-        
+        auto msg = cache_->getElemAfterTime(ros::Time(image.timestamp()));
+        while( (ros::Time::now() - now).toSec() < timelag_ && ros::ok()){            
+            if( msg == nullptr ){
+                //printf("waiting\n");
+                msg = cache_->getElemAfterTime(ros::Time(image.timestamp()));
+            }
+            else{
+                printf("yes msg\n");
+                return results;
+            }            
+            printf("diff is %f\n", (ros::Time(image.timestamp()) - cache_->getLatestTime()).toSec() );
+        }                        
+        printf("no msg\n");
         return results;
     }
     
