@@ -5,11 +5,7 @@
 
 namespace eod{
     
-    std::vector<cv::Point2f> get_keypoints_single_channel(const cv::Mat& heatmap_channel){
         
-    }
-    
-    
     ROSSubscriberOpenPoseRaw::ROSSubscriberOpenPoseRaw(std::string topic_name, float timelag) : ROSSubscriberBaseAttribute(topic_name, timelag){
         Type = ROS_SUB_OPENPOSE_RAW_A;        
     }
@@ -19,6 +15,8 @@ namespace eod{
         ros::Time imtime = ros::Time(image.sec_, image.nsec_);
         std::vector<ExtendedObjectInfo> results;        
             
+        ExtendedObjectInfo tmp;
+        
         auto msg = cache_->getElemAfterTime(imtime);
         do{                        
             if( msg == nullptr ){
@@ -43,27 +41,37 @@ namespace eod{
                             if( dim.label == "width" )
                                 width = dim.size;
                         }
-                        for( size_t i = 0 ; i < 1; i++){//num_keypoints ; i++ ){
+                        cv::Size proc_size(width, height);
+                        for( size_t i = 0 ; i < num_keypoints; i++){
+                            
                             auto start = layer.tensor.data.begin() + i * height * width;
                             auto end = layer.tensor.data.begin() + (1+i) * height * width;
-                            cv::Mat channel(height, width, CV_64F, std::vector<double>(start, end).data() );
-                            cv::Mat out;
-                            cv::normalize(channel, out, 0, 1, cv::NORM_MINMAX);
                             
-                            //channel = normalize_float_mat(channel);
-                            cv::imshow("nose",out);
-                            //cv::waitKey();
+                            cv::Mat channel(height, width, CV_64F, std::vector<double>(start, end).data() );
+                            
+                            std::vector<std::pair<cv::Point, double>> keypoints = get_keypoints_single_channel(channel);
+                            
+                            //cv::Mat out;
+                            //cv::normalize(channel, out, 0, 1, cv::NORM_MINMAX);                                                        
+                            //cv::resize(out, out, cv::Size(msg->input_width, msg->input_height) );
+                            
+                            for( const auto& kpt : keypoints){
+                                std::string label = landmarks_labels.size() > i ? landmarks_labels[i] : ""; 
+                                tmp.keypoints.push_back(eod::KeyPoint(scale_point(kpt.first, proc_size, image.size()), kpt.second, label)); //DANGER better is too check size
+                            }
                         }
                         
                     }
-                }                
+                }       
+                tmp.setScoreWeight(1,1);
+                results.push_back(tmp);
                 return results;
             }                        
         }  
         while( (ros::Time::now() - now).toSec() < timelag_ && ros::ok());
         
-        printf("no msg\n");
-        printf("diff is %f\n", (imtime - cache_->getLatestTime()).toSec() );
+        //printf("no msg\n");
+        //printf("diff is %f\n", (imtime - cache_->getLatestTime()).toSec() );
         return results;
     }
     
@@ -74,6 +82,37 @@ namespace eod{
         return false;
     }  
     
+    std::vector<std::pair<cv::Point, double>> ROSSubscriberOpenPoseRaw::get_keypoints_single_channel(const cv::Mat& heatmap_channel){
+        
+        std::vector<std::pair<cv::Point,double> > channel_keypoints;
+        
+        // filter by prob        
+        cv::Mat mask;
+        cv::inRange(heatmap_channel, Probability, 1, mask);
+        
+        // find clusters
+        std::vector<std::vector<cv::Point> > contours;
+        std::vector<cv::Vec4i> hierarchy;
+        cv::findContours( mask, contours, hierarchy, cv::RETR_TREE, cv::CHAIN_APPROX_SIMPLE );
+        
+        // get cluster centers
+        for( const auto& contour : contours ){
+            cv::Mat contour_mask = cv::Mat::zeros(heatmap_channel.size(), CV_8UC1);
+            cv::fillConvexPoly(contour_mask, contour, 1);
+            double max, min;
+            cv::Point maxLoc, minLoc;
+            cv::minMaxLoc(heatmap_channel, &min, &max, &minLoc, &maxLoc, contour_mask);
+            
+            channel_keypoints.push_back(std::make_pair(maxLoc, max));
+            //printf("Added keypoint %i %i %f\n", maxLoc.x, maxLoc.y, max);
+        }
+        
+        cv::Mat out;
+        cv::normalize(heatmap_channel, out, 0, 1, cv::NORM_MINMAX);                                                        
+        cv::imshow("nose",out);   
+        // 
+        return channel_keypoints;
+    }
     
 }
 

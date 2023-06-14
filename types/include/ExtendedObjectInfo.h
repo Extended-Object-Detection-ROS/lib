@@ -19,6 +19,11 @@ namespace eod{
             this->score = score;
             this->label = label;
         }
+        KeyPoint(cv::Point point, float score, std::string label = "") : cv::Point(point){
+            this->score = score;
+            this->label = label;
+        }
+        
         float score;
         std::string label;
     private:        

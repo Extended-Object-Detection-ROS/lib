@@ -224,6 +224,13 @@ namespace eod{
         auto tvec = get_translation(point, src);
         return reverse_translation(tvec, dst);         
     }
+    
+    cv::Point scale_point(const cv::Point& point, const cv::Size& old_size, const cv::Size& new_size){
+        cv::Point new_point;
+        new_point.x = int((float)point.x / old_size.width * new_size.width);
+        new_point.y = int((float)point.y / old_size.height * new_size.height);
+        return new_point;
+    }
 
     
     

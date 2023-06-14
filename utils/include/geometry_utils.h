@@ -50,6 +50,8 @@ namespace eod{
         
     cv::Point transform_between_channels(const cv::Point& point, const cv::Mat& src, const cv::Mat& dst);
     
+    cv::Point scale_point(const cv::Point& point, const cv::Size& old_size, const cv::Size& new_size);
+    
 }
 
 #endif
