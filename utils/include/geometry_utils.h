@@ -52,6 +52,8 @@ namespace eod{
     
     cv::Point scale_point(const cv::Point& point, const cv::Size& old_size, const cv::Size& new_size);
     
+    cv::Vec<int,2> substruct_points_to_vector(cv::Point a, cv::Point b);
+    
 }
 
 #endif

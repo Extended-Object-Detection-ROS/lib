@@ -231,6 +231,14 @@ namespace eod{
         new_point.y = int((float)point.y / old_size.height * new_size.height);
         return new_point;
     }
+    
+    cv::Vec<int,2> substruct_points_to_vector(cv::Point a, cv::Point b){
+        
+        cv::Vec<int,2> result;
+        result[0] = a.x - b.x;
+        result[1] = a.y - b.y;
+        return result;
+    }
 
     
     

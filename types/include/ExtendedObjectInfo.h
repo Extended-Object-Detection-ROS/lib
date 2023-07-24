@@ -93,6 +93,7 @@ namespace eod{
         std::vector<cv::Vec3d> rvec;      
         
         std::vector<KeyPoint> keypoints;
+        std::vector<std::pair<int, int>> keypoint_connection;        
         
         void initVars();       
     private:            
