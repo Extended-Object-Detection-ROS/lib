@@ -1,8 +1,9 @@
+#ifdef USE_IGRAPH
+
 #include "Graph.h"
 #include <stdlib.h>
 #include <algorithm>
 
-#ifdef USE_IGRAPH
 namespace eod{
     
     std::vector<double> parse_packed_str_d(std::string packed, std::string delimiter = ":"){
@@ -266,9 +267,6 @@ namespace eod{
         }
         igraph_vector_ptr_destroy(&maps);       
         
-        // get Dc
-        //std::vector<double> Dcs;
-        
         igraph_vector_t pair;
         igraph_vector_init(&pair, 2);
         igraph_vector_t edge_id;
@@ -276,7 +274,6 @@ namespace eod{
         
         for( size_t i = 0 ; i < vect_maps.size() ; i++ ){
             double Dc = 0;
-            //int edges_cnt = 0;
             double denominator = 0; // TODO calc on graph init
             for( size_t j1 = 0; j1 < vect_maps[i].first.size(); j1++ ){
                 for( size_t j2 = j1+1; j2 < vect_maps[i].first.size(); j2++ ){
@@ -286,8 +283,6 @@ namespace eod{
                     igraph_get_eids(&graph, &edge_id, &pair, NULL, 0, 0);
                     int edge_id_ind = VECTOR(edge_id)[0];// takin' first edge only, so it is important for graph to be simple
                     if( edge_id_ind != -1){                        
-//                         double dc1 = double(VAN(&graph, "dc", vect_maps[i].first[j1]))/accuracy;
-//                         double dc2 = double(VAN(&graph, "dc", vect_maps[i].first[j2]))/accuracy;
                         double dc1 = double(VAN(&(sub_graph->graph), "dc", j1))/accuracy;
                         double dc2 = double(VAN(&(sub_graph->graph), "dc", j2))/accuracy;
                         double k1 = double(VAN(&(sub_graph->graph), "weight", j1))/accuracy;
@@ -295,9 +290,6 @@ namespace eod{
                         
                         // additional DC
                         if( !scores.empty() ){
-//                             printf("dc %f %f",scores.at<double>(j1, vect_maps[i].first[j1]), scores.at<double>(j2, vect_maps[i].first[j2]));
-//                             dc1 = (dc1 + scores.at<double>(j1, vect_maps[i].first[j1]))/2;
-//                             dc2 = (dc2 + scores.at<double>(j2, vect_maps[i].first[j2]))/2;
                             dc1 = (dc1 + scores.at<double>(vect_maps[i].first[j1], j1))/2;
                             dc2 = (dc2 + scores.at<double>(vect_maps[i].first[j2], j2))/2;
                         }                        
@@ -315,8 +307,7 @@ namespace eod{
                         if(! EAN(&graph, "multi", edge_id_ind) ){
                             dc_edge = double(EAN(&graph, "dc", edge_id_ind))/accuracy;
                         }
-                        else{
-                            //dc_edge = 1; // just for test
+                        else{                            
                             auto indexes = parse_packed_str_i(EAS(&graph, "rel_type", edge_id_ind));
                             auto dcs = parse_packed_str_d(EAS(&graph, "dc", edge_id_ind));
                             
@@ -328,9 +319,8 @@ namespace eod{
                                 dc_edge = dcs[index];
                             }
                             else{
-                                printf("Error! Main graph does not contain specifiec enge corresssponing second\n");
-                            }
-                            
+                                printf("Error! Main graph does not contain specific edge corresssponing the second\n");
+                            }                            
                         }
                                                                                 
                         if( EAN(&graph, "fake", edge_id_ind) ){

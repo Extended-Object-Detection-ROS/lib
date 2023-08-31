@@ -1,3 +1,4 @@
+#ifdef USE_IGRAPH
 #include "Scene.h"
 #include "geometry_utils.h"
 #include "math_utils.h"
@@ -36,7 +37,7 @@ namespace eod{
             }            
         }      
         //printf("p_h = %f, p_w = %f\n", p_h, p_w);
-        printf("%f and %f = %f\n", vis_w, sc_obj_w, p_w);
+        //printf("%f and %f = %f\n", vis_w, sc_obj_w, p_w);
         return (p_h + p_w)/2;
     }
     
@@ -320,3 +321,4 @@ namespace eod{
     }
     
 }
+#endif //USE_IGRAPH

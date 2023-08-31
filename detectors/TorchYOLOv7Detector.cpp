@@ -3,7 +3,7 @@
 #include <fstream> 
 
 using namespace std;
-using namespace cv;
+//using namespace cv;
 
 namespace eod{
     
@@ -23,8 +23,8 @@ namespace eod{
     }
     
     at::Tensor tensor_from_mat(const cv::Mat& image){
-        Mat blob;        
-        cvtColor(image, blob, COLOR_BGR2RGB);         
+        cv::Mat blob;        
+        cv::cvtColor(image, blob, cv::COLOR_BGR2RGB);         
         at::Tensor tensor = torch::from_blob(blob.data, {1, image.rows, image.cols, 3 }, at::kByte);
         tensor = tensor.toType(c10::kFloat).div(255);
         tensor = tensor.permute({0,3,1,2}).contiguous();        
@@ -59,11 +59,15 @@ namespace eod{
     // YOLO v7 Basic Attribute
     // =~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~
     
-    TorchYOLOv7Attribute::TorchYOLOv7Attribute(std::string model_path, int input_size, std::string lales_path){
-        Type = TORCH_YOLOV7_A;        
-        module = torch::jit::load(model_path);
+    TorchYOLOv7Attribute::TorchYOLOv7Attribute(std::string model_path, int input_size, std::string lables_path){
+        Type = TORCH_YOLOV7_A;   
+        printf("CREATE %s\n", model_path.c_str());
+        module = torch::jit::load(model_path.c_str());
+        //module = torch::jit::load("/home/anton/Projects/yolov7/runs/train/yolov7_gazebo_tiny_2/weights/best.torchscript.pt");
+        printf("LOAD\n");
         input_size_ = input_size;
-        readLabelsMapTxt(lales_path, labelsMap);
+        readLabelsMapTxt(lables_path, labelsMap);
+        printf("LABELS\n");
     }
     
     TorchYOLOv7Attribute::TorchYOLOv7Attribute(){
@@ -76,7 +80,7 @@ namespace eod{
         std::vector<ExtendedObjectInfo> answer;                
         
         std::vector<torch::jit::IValue> inputs;
-        Mat letter_box_image;
+        cv::Mat letter_box_image;
         std::vector<float> pad_info = LetterboxImage(image, letter_box_image, cv::Size(input_size_, input_size_));        
         
         inputs.push_back(tensor_from_mat(letter_box_image));                
@@ -120,8 +124,12 @@ namespace eod{
                 int x = xc - w/2;
                 int y = yc - h/2;
                 
-                ExtendedObjectInfo tmp = ExtendedObjectInfo(Rect(x,y,w,h));
-                tmp.setScoreWeight(det_array[i][4], Weight);
+                double score = det_array[i][4];
+                if(score < Probability)
+                    continue;
+                
+                ExtendedObjectInfo tmp = ExtendedObjectInfo(cv::Rect(x,y,w,h));
+                tmp.setScoreWeight(score, Weight);
                 int class_id = (int)det_array[i][5];
                 set_extracted_info(tmp, "class_id", class_id); 
                 
@@ -166,7 +174,7 @@ namespace eod{
         std::vector<ExtendedObjectInfo> answer;                
         
         std::vector<torch::jit::IValue> inputs;
-        Mat letter_box_image;
+        cv::Mat letter_box_image;
         std::vector<float> pad_info = LetterboxImage(image, letter_box_image, cv::Size(input_size_, input_size_));        
         
         inputs.push_back(tensor_from_mat(letter_box_image));                
@@ -223,7 +231,7 @@ namespace eod{
                 int x = xc - w/2;
                 int y = yc - h/2;
                 
-                ExtendedObjectInfo tmp = ExtendedObjectInfo(Rect(x,y,w,h));
+                ExtendedObjectInfo tmp = ExtendedObjectInfo(cv::Rect(x,y,w,h));
                 tmp.setScoreWeight(det_array[i][4], Weight);
                 int class_id = (int)det_array[i][5];
                 set_extracted_info(tmp, "class_id", class_id); 
