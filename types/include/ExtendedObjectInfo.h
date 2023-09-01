@@ -71,9 +71,7 @@ namespace eod{
         double total_score;
         void setScoreWeight(double score, double weight);
         void calcTotalScore();        
-        
-          
-        
+                          
         //
         // Variables behind is those, which could be individual for each attribute
         //        

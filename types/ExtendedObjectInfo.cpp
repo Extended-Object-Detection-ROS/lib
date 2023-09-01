@@ -126,12 +126,12 @@ namespace eod{
         
         if( keypoints.size() > 0 ){
             for( auto& kpt: keypoints){
-                circle(image, kpt, 2, col, cv::FILLED, cv::LINE_8);
+                circle(image, kpt, 10, col, cv::FILLED, cv::LINE_8);//2
             }
         }        
         for( const auto& kpt_con: keypoint_connection ){
-            int a = kpt_con.first;
-            int b = kpt_con.second;
+            size_t a = kpt_con.first;
+            size_t b = kpt_con.second;
             if( a < keypoints.size() && b < keypoints.size() ){
                 line(image, keypoints[a], keypoints[b], col, 1, cv::LINE_8);
             }

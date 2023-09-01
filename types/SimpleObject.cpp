@@ -82,9 +82,9 @@ namespace eod{
                     objects = mode_attributes[0].second->Detect(frame, seq);
                 else if( mode_attributes[0].first.second == DEPTH)
                     objects = mode_attributes[0].second->Detect(depth, seq);
-                for( size_t i = 0 ; i < objects.size(); i++)
-                    //objects[i].calcTotalScore();                
-                    objects[i].mergeAllData(merging_policy);
+//                 for( size_t i = 0 ; i < objects.size(); i++)
+//                     //objects[i].calcTotalScore();                
+//                     objects[i].mergeAllData(merging_policy);
             }
             // else TODO how about to use checker on whole image in such case
 //             auto it = objects.begin();
@@ -192,7 +192,7 @@ namespace eod{
                 transform_eoi(objects, depth, frame);
             }
         }
-            
+        printf("OBJECTS DONE\n");
         return objects;
     }
     

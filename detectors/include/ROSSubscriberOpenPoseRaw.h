@@ -38,12 +38,10 @@ namespace eod{
                  {{2, 17}, {18, 19}}, {{5, 16}, {26, 27}}};
                  
         int _num_paf_samples = 10;
-        double _min_paf_score_th = 2;
-        double _paf_sample_th = 4;
-            
-        
-    };
-    
+        double _min_paf_score_th = 0.2;//2
+        double _paf_sample_th = 0.4;//4
+                    
+    };    
 }
 
 

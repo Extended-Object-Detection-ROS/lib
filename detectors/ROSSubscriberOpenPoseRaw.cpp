@@ -26,14 +26,16 @@ namespace eod{
         ros::Time imtime = ros::Time(image.sec_, image.nsec_);
         std::vector<ExtendedObjectInfo> results;        
             
-        ExtendedObjectInfo tmp;
+        ExtendedObjectInfo tmp(0, 0, 2, 2);
         
         auto msg = cache_->getElemAfterTime(imtime);
+        
         do{                        
             if( msg == nullptr ){
                 //printf("waiting\n");
                 msg = cache_->getElemAfterTime(imtime);
             }
+            
             else{
                 //printf("yes msg\n");
                 //printf("diff is %f\n", (imtime - cache_->getLatestTime()).toSec() );
@@ -64,13 +66,19 @@ namespace eod{
                             //cv::normalize(channel, out, 0, 1, cv::NORM_MINMAX);                                                        
                             //cv::resize(out, out, cv::Size(msg->input_width, msg->input_height) );
                             
-//                             for( const auto& kpt : keypoints){
-//                                 std::string label = landmarks_labels.size() > i ? landmarks_labels[i] : ""; 
-//                                 tmp.keypoints.push_back(eod::KeyPoint(scale_point(kpt.first, proc_size, image.size()), kpt.second, label));
-//                             }
+                            /*
+                             for( const auto& kpt_ch : keypoints){
+                                 for( const auto& kpt : kpt_ch ){
+                                    std::string label = landmarks_labels.size() > i ? landmarks_labels[i] : ""; 
+                                    tmp.keypoints.push_back(eod::KeyPoint(scale_point(kpt.first, proc_size, image.size()), kpt.second, label));
+                                    printf("%i %i\n", tmp.keypoints.back().x, tmp.keypoints.back().y);
+                                 }
+                             }
+                             */
                         }                        
                     }
-                }    
+                }
+                
                 // get connections
                 printf("Connection\n");
                 std::vector<std::vector<std::pair<cv::Point, double>>> pairs;
@@ -90,70 +98,79 @@ namespace eod{
                         
                         
                         for( const auto& connection_pafs_ids : paf_keys ){
-                            printf("Next con\n");
+                            //printf("Next con\n");
                             auto connection = connection_pafs_ids[0];
                             auto pafs_ids = connection_pafs_ids[1];
                             
-                            printf("Data get\n");
+                            //printf("Data get\n");
                             cv::Mat paf_a = get_mat_from_data(layer.tensor.data, pafs_ids[0], width, height);
                             cv::Mat paf_b = get_mat_from_data(layer.tensor.data, pafs_ids[1], width, height);
-                            printf("Data got\n");
+                            //printf("Data got\n");
                             
-                            auto* cand_a = &(keypoints[connection[0]]);
-                            auto* cand_b = &(keypoints[connection[1]]);
-                            
-                            
+                            std::vector<std::pair<cv::Point, double>>* cand_a = &(keypoints[connection[0]]);
+                            std::vector<std::pair<cv::Point, double>>* cand_b = &(keypoints[connection[1]]);
+                                                        
                             std::vector<std::pair<cv::Point, double>> pairs_found;
                             
+                            
                             for( size_t i = 0 ; i < cand_a->size() ; i++){
-                                printf("Next i\n");
+                                //printf("Next i\n");
+                                fflush(stdout);
+                                
                                 int max_j = -1;
                                 double max_score = -1;
                                 
                                 for( size_t j = 0 ; j < cand_b->size() ; j++){
-                                    printf("Next j\n");                                    
-                                    auto unit_a2b = substruct_points_to_vector(cand_b->at(j).first, cand_a->at(i).first);
+                                    //printf("Next j\n"); 
+                                    fflush(stdout);
                                     
-                                    auto vec_norm = cv::norm(unit_a2b);
-                                    printf("Normed %f\n", vec_norm);
-                                    if( vec_norm > 0){
-                                        printf("YEZ\n");
-                                        unit_a2b /= vec_norm;
+                                    double unit_a2b_x = cand_b->at(j).first.x - cand_a->at(i).first.x;
+                                    double unit_a2b_y = cand_b->at(j).first.y - cand_a->at(i).first.y;
+                                    
+                                    double vec_norm = std::sqrt( unit_a2b_x * unit_a2b_x + unit_a2b_y * unit_a2b_y); 
+                                                                                                            
+                                    if( vec_norm > 0){                          
+                                        unit_a2b_x /= vec_norm;
+                                        unit_a2b_y /= vec_norm;
                                     }
                                     else{
-                                        printf("NOES\n");
+                                        //printf("NOES\n");
                                         continue;
                                     }
-                                                                        
+                                                       
+                                    
                                     cv::Mat paf_samples = cv::Mat::zeros(cv::Size(_num_paf_samples, 2), CV_64F);
                                     
-                                    printf("Even this?\n");                                    
+                                    //printf("Even this?\n");                                    
                                     double x_len = cand_b->at(j).first.x - cand_a->at(i).first.x;
                                     double y_len = cand_b->at(j).first.y - cand_a->at(i).first.y;
+                                    
                                     
                                     for( int k = 0 ; k < _num_paf_samples ; k++ ){
                                         double coord_x = cand_a->at(i).first.x + (x_len / (_num_paf_samples - 1)) * k;
                                         double coord_y = cand_a->at(i).first.y + (y_len / (_num_paf_samples - 1)) * k;
                                                                
                                         int x = int(std::round(coord_x));
-                                        int y = int(std::round(coord_y));
+                                        int y = int(std::round(coord_y));                                                                                
                                         
                                         if( x >= width )
                                             x = width-1;
                                         if( y >= height )
                                             y = height-1;
-                                                                                
-                                        //paf_samples.push_back( std::make_pair);
-                                        paf_samples.at<double>(k, 0) = paf_a.at<double>(x, y);
-                                        paf_samples.at<double>(k, 1) = paf_b.at<double>(x, y);
+                                                                                                                                            
+                                        //paf_samples.at<double>(k, 0) = paf_a.at<double>(x, y);
+                                        //paf_samples.at<double>(k, 1) = paf_b.at<double>(x, y);
+                                        paf_samples.at<double>(0, k) = paf_a.at<double>(y, x);
+                                        paf_samples.at<double>(1, k) = paf_b.at<double>(y, x);
                                         
-                                    }                                                                        
+                                    }                                                          
+                                    //printf("Latir\n");                                    
                                     
-                                    //auto paf_scores = paf_samples.dot(unit_a2b);
                                     std::vector<double> paf_scores;
                                     for( int k = 0 ; k < _num_paf_samples ; k++ ){
-                                        double dot_prod = paf_samples.at<double>(k, 0) * unit_a2b[0] + paf_samples.at<double>(k, 1) * unit_a2b[1];
+                                        double dot_prod = paf_samples.at<double>(0, k) * unit_a2b_x + paf_samples.at<double>(1, k) * unit_a2b_y;
                                         paf_scores.push_back(dot_prod);
+                                        //printf("Dot_prod %f\n", dot_prod);
                                     }
                                     
                                     int good_paf_scores = 0;
@@ -164,39 +181,48 @@ namespace eod{
                                         sum_scores += paf_scores.at(k);
                                     }
                                     
-                                    if( good_paf_scores / _num_paf_samples > _paf_sample_th ){
+                                    double mean_good_paf_score = double(good_paf_scores) / _num_paf_samples;
+                                    //printf("Mean good paf score %f\n", mean_good_paf_score);
+                                    if( mean_good_paf_score  > _paf_sample_th ){
                                         double avg_paf_score = sum_scores / _num_paf_samples;
+                                        //printf("avg %f\n", avg_paf_score);
                                         if( avg_paf_score > max_score){
                                             max_j = j;
                                             max_score = avg_paf_score;
                                         }
-                                    }                                    
-                                }
-                                if( max_j >= 0 ){
+                                    }            
+                                    //printf("Cycle end, max_j %i, max_score %f\n", max_j, max_score);
                                     
-                                    pairs_found.push_back(std::make_pair(cv::Point(i, max_j), max_score));
+                                }                                
+                                if( max_j >= 0 ){                                    
+                                    pairs_found.push_back(std::make_pair(cv::Point(i, max_j), max_score));                                    
                                 }
+                                //printf("Real cycle end\n");
                             }
-                            pairs.push_back(pairs_found);                                                    
+                            //printf("Real i cycle end\n");
+                            pairs.push_back(pairs_found);
+                            //printf("Pushed back\n");
                         }
+                        
                     }
                 }
+                        
                 
-                
-                // test connections
+                //printf("TESTING CONNECTION\n");
                 /*
                 for( size_t i = 0 ; i < paf_keys.size() ; i++ ){
                     
                     auto connection = paf_keys[i][0];
+                    //printf("Connection problem?\n");
                     
-                    //if( pairs[i].size() > 0 ){
                     for( auto& pair : pairs[i] ){
+                        //printf("Next pair\n");
                         
                         auto kpt_ind_1 = pair.first.x;
                         auto kpt_ind_2 = pair.first.y;
                         
                         auto kpt_1 = keypoints[connection[0]][kpt_ind_1];
-                        auto kpt_2 = keypoints[connection[0]][kpt_ind_2];
+                        auto kpt_2 = keypoints[connection[1]][kpt_ind_2];
                         
                         tmp.keypoints.push_back(eod::KeyPoint(scale_point(kpt_1.first, proc_size, image.size()), kpt_1.second, ""));
                         
@@ -206,19 +232,22 @@ namespace eod{
                     }                                        
                 }
                 */
+                                                                
+                // get personwise                                 
                 
-                
-                // get personwise 
+                                
                 
                 
                 tmp.setScoreWeight(1,1);
                 results.push_back(tmp);
+                                
                 return results;
             }                        
+            
         }  
         while( (ros::Time::now() - now).toSec() < timelag_ && ros::ok());
         
-        //printf("no msg\n");
+        printf("fin\n");
         //printf("diff is %f\n", (imtime - cache_->getLatestTime()).toSec() );
         return results;
     }        
