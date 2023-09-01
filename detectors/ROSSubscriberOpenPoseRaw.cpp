@@ -29,7 +29,7 @@ namespace eod{
         ExtendedObjectInfo tmp(0, 0, 2, 2);
         
         auto msg = cache_->getElemAfterTime(imtime);
-        
+        int num_keypoints;
         do{                        
             if( msg == nullptr ){
                 //printf("waiting\n");
@@ -41,12 +41,12 @@ namespace eod{
                 //printf("diff is %f\n", (imtime - cache_->getLatestTime()).toSec() );
                 
                 // PROCESS DATA
-                std::vector<std::vector<std::pair<cv::Point, double>>> keypoints;
+                std::vector<std::vector<std::pair<cv::Point, double>>> keypoints; // channel vise keypoints
                 cv::Size proc_size;
                 // get keypoints
                 for( const auto &layer : msg->layers){
                     if( layer.name == "heatmaps" ){
-                        int num_keypoints, width, height;
+                        int width, height;
                         for( const auto& dim : layer.tensor.layout.dim ){
                             if( dim.label == "channel" )
                                 num_keypoints = dim.size;
@@ -234,8 +234,37 @@ namespace eod{
                 */
                                                                 
                 // get personwise                                 
+                //std::vector<std::map<int, std::vector<double>>> persons;
+                //std::vector<std::vector<std::vector<double>>> persons;
                 
-                                
+                std::vector<std::vector<int>> persons;                
+                for( auto person : persons){
+                    person = std::vector<int>(num_keypoints);
+                    for( auto val : person )
+                        val = -1;
+                }
+                
+                
+                
+//                 for( size_t connection_id = 0 ; connection_id < paf_keys.size() ; connection_id++ ){
+//                     
+//                     if( pairs[connection_id].size() == 0 )
+//                         continue;
+//                     
+//                     int start_landmark = paf_keys[connection_id][0][0];
+//                     int end_landmark = paf_keys[connection_id][0][1];
+//                     
+//                     for( size_t i = 0 ; i < pairs[connection_id].size() ; i++ ){
+//                         int start_keypoint = pairs[connection_id][i].first.x; // id of KeyPoint in keypoints for this connection_id
+//                         int end_keypoint = pairs[connection_id][i].first.y;
+//                         
+//                         int person_id = -1;
+//                         for( size_t j = 0 ; j < persons.size() ; j++ ){
+//                             persons[j]                            
+//                         }
+//                         
+//                     }                                    
+//                 }
                 
                 
                 tmp.setScoreWeight(1,1);
