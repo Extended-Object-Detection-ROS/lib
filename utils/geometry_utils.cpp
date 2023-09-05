@@ -239,7 +239,7 @@ namespace eod{
         result[1] = a.y - b.y;
         return result;
     }
-
     
+        
     
 }

@@ -581,9 +581,13 @@ namespace eod{
             case ROS_SUB_OPENPOSE_RAW_A:
             {
                 string topic = attr->Attribute("topic");
-                double lag;
+                double lag, min_paf_score_th = 0.4, paf_sample_th = 0.2;
+                int num_paf_samples = 10;
                 attr->Attribute("timelag", &lag);
-                tmpA = new ROSSubscriberOpenPoseRaw(topic, lag);
+                attr->Attribute("min_paf_score_th", &min_paf_score_th);
+                attr->Attribute("paf_sample_th", &paf_sample_th);
+                attr->Attribute("num_paf_samples", &num_paf_samples);
+                tmpA = new ROSSubscriberOpenPoseRaw(topic, (float)lag, num_paf_samples, (float)min_paf_score_th, (float)paf_sample_th);
                 break;
             }
 #endif            

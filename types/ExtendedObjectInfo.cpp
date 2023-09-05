@@ -127,17 +127,16 @@ namespace eod{
         if( keypoints.size() > 0 ){
             for( auto& kpt: keypoints){
                 circle(image, kpt, 10, col, cv::FILLED, cv::LINE_8);//2
+                putText(image, kpt.label.c_str(), kpt, FONT_HERSHEY_SIMPLEX, 1, col ,1);
             }
         }        
         for( const auto& kpt_con: keypoint_connection ){
             size_t a = kpt_con.first;
             size_t b = kpt_con.second;
             if( a < keypoints.size() && b < keypoints.size() ){
-                line(image, keypoints[a], keypoints[b], col, 1, cv::LINE_8);
+                line(image, keypoints[a], keypoints[b], col, 3, cv::LINE_8);
             }
-        }
-        
-        
+        }                
     }
     
     double getRange(ExtendedObjectInfo a, ExtendedObjectInfo b){
@@ -194,6 +193,34 @@ namespace eod{
             else
                 contour.insert( contour.begin(), total_contour);
         }
+        
+        // TODO: keypoints?
     }
+    
+    void ExtendedObjectInfo::updateRectFromKeypoints(int offset){
+        int x_min, x_max, y_min, y_max;
+        if( keypoints.size() ){
+            x_min = keypoints[0].x;
+            y_min = keypoints[0].y;
+            x_max = keypoints[0].x;
+            y_max = keypoints[0].y;
+        }
+        
+        for( const auto& kpt : keypoints ){
+            if( x_min > kpt.x )
+                x_min  = kpt.x;
+            if( x_max < kpt.x )
+                x_max = kpt.x;
+            if( y_min > kpt.y )
+                y_min  = kpt.y;
+            if( y_max < kpt.y )
+                y_max = kpt.y;  
+        }
+        this->x = x_min;
+        this->y = y_min;
+        this->width = x_max - x_min;
+        this->height = y_max - y_min;        
+    }
+    
 }
 

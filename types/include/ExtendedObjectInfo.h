@@ -90,8 +90,12 @@ namespace eod{
         // rotation vectors
         std::vector<cv::Vec3d> rvec;      
         
+        // keypoints stuff
         std::vector<KeyPoint> keypoints;
-        std::vector<std::pair<int, int>> keypoint_connection;        
+        std::vector<std::pair<int, int>> keypoint_connection; 
+        
+        void updateRectFromKeypoints(int offset = 0);
+        
         
         void initVars();       
     private:            
