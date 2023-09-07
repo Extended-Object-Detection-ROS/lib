@@ -42,11 +42,12 @@ namespace eod{
     }
     
         
-    ROSSubscriberOpenPoseRaw::ROSSubscriberOpenPoseRaw(std::string topic_name, float timelag, int num_paf_samples, float min_paf_score_th, float paf_sample_th) : ROSSubscriberBaseAttribute(topic_name, timelag){
+    ROSSubscriberOpenPoseRaw::ROSSubscriberOpenPoseRaw(std::string topic_name, float timelag, float kpt_score_th, int num_paf_samples, float min_paf_score_th, float paf_sample_th) : ROSSubscriberBaseAttribute(topic_name, timelag){
         Type = ROS_SUB_OPENPOSE_RAW_A;        
         _num_paf_samples = num_paf_samples;
         _min_paf_score_th = min_paf_score_th;
         _paf_sample_th = paf_sample_th;
+        _kpt_score_th = kpt_score_th;
     }
     
     std::vector<ExtendedObjectInfo> ROSSubscriberOpenPoseRaw::Detect2(const InfoImage& image, int seq){
@@ -90,35 +91,20 @@ namespace eod{
                             
                             cv::Mat channel = get_mat_from_data(layer.tensor.data, i, width, height);
                             
-                            printf("Extracting %s...\n", landmarks_labels[i].c_str());
+                            //printf("Extracting %s...\n", landmarks_labels[i].c_str());
                             keypoints.push_back(get_keypoints_single_channel(channel, original_size));
                             
-                            //cv::Mat out;
-                            //cv::normalize(channel, out, 0, 1, cv::NORM_MINMAX);                                                        
-                            //cv::resize(out, out, cv::Size(msg->input_width, msg->input_height) );
-                            
-                            /*
-                             for( const auto& kpt_ch : keypoints){
-                                 for( const auto& kpt : kpt_ch ){
-                                    std::string label = landmarks_labels.size() > i ? landmarks_labels[i] : ""; 
-                                    tmp.keypoints.push_back(eod::KeyPoint(scale_point(kpt.first, proc_size, image.size()), kpt.second, label));
-                                    printf("%i %i\n", tmp.keypoints.back().x, tmp.keypoints.back().y);
-                                 }
-                             }
-                             */
                         }                        
                     }
                 }
                 
                 // get connections
-                printf("Connection\n");
+                //printf("Connection\n");
                 std::vector<std::vector<std::pair<cv::Point, float>>> pairs;
                 for( const auto &layer : msg->layers){
                     if( layer.name == "pafs" ){
                         int height, width;
                         for( const auto& dim : layer.tensor.layout.dim ){
-//                             if( dim.label == "channel" )
-//                                 num_keypoints = dim.size;
                             if( dim.label == "height" )
                                 height = dim.size;
                             if( dim.label == "width" )
@@ -132,14 +118,14 @@ namespace eod{
                             auto connection = connection_pafs_ids[0];
                             auto pafs_ids = connection_pafs_ids[1];
                             
-                            printf("Pair (%s-%s)\n", landmarks_labels[connection[0]].c_str(), landmarks_labels[connection[1]].c_str());
+                            //printf("Pair (%s-%s)\n", landmarks_labels[connection[0]].c_str(), landmarks_labels[connection[1]].c_str());
                             
                             cv::Mat paf_a = get_mat_from_data(layer.tensor.data, pafs_ids[0], width, height, CV_32F);
-                            cv::Mat paf_b = get_mat_from_data(layer.tensor.data, pafs_ids[1], width, height, CV_32F);
+                            cv::Mat paf_b = get_mat_from_data(layer.tensor.data, pafs_ids[1], width, height, CV_32F);                                                        
                             
                             cv::resize(paf_a, paf_a, original_size);
                             cv::resize(paf_b, paf_b, original_size);
-                            
+                                                                                    
                             std::vector<std::pair<cv::Point, float>>* cand_a = &(keypoints[connection[0]]);
                             std::vector<std::pair<cv::Point, float>>* cand_b = &(keypoints[connection[1]]);
                                                         
@@ -162,7 +148,7 @@ namespace eod{
                                         unit_a2b_y /= vec_norm;
                                     }
                                     else{
-                                        printf("Rejected\n");
+//                                       //printf("Rejected\n");
                                         continue;
                                     }
                                                                                                                                
@@ -205,7 +191,7 @@ namespace eod{
                                     //printf("Mean good paf score %f\n", mean_good_paf_score);
                                     if( mean_good_paf_score  > _paf_sample_th ){
                                         float avg_paf_score = sum_scores / paf_scores.size();//_num_paf_samples;                                        
-                                        printf("Avg paf score is %f\n", avg_paf_score);
+                                        //printf("Avg paf score is %f\n", avg_paf_score);
                                         if( avg_paf_score > max_score){
                                             max_j = j;
                                             max_score = avg_paf_score;
@@ -252,7 +238,8 @@ namespace eod{
                         for( size_t j = 0 ; j < persons.size() ; j++ ){
                             //if( std::find(persons[j].begin(), persons[j].end(), start_keypoint_id) != persons[j].end() || std::find(persons[j].begin(), persons[j].end(), end_keypoint_id) != persons[j].end() ){
                             
-                            if( std::find(persons[j].begin(), persons[j].end(), start_keypoint_id) != persons[j].end() ){                                                                                                            
+                            //if( std::find(persons[j].begin(), persons[j].end(), start_keypoint_id) != persons[j].end() ){                                                                                                            
+                            if( persons[j][start_landmark_id] == start_keypoint_id ){ 
                                                                 
                                 //persons[j][start_landmark_id] = start_keypoint_id;
                                 persons[j][end_landmark_id] = end_keypoint_id;                          
@@ -273,50 +260,85 @@ namespace eod{
                     }                    
                 }
                 
-                printf("Counted %i persons\n", persons.size());
-                
+                /*
+                printf("Counted %i persons\n", persons.size());                
                 for( const auto& person: persons ){
                     printf("person\n");
                     for( size_t i =0 ; i < person.size() ; i++ ){
                         if( person[i] != -1 ){
-                            //printf("%s: %i %i\n",landmarks_labels[i].c_str(), keypoints[i][person[i]].first.x, keypoints[i][person[i]].first.y);
+                            printf("%s: %i %i\n",landmarks_labels[i].c_str(), keypoints[i][person[i]].first.x, keypoints[i][person[i]].first.y);
                             printf("%s (%i)\t",landmarks_labels[i].c_str(), person[i]);
                         }
                     }
                     printf("\n");
                 }
-                
+                */
 
                 for( auto& person : persons ){
                     ExtendedObjectInfo tmp(0, 0, 2, 2);
-                         
+                    double conf = 0;                    
+                    
                     for( size_t kpt_id = 0 ; kpt_id < person.size() ; kpt_id++ ){
-                        if( person[kpt_id] != -1 ){
-                            
+                        if( person[kpt_id] != -1 ){                            
                             auto kpt = keypoints[kpt_id][person[kpt_id]];
+                            
                             tmp.keypoints.push_back(eod::KeyPoint(scale_point(kpt.first, original_size, image.size()), kpt.second, landmarks_labels[kpt_id]));                            
+                            
+                            conf += kpt.second;
                         }                        
                     }
                     tmp.updateRectFromKeypoints();
-                    for( size_t connection = 0 ; connection < paf_keys.size() ; connection++ ){
+                    for( size_t connection = 0 ; connection < paf_keys.size()-2 ; connection++ ){
                         int id1 = paf_keys[connection][0][0];
                         int id2 = paf_keys[connection][0][1];
                         
                         if( person[id1] != -1 && person[id2] != -1 ){
                             int real_id1 = id1 - std::count(person.begin(), person.begin() + id1, -1);
-                            int real_id2 = id2 - std::count(person.begin(), person.begin() + id2, -1);
-                            
+                            int real_id2 = id2 - std::count(person.begin(), person.begin() + id2, -1);                            
                             tmp.keypoint_connection.push_back(std::make_pair(real_id1, real_id2));
+                                                        
                         }
                     }
                     
+                    conf /= (2 * paf_keys.size());
                     
-                    tmp.setScoreWeight(1,1);
+                    tmp.setScoreWeight(conf, Weight);
                     results.push_back(tmp);
                     
                 }                                
                 
-                                
+                /*
+                // TEST FOR PRINT ALL KPT AND CONNECTIONS
+                ExtendedObjectInfo tmp(0, 0, 2, 2);                
+                
+                for( size_t p = 0 ; p < pairs.size() ; p++ ){
+                    for( auto& pair : pairs[p] ){
+                        int a = pair.first.x;
+                        int b = pair.first.y;
+                        
+                        int kpt_a_id, kpt_b_id;
+                        kpt_a_id = paf_keys[p][0][0];
+                        kpt_b_id = paf_keys[p][0][1];
+                                                
+                        
+                        auto kpt_a = keypoints[kpt_a_id][a];
+                        auto kpt_b = keypoints[kpt_b_id][b];
+                        
+                        tmp.keypoints.push_back(eod::KeyPoint(scale_point(kpt_a.first, original_size, image.size()), kpt_a.second, ""));                                                    
+                        tmp.keypoints.push_back(eod::KeyPoint(scale_point(kpt_b.first, original_size, image.size()), kpt_b.second, ""));
+                        
+                        tmp.keypoint_connection.push_back(std::make_pair(tmp.keypoints.size()-1, tmp.keypoints.size()-2));
+                        
+                    }
+                }
+                // repeat kpts                 
+                for( auto &kpts : keypoints ){
+                    for( auto& kpt : kpts ){
+                        tmp.keypoints.push_back(eod::KeyPoint(scale_point(kpt.first, original_size, image.size()), kpt.second, ""));                                                    
+                    }
+                }
+                results.push_back(tmp);
+                */                                                                
                 return results;
             }                        
             
@@ -345,7 +367,7 @@ namespace eod{
         
         // filter by prob        
         cv::Mat mask;
-        cv::inRange(resized, Probability, 1.0, mask);
+        cv::inRange(resized, _kpt_score_th, 1.0, mask);
         
         // find clusters
         std::vector<std::vector<cv::Point> > contours;
@@ -360,10 +382,8 @@ namespace eod{
             cv::Point maxLoc, minLoc;
             cv::minMaxLoc(resized, &min, &max, &minLoc, &maxLoc, contour_mask);
             
-            //if( max < 1.0 ){
-                channel_keypoints.push_back(std::make_pair(maxLoc, max));                
-                printf("Added keypoint %i %i %f\n", maxLoc.x, maxLoc.y, (float)max);
-            //}
+            channel_keypoints.push_back(std::make_pair(maxLoc, max));                
+            //printf("Added keypoint %i %i %f\n", maxLoc.x, maxLoc.y, (float)max);
         }
          
         // 

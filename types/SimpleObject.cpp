@@ -192,7 +192,7 @@ namespace eod{
                 transform_eoi(objects, depth, frame);
             }
         }
-        printf("OBJECTS DONE\n");
+        //printf("OBJECTS DONE\n");
         return objects;
     }
     
