@@ -61,8 +61,7 @@ namespace eod{
     
     template<class T>
     void ROSSubscriberBaseAttribute<T>::callback(const boost::shared_ptr<T>& msg){
-        //printf("Got message\n");
-        //cache_->add(msg);
+        //printf("Got message\n");        
     }
    
 }

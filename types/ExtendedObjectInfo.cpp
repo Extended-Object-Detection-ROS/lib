@@ -192,12 +192,12 @@ namespace eod{
                 contour.clear();
             else
                 contour.insert( contour.begin(), total_contour);
-        }
-        
+        }        
         // TODO: keypoints?
+        
     }
     
-    void ExtendedObjectInfo::updateRectFromKeypoints(int offset){
+    void ExtendedObjectInfo::updateRectFromKeypoints(float scale){
         int x_min, x_max, y_min, y_max;
         if( keypoints.size() ){
             x_min = keypoints[0].x;
@@ -216,10 +216,13 @@ namespace eod{
             if( y_max < kpt.y )
                 y_max = kpt.y;  
         }
-        this->x = x_min;
-        this->y = y_min;
-        this->width = x_max - x_min;
-        this->height = y_max - y_min;        
+        int offset_x = ((x_max - x_min) * scale);
+        int offset_y = ((y_max - y_min) * scale);
+        
+        this->x = x_min - offset_x/2;
+        this->y = y_min - offset_y/2;
+        this->width = x_max - x_min + offset_x;
+        this->height = y_max - y_min + offset_y;
     }
     
 }

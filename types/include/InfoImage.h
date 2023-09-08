@@ -45,8 +45,6 @@ namespace eod{
         std::string frame_id_;
     };
     
-    
-    
 }
 
 
