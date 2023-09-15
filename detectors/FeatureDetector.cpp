@@ -201,7 +201,7 @@ namespace eod{
                     tmp.contour.push_back(float2intPointVector(vector<Point2f>(corners)));
                 // tvec rvec
                 if( !image.K().empty() and !image.D().empty() ){
-                    Vec3d rvec, tvec;                                                            
+                    Vec3d rvec, tvec;
                     if( solvePnP(original_corners_shifted, corners, image.K(), image.D(), rvec, tvec)){                            
                         if( scale > 0 )
                             tmp.tvec.push_back(scaleVec3d(tvec,scale));

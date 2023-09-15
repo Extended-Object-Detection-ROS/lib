@@ -128,9 +128,9 @@ namespace eod{
             return TORCH_YOLOV7_KPT_A;
         if(name == "rossubcriberopenposeraw")
             return ROS_SUB_OPENPOSE_RAW_A;
-        
-        
-        
+        if(name == "keypointpose")
+            return KPT_POSE_A;
+                        
         printf("Unknown attribute type %s!",name.c_str());
         return UNK_A;
     }

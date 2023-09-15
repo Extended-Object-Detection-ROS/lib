@@ -56,6 +56,7 @@ File: Class realises loading simple_simple_objects parameters from XML file
 #include "ROSSubscriberBaseDetector.h"
 #include "ROSSubscriberOpenPoseRaw.h"
 #endif
+#include "KeypointPoseDetector.h"
 
 #include "Filtering.h"
 
@@ -215,6 +216,7 @@ namespace eod{
         std::vector<int> getIntVectorAttribute(TiXmlElement * attr, const char * at_name);
         std::string getStringAttribute(TiXmlElement * attr, const char * at_name, std::string default_value = "");
         std::vector<std::string> getStringVectorAttribute(TiXmlElement * attr, const char * at_name);
+        std::vector<double> getDoubleVectorAttribute(TiXmlElement * attr, const char * at_name);
         
         
         ComplexObject* getByNameNS(std::string scenename);

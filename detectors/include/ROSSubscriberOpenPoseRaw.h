@@ -4,12 +4,12 @@
 #include "ROSSubscriberBaseDetector.h"
 #include "depthai_ros_extended_msgs/NeuralNetworkRawOutput.h"
 
-namespace eod{
+namespace eod{        
     
     class ROSSubscriberOpenPoseRaw : public ROSSubscriberBaseAttribute<depthai_ros_extended_msgs::NeuralNetworkRawOutput>{
     public:
         
-        ROSSubscriberOpenPoseRaw(std::string topic_name, float timelag, float kpt_score_th = 0.15, int num_paf_samples = 10, float min_paf_score_th = 0.2, float paf_sample_th = 0.4);
+        ROSSubscriberOpenPoseRaw(std::string topic_name, float timelag, float kpt_score_th = 0.15, int num_paf_samples = 10, float min_paf_score_th = 0.2, float paf_sample_th = 0.4);                
         
         void callback(const depthai_ros_extended_msgs::NeuralNetworkRawOutput::ConstPtr& msg);
         
@@ -23,10 +23,10 @@ namespace eod{
         
         std::vector<std::pair<cv::Point, float>> get_keypoints_single_channel(const cv::Mat& heatmap_channel, const cv::Size& original_size);
         
-        const std::vector<std::string> landmarks_labels = {"nose", "neck", "right shoulder", "right elbow", "right wrist",
-        "left shoulder", "left elbow", "left wrist", "right hip", "right knee",
-        "right ankle", "left hip", "left knee", "left ankle", "right eye",
-        "left eye", "right ear", "left ear"};
+        const std::vector<std::string> landmarks_labels = {"nose", "neck", "right_shoulder", "right_elbow", "right_wrist",
+        "left_shoulder", "left_elbow", "left_wrist", "right_hip", "right_knee",
+        "right_ankle", "left_hip", "left_knee", "left_ankle", "right_eye",
+        "left_eye", "right_ear", "left_ear"};
                 
         const std::vector<std::vector<std::vector<int>>> paf_keys = {{{1, 2}, {12, 13}}, {{1, 5}, {20, 21}}, {{2, 3}, {14, 15}},
                  {{3, 4}, {16, 17}}, {{5, 6}, {22, 23}}, {{6, 7}, {24, 25}},

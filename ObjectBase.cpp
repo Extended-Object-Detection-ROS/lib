@@ -29,8 +29,7 @@ namespace eod{
      */
     vector<int> ObjectBase::getIntVectorAttribute(TiXmlElement * attr, const char * at_name){
         vector<int> vint;
-        
-        //istringstream iss(attr->Attribute(at_name));
+                
         istringstream iss(getStringAttribute(attr, at_name));
         
         string item;
@@ -51,6 +50,19 @@ namespace eod{
         return vint;
     }
     
+    /*
+     * format "1.456 3 455.223"
+     */    
+    vector<double> ObjectBase::getDoubleVectorAttribute(TiXmlElement * attr, const char* at_name){
+        vector<double> dvector;
+        string item;
+        istringstream iss(getStringAttribute(attr, at_name));
+        while( getline(iss, item, ' ')){
+            dvector.push_back(stod(item));
+        }
+        return dvector;        
+    }
+        
     string ObjectBase::getStringAttribute(TiXmlElement * attr, const char * at_name, string default_value){
         const char* value = attr->Attribute(at_name);        
         if(!value)
@@ -592,6 +604,25 @@ namespace eod{
                 break;
             }
 #endif            
+            case KPT_POSE_A:
+            {
+                vector<string> points_names = getStringVectorAttribute(attr, "keypoints");
+                vector<double>  point_poses = getDoubleVectorAttribute(attr, "poses");
+                if( points_names.size()*3 != point_poses.size() ){
+                    printf("Error KeypointPose attribute %s: size of 'poses' must be equal 3* size if 'keypoints'\n", name.c_str());
+                    continue;
+                }
+                std::map<std::string, cv::Point3f> object_points;
+                for( size_t i = 0 ; i < points_names.size() ; i++ ){
+                    cv::Point3f p;
+                    p.x = point_poses[i*3];
+                    p.y = point_poses[i*3+1];
+                    p.z = point_poses[i*3+2];
+                    object_points[points_names[i]] = p;
+                }
+                tmpA = new KeypointPoseAttribute(object_points);
+                break;
+            }
             default:
             {                
                 attr = attr->NextSiblingElement("Attribute");

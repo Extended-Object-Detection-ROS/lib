@@ -49,8 +49,23 @@ namespace eod{
         contour.insert( contour.end(), a->contour.begin(), a->contour.end() );
         contour.insert( contour.end(), b->contour.begin(), b->contour.end() );
         
+        // scores
         scores_with_weights.insert( scores_with_weights.end(), a->scores_with_weights.begin(), a->scores_with_weights.end() );
-        scores_with_weights.insert( scores_with_weights.end(), b->scores_with_weights.begin(), b->scores_with_weights.end() );        
+        scores_with_weights.insert( scores_with_weights.end(), b->scores_with_weights.begin(), b->scores_with_weights.end() );   
+        
+        // keypoints NOTE: not tested
+        int offset = keypoints.size();
+        
+        keypoints.insert( keypoints.end(), a->keypoints.begin(), a->keypoints.end() );
+        keypoints.insert( keypoints.end(), b->keypoints.begin(), b->keypoints.end() );
+                
+        for( const auto& conection : a->keypoint_connection ){
+            keypoint_connection.push_back(std::make_pair(conection.first + offset, conection.second + offset));
+        }
+        offset = keypoints.size();
+        for( const auto& conection : b->keypoint_connection ){
+            keypoint_connection.push_back(std::make_pair(conection.first + offset, conection.second + offset));
+        }
     }
 
     const ExtendedObjectInfo operator& ( ExtendedObjectInfo& left,  ExtendedObjectInfo& right){
@@ -192,9 +207,7 @@ namespace eod{
                 contour.clear();
             else
                 contour.insert( contour.begin(), total_contour);
-        }        
-        // TODO: keypoints?
-        
+        }                                
     }
     
     void ExtendedObjectInfo::updateRectFromKeypoints(float scale){
