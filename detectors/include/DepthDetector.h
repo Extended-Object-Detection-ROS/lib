@@ -12,7 +12,7 @@ namespace eod{
         
         DepthAttribute();        
         
-        DepthAttribute(int mode, double max_dist_m );
+        DepthAttribute(int mode, double max_dist_m, int radius);
         
         std::vector<ExtendedObjectInfo> Detect2(const InfoImage& image, int seq);
         
@@ -21,8 +21,8 @@ namespace eod{
         void Extract2(const InfoImage& image, ExtendedObjectInfo& rect);
         
     private:        
-        int mode;
-        double max_dist_m;
+        int mode, radius;
+        double max_dist_m;        
     };
     
 }

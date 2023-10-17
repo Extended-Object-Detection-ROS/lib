@@ -494,11 +494,12 @@ namespace eod{
             }
             case DEPTH_A:
             {                
-                int mode = 0;                
+                int mode = 0, radius = 0;                
                 double max_dist_m = 12;
                 attr->Attribute("mode", &mode);
                 attr->Attribute("max_dist_m", &max_dist_m);
-                tmpA = new DepthAttribute(mode, max_dist_m);
+                attr->Attribute("radius", &radius);
+                tmpA = new DepthAttribute(mode, max_dist_m, radius);
                 break;
             }
             case ROUGH_DIST_A:

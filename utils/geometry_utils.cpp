@@ -142,7 +142,8 @@ namespace eod{
         return closenessMapD;
     }
     
-    double mat_median( const cv::Mat& channel, bool mask_zeros, cv::Mat custom_mask, int max_dist_cm){
+    double mat_median(const cv::Mat& channel, bool mask_zeros, cv::Mat custom_mask, int max_dist_cm){
+        
         Mat mask = Mat::zeros(channel.size(), CV_8UC1);        
         if( mask_zeros ){
             cv::inRange( channel, 0, 0, mask);
@@ -156,20 +157,19 @@ namespace eod{
         double med = -1.0;
 
         int histSize = std::min(max_dist_cm, 65536);//16^2
-        float range[] = { 0, histSize };
-        const float* histRange = { range };
+        float range[] = {0, histSize};
+        const float* histRange = {range};
         bool uniform = true;
         bool accumulate = false;
         cv::Mat hist;                        
         cv::calcHist( &channel, 1, 0, mask, hist, 1, &histSize, &histRange, uniform, accumulate );
         
-        for ( int i = 0; i < histSize && med < 0.0; ++i )
-        {
-            bin += cvRound( hist.at<float>( i ) );                        
-            if ( bin > m && med < 0.0 ){
-                med = i;                   
+        for( int i = 0; i < histSize && med < 0.0; ++i ){
+            bin += cvRound( hist.at<float>(i) );
+            if( bin > m && med < 0.0 ){
+                med = i;
             }
-        }        
+        }
         return med;
     }
     
