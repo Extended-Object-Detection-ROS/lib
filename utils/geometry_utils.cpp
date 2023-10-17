@@ -187,6 +187,12 @@ namespace eod{
         return Point(x, y);        
     }
     
+    void reverse_translation(cv::Point& pt, const Vec3d& translation, const Mat& camMat){
+        pt.x = int(((translation[0] * camMat.at<double>(0,0))/translation[2]) + camMat.at<double>(0,2));
+        pt.y = int(((translation[1] * camMat.at<double>(1,1))/translation[2]) + camMat.at<double>(1,2));        
+    }
+    
+    
     double range_v3d(Vec3d a, Vec3d b){
         double dx = a[0] - b[0];
         double dy = a[1] - b[1];
@@ -223,6 +229,11 @@ namespace eod{
     cv::Point transform_between_channels(const cv::Point& point, const cv::Mat& src, const cv::Mat& dst){
         auto tvec = get_translation(point, src);
         return reverse_translation(tvec, dst);         
+    }
+    
+    void transform_between_channels_(cv::Point& point, const cv::Mat& src, const cv::Mat& dst){
+        auto tvec = get_translation(point, src);
+        reverse_translation(point, tvec, dst);         
     }
     
     cv::Point scale_point(const cv::Point& point, const cv::Size& old_size, const cv::Size& new_size){

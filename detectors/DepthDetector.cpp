@@ -66,10 +66,31 @@ namespace eod{
                 Mat mask = contour_to_mask(shift_contours(rect.contour, rect.tl()), cropped.size());
                 distance = mat_median(cropped, true, mask, max_dist_m*1000);                
             }
+            else if( mode == KEYPOINTS){
+                if(rect.keypoints.size() == 0){
+                    int cnt = 0;
+                    for( const auto& kpt : rect.keypoints ){
+                        double d = image.at<char16_t>(kpt);
+                        if( d > 0 ){
+                            distance += d;
+                            cnt++;
+                        }
+                    }
+                    distance /= cnt;
+                }
+                else{
+                    printf("DepthAttribute in mode KEYPOINTS(4) only works with objects that have keypoints!\n");
+                    return;
+                }
+            }
             else{
                 printf("Unknown mode in DepthAttribute!\n");
                 return;          
             }
+            
+            
+            
+            // FINALE
             if( distance > 0 ){
                 distance *= 0.001f; //NOTE as well depth stored as 256 char values
                 if( !image.K().empty() ){

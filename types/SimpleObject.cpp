@@ -349,6 +349,7 @@ namespace eod{
         }        
    }
    
+   // TODO: move to common or EOI itself
    void SimpleObject::transform_eoi(std::vector<ExtendedObjectInfo> &rects, const InfoImage& src, const InfoImage& dst){
        if( src.empty() || dst.empty()){
            printf("Error! On of channel data is empty, can't convert!");
@@ -369,6 +370,10 @@ namespace eod{
                }
            }                      
            // tvec & rvec - should not be converted as already in 3d
+           // keypoints
+           for( auto& kpt: rect.keypoints ){
+               transform_between_channels_(kpt, src.K(), dst.K());
+           }
        }
        
    }

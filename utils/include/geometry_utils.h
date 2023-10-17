@@ -44,11 +44,15 @@ namespace eod{
     
     cv::Point reverse_translation(const cv::Vec3d&, const cv::Mat& camMat);
     
+    void reverse_translation(cv::Point& pt, const cv::Vec3d& translation, const cv::Mat& camMat);
+    
     double range_v3d(cv::Vec3d, cv::Vec3d);
     
     double rect_distance(cv::Rect, cv::Rect);
         
     cv::Point transform_between_channels(const cv::Point& point, const cv::Mat& src, const cv::Mat& dst);
+    
+    void transform_between_channels_(cv::Point& point, const cv::Mat& src, const cv::Mat& dst);
     
     cv::Point scale_point(const cv::Point& point, const cv::Size& old_size, const cv::Size& new_size);
     

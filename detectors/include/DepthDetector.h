@@ -5,7 +5,7 @@
 
 namespace eod{
     
-    enum DEPTH_EXTRACT_MODE {ALL_BOX, HALF_SIZE_BOX, CENTER_PX, MASK};
+    enum DEPTH_EXTRACT_MODE {ALL_BOX, HALF_SIZE_BOX, CENTER_PX, MASK, KEYPOINTS};
 
     class DepthAttribute : public Attribute{
     public:
