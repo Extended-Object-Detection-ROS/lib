@@ -35,12 +35,18 @@ namespace eod{
         ros::Time now = ros::Time::now();
         ros::Time imtime = ros::Time(image.sec_, image.nsec_);
         std::vector<ExtendedObjectInfo> results;                            
-        
+                
+            
         auto msg = cache_->getElemAfterTime(imtime);
         int num_keypoints = landmarks_labels.size();
         do{                        
             if( msg == nullptr ){                
-                msg = cache_->getElemAfterTime(imtime);
+                if( timelag_ != 0 ){
+                    msg = cache_->getElemAfterTime(imtime);
+                }
+                else{
+                    msg = cache_->getElemBeforeTime(imtime);
+                }
             }
             
             else{     
@@ -276,7 +282,7 @@ namespace eod{
             }                        
             
         }  
-        while( (ros::Time::now() - now).toSec() < timelag_ && ros::ok());                
+        while( ((ros::Time::now() - now).toSec() < timelag_ || timelag_ == 0) && ros::ok());                
         return results;
     }        
     
