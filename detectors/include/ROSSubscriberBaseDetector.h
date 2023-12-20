@@ -25,7 +25,7 @@ namespace eod{
     class ROSSubscriberBaseAttribute : public ROSSubscriberSuperBaseAttribute{
        
     public:       
-        ROSSubscriberBaseAttribute(std::string topic_name, float timelag);
+        ROSSubscriberBaseAttribute(std::string topic_name, float timelag, float timeshift);
               
         virtual std::vector<ExtendedObjectInfo> Detect2(const InfoImage& image, int seq) = 0;       
         virtual bool Check2(const InfoImage& image, ExtendedObjectInfo& rect) = 0;       
@@ -39,17 +39,18 @@ namespace eod{
        
     protected:    
         std::string topic_name_;
-        float timelag_;
+        float timelag_, timeshift_;
        
         message_filters::Subscriber<T>* subscriber_;
         message_filters::Cache<T>* cache_;                     
     };
 
     template<class T>
-    ROSSubscriberBaseAttribute<T>::ROSSubscriberBaseAttribute(std::string topic_name, float timelag){
+    ROSSubscriberBaseAttribute<T>::ROSSubscriberBaseAttribute(std::string topic_name, float timelag, float timeshift){
         Type = ROS_SUB_BASE_A;
         topic_name_ = topic_name;
         timelag_ = timelag;
+        timeshift_ = timeshift;
     }
     
     template<class T>

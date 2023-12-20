@@ -23,7 +23,7 @@ namespace eod{
         return channel_mat;        
     }            
             
-    ROSSubscriberOpenPoseRaw::ROSSubscriberOpenPoseRaw(std::string topic_name, float timelag, float kpt_score_th, int num_paf_samples, float min_paf_score_th, float paf_sample_th) : ROSSubscriberBaseAttribute(topic_name, timelag){
+    ROSSubscriberOpenPoseRaw::ROSSubscriberOpenPoseRaw(std::string topic_name, float timelag, float timeshift, float kpt_score_th, int num_paf_samples, float min_paf_score_th, float paf_sample_th) : ROSSubscriberBaseAttribute(topic_name, timelag, timeshift){
         Type = ROS_SUB_OPENPOSE_RAW_A;        
         _num_paf_samples = num_paf_samples;
         _min_paf_score_th = min_paf_score_th;
@@ -33,7 +33,7 @@ namespace eod{
     
     std::vector<ExtendedObjectInfo> ROSSubscriberOpenPoseRaw::Detect2(const InfoImage& image, int seq){
         ros::Time now = ros::Time::now();
-        ros::Time imtime = ros::Time(image.sec_, image.nsec_);
+        ros::Time imtime = ros::Time(image.sec_, image.nsec_) + ros::Duration(timeshift_);
         std::vector<ExtendedObjectInfo> results;                            
                 
             
