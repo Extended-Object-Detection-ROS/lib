@@ -1,17 +1,16 @@
 #ifndef _ROS_SUBSCRIBER_OPEN_POSE_RAW_
 #define _ROS_SUBSCRIBER_OPEN_POSE_RAW_
 
-#include "ROSSubscriberBaseDetector.h"
+#include "ObjectIdentifier.h"
 #include "depthai_ros_extended_msgs/NeuralNetworkRawOutput.h"
 
 namespace eod{        
     
-    class ROSSubscriberOpenPoseRaw : public ROSSubscriberBaseAttribute<depthai_ros_extended_msgs::NeuralNetworkRawOutput>{
+    class ROSSubscriberOpenPoseRaw : public Attribute{
     public:
         
-        ROSSubscriberOpenPoseRaw(std::string topic_name, float timelag, float timeshift, float kpt_score_th = 0.15, int num_paf_samples = 10, float min_paf_score_th = 0.2, float paf_sample_th = 0.4);                
-        
-        void callback(const depthai_ros_extended_msgs::NeuralNetworkRawOutput::ConstPtr& msg);
+
+        ROSSubscriberOpenPoseRaw(float kpt_score_th = 0.15, int num_paf_samples = 10, float min_paf_score_th = 0.2, float paf_sample_th = 0.4);                            
         
         std::vector<ExtendedObjectInfo> Detect2(const InfoImage& image, int seq);
         
