@@ -181,6 +181,19 @@ namespace eod{
         return tvec;
     }
     
+    Vec3d get_translation_oak_fixed(const Point& point, const Mat& camMat, double dist){
+        Vec3d tvec;
+        tvec[0] = (point.x - camMat.at<double>(0,2)) / camMat.at<double>(0,0);
+        tvec[1] = (point.y - camMat.at<double>(1,2)) / camMat.at<double>(1,1);
+        tvec[2] = 1;
+        
+        double r = sqrt( pow(tvec[0], 2) + pow(tvec[1], 2) + pow(tvec[2],2));
+        
+        double r_fixed = dist / r;
+        
+        return get_translation(point, camMat, r_fixed);
+    }
+    
     Point reverse_translation(const Vec3d& translation, const Mat& camMat){
         int x = int(((translation[0] * camMat.at<double>(0,0))/translation[2]) + camMat.at<double>(0,2));
         int y = int(((translation[1] * camMat.at<double>(1,1))/translation[2]) + camMat.at<double>(1,2));

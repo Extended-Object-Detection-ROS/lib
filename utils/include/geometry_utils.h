@@ -41,6 +41,7 @@ namespace eod{
     double mat_median( const cv::Mat& channel, bool mask_zeros = false,  cv::Mat custom_mask = cv::Mat(), int max_dist_cm = 12000);
     
     cv::Vec3d get_translation(const cv::Point& point, const cv::Mat& camMat, double dist = 1.0);
+    cv::Vec3d get_translation_oak_fixed(const cv::Point& point, const cv::Mat& camMat, double dist = 1.0);
     
     cv::Point reverse_translation(const cv::Vec3d&, const cv::Mat& camMat);
     
