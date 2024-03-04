@@ -724,7 +724,7 @@ namespace eod{
             obj->Attribute("ID",&ID);            
             SimpleObject* temp;
 
-#if CV_MAJOR_VERSION > 3          
+#if USE_TRACKING          
             // TRACKER
             // see if there are some tracking settings
             TiXmlElement *tracker_el = obj->FirstChildElement("Tracker");

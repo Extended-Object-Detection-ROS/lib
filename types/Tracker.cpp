@@ -1,5 +1,5 @@
 #include <opencv2/core/version.hpp>
-#if CV_MAJOR_VERSION > 3
+#if USE_TRACKING
 #include "Tracker.h"
 #include "geometry_utils.h"
 #include "drawing_utils.h"
@@ -280,4 +280,4 @@ namespace eod{
         }
     }
 }
-#endif
+#endif // USE_TRACKING
