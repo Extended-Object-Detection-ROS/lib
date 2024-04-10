@@ -153,7 +153,7 @@ namespace eod{
     
     TorchYOLOv7KeypointAttribute::TorchYOLOv7KeypointAttribute(std::string model_path, int input_size, std::string lables_path, int num_class, int num_points){
         Type = TORCH_YOLOV7_KPT_A;
-        module = torch::jit::load(model_path);
+        module = torch::jit::load(model_path, torch::kCUDA);
         input_size_ = input_size;
         num_class_ = num_class;
         num_points_ = num_points;
@@ -169,8 +169,8 @@ namespace eod{
         Mat letter_box_image;
         std::vector<float> pad_info = LetterboxImage(image, letter_box_image, cv::Size(input_size_, input_size_));        
         
-        inputs.push_back(tensor_from_mat(letter_box_image));                
-        auto output = module.forward(inputs).toTuple()->elements()[0].toTensor();
+        inputs.push_back(tensor_from_mat(letter_box_image).to(torch::kCUDA));                
+        auto output = module.forward(inputs).toTuple()->elements()[0].toTensor().to(torch::kCPU);
         
         // postprocess
         int item_attr_size = 5;        
