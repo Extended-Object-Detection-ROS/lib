@@ -53,7 +53,6 @@ File: Class realises loading simple_simple_objects parameters from XML file
 #include "TorchYOLOv7Detector.h"
 #endif
 #if (USE_ROS)
-#include "ROSSubscriberBaseDetector.h"
 #include "ROSSubscriberOpenPoseRaw.h"
 #endif
 #include "KeypointPoseDetector.h"
@@ -80,6 +79,7 @@ namespace eod{
                 
     class ObjectBase{
     public:
+        
         std::vector<Attribute*>  attributes;      
         std::vector<SimpleObject*> simple_objects;
         std::vector<RelationShip*> relations;        
@@ -87,6 +87,8 @@ namespace eod{
 #ifdef USE_IGRAPH        
         std::vector<ComplexObjectGraph*> complex_objects_graph;
 #endif
+        
+        std::map<std::string, void*> inner_storage;
 
         /// <summary>
         /// Default constructor

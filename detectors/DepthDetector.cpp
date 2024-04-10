@@ -108,7 +108,7 @@ namespace eod{
                 distance *= 0.001f; //NOTE as well depth stored as 256 char values
                 if( !image.K().empty() ){
                     if( rect.tvec.size() == 0 ){
-                        Vec3d tvec = get_translation(rect.getCenter(), image.K(), distance);                        
+                        Vec3d tvec = get_translation_oak_fixed(rect.getCenter(), image.K(), distance);                        
                         rect.tvec.push_back(tvec);                        
                     }
                     else{
