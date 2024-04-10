@@ -59,11 +59,16 @@ namespace eod{
     // YOLO v7 Basic Attribute
     // =~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~
     
-    TorchYOLOv7Attribute::TorchYOLOv7Attribute(std::string model_path, int input_size, std::string lales_path){
+    TorchYOLOv7Attribute::TorchYOLOv7Attribute(std::string model_path, int input_size, std::string lales_path, bool force_cuda){
         Type = TORCH_YOLOV7_A;        
-        module = torch::jit::load(model_path);
+        this->force_cuda = force_cuda;
+        if( force_cuda )
+            module = torch::jit::load(model_path, torch::kCUDA);
+        else
+            module = torch::jit::load(model_path, torch::kCPU);
         input_size_ = input_size;
         readLabelsMapTxt(lales_path, labelsMap);
+        
     }
     
     TorchYOLOv7Attribute::TorchYOLOv7Attribute(){
@@ -79,8 +84,12 @@ namespace eod{
         Mat letter_box_image;
         std::vector<float> pad_info = LetterboxImage(image, letter_box_image, cv::Size(input_size_, input_size_));        
         
-        inputs.push_back(tensor_from_mat(letter_box_image));                
-        auto output = module.forward(inputs).toTuple()->elements()[0].toTensor();
+        if( force_cuda )
+            inputs.push_back(tensor_from_mat(letter_box_image).to(torch::kCUDA));                
+        else
+            inputs.push_back(tensor_from_mat(letter_box_image).to(torch::kCPU));                
+        
+        auto output = module.forward(inputs).toTuple()->elements()[0].toTensor().to(torch::kCPU);
         
         // postprocess
         int item_attr_size = 5;
@@ -151,12 +160,20 @@ namespace eod{
     // YOLO v7 KeyPoint Attribute
     // =~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~
     
-    TorchYOLOv7KeypointAttribute::TorchYOLOv7KeypointAttribute(std::string model_path, int input_size, std::string lables_path, int num_class, int num_points){
+    TorchYOLOv7KeypointAttribute::TorchYOLOv7KeypointAttribute(std::string model_path, int input_size, std::string lables_path, int num_class, int num_points, bool force_cuda){
         Type = TORCH_YOLOV7_KPT_A;
-        module = torch::jit::load(model_path, torch::kCUDA);
+        this->force_cuda = force_cuda;
+        
+        if( force_cuda )
+            module = torch::jit::load(model_path, torch::kCUDA);
+        else
+            module = torch::jit::load(model_path, torch::kCPU);
+        
         input_size_ = input_size;
         num_class_ = num_class;
         num_points_ = num_points;
+        
+        
         
     }
     
@@ -169,7 +186,10 @@ namespace eod{
         Mat letter_box_image;
         std::vector<float> pad_info = LetterboxImage(image, letter_box_image, cv::Size(input_size_, input_size_));        
         
-        inputs.push_back(tensor_from_mat(letter_box_image).to(torch::kCUDA));                
+        if (force_cuda )
+            inputs.push_back(tensor_from_mat(letter_box_image).to(torch::kCUDA));
+        else
+            inputs.push_back(tensor_from_mat(letter_box_image).to(torch::kCPU));
         auto output = module.forward(inputs).toTuple()->elements()[0].toTensor().to(torch::kCPU);
         
         // postprocess

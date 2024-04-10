@@ -574,7 +574,11 @@ namespace eod{
                 int input_size = 640;
                 attr->Attribute("input_size", &input_size);
                 string labels_path = getPathAttribute(attr, "labels");
-                tmpA = new TorchYOLOv7Attribute(model_path, input_size, labels_path);
+                
+                int force_cuda = 0;
+                attr->Attribute("force_cuda", &force_cuda);
+                
+                tmpA = new TorchYOLOv7Attribute(model_path, input_size, labels_path, bool(force_cuda));
                 break;
             }
             case TORCH_YOLOV7_KPT_A:
@@ -586,7 +590,11 @@ namespace eod{
                 int num_class = 1 , num_points = 17;
                 attr->Attribute("num_class", &num_class);
                 attr->Attribute("num_points", &num_points);
-                tmpA = new TorchYOLOv7KeypointAttribute(model_path, input_size, labels_path, num_class, num_points);
+                
+                int force_cuda = 0;
+                attr->Attribute("force_cuda", &force_cuda);
+                
+                tmpA = new TorchYOLOv7KeypointAttribute(model_path, input_size, labels_path, num_class, num_points, bool(force_cuda));
                 break;
             }
 #endif

@@ -23,7 +23,7 @@ namespace eod{
     public: 
         
         TorchYOLOv7Attribute();
-        TorchYOLOv7Attribute(std::string model_path, int input_size, std::string lables_path);
+        TorchYOLOv7Attribute(std::string model_path, int input_size, std::string lables_path, bool force_cuda = false);
         
         std::vector<ExtendedObjectInfo> Detect2(const InfoImage& image, int seq);                
         bool Check2(const InfoImage& image, ExtendedObjectInfo& rect);        
@@ -32,6 +32,9 @@ namespace eod{
         int input_size_;        
         torch::jit::script::Module module;
         std::map<int, std::string> labelsMap;
+        
+        bool force_cuda;
+                
         
     };
     
@@ -43,7 +46,7 @@ namespace eod{
     class TorchYOLOv7KeypointAttribute : public TorchYOLOv7Attribute{
     public:
         
-        TorchYOLOv7KeypointAttribute(std::string model_path, int input_size, std::string lables_path, int num_class, int num_points );
+        TorchYOLOv7KeypointAttribute(std::string model_path, int input_size, std::string lables_path, int num_class, int num_points, bool force_cuda = false);
         
         std::vector<ExtendedObjectInfo> Detect2(const InfoImage& image, int seq);                
         bool Check2(const InfoImage& image, ExtendedObjectInfo& rect);        
