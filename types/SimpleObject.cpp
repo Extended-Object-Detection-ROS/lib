@@ -193,6 +193,9 @@ namespace eod{
             }
         }
         //printf("OBJECTS DONE\n");
+        // norm again
+        for( auto& obj : objects )
+            obj.normalize(frame.size().width, frame.size().height);
         return objects;
     }
     
