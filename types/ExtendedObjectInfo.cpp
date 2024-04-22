@@ -142,7 +142,7 @@ namespace eod{
         if( keypoints.size() > 0 ){
             for( auto& kpt: keypoints){
                 circle(image, kpt, 10, col, cv::FILLED, cv::LINE_8);//2
-                putText(image, kpt.label.c_str(), kpt, FONT_HERSHEY_SIMPLEX, 1, col ,1);
+                //putText(image, kpt.label.c_str(), kpt, FONT_HERSHEY_SIMPLEX, 1, col ,1);
             }
         }        
         for( const auto& kpt_con: keypoint_connection ){
