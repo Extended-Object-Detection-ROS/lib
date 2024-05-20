@@ -46,7 +46,8 @@ namespace eod{
     class TorchYOLOv7KeypointAttribute : public TorchYOLOv7Attribute{
     public:
         
-        TorchYOLOv7KeypointAttribute(std::string model_path, int input_size, std::string lables_path, int num_class, int num_points, bool force_cuda = false);
+        TorchYOLOv7KeypointAttribute(std::string model_path, int input_size, std::vector<std::string> kpt_lables, int num_class, int num_points, bool force_cuda = false);
+
         
         std::vector<ExtendedObjectInfo> Detect2(const InfoImage& image, int seq);                
         bool Check2(const InfoImage& image, ExtendedObjectInfo& rect);        
@@ -54,6 +55,7 @@ namespace eod{
         
     private:
         int num_class_, num_points_;
+        std::vector<std::string> kpt_lables_;
     };
     
 }

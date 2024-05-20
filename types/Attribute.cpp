@@ -130,6 +130,8 @@ namespace eod{
             return ROS_SUB_OPENPOSE_RAW_A;
         if(name == "keypointpose")
             return KPT_POSE_A;
+        if(name == "dummyhumanpose")
+            return DUMMY_POSE_A;
                         
         printf("Unknown attribute type %s!",name.c_str());
         return UNK_A;

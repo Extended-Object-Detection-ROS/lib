@@ -59,7 +59,8 @@ namespace eod{
         TORCH_YOLOV7_KPT_A,
         ROS_SUB_BASE_A,
         ROS_SUB_OPENPOSE_RAW_A,
-        KPT_POSE_A
+        KPT_POSE_A,
+        DUMMY_POSE_A,
     };
     
     AttributeTypes getAttributeTypeFromName(std::string name);

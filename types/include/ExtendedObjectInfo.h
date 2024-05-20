@@ -95,6 +95,7 @@ namespace eod{
         std::vector<std::pair<int, int>> keypoint_connection; 
         
         void updateRectFromKeypoints(float scale = 0);
+        int getKeypointByName(std::string name);
         
         
         void initVars();       

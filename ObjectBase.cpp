@@ -586,7 +586,8 @@ namespace eod{
                 string model_path = getPathAttribute(attr, "model_path");
                 int input_size = 640;
                 attr->Attribute("input_size", &input_size);
-                string labels_path = getPathAttribute(attr, "labels");
+                //string labels_path = getPathAttribute(attr, "labels");
+                vector<string> labels = getStringVectorAttribute(attr, "labels");
                 int num_class = 1 , num_points = 17;
                 attr->Attribute("num_class", &num_class);
                 attr->Attribute("num_points", &num_points);
@@ -594,7 +595,7 @@ namespace eod{
                 int force_cuda = 0;
                 attr->Attribute("force_cuda", &force_cuda);
                 
-                tmpA = new TorchYOLOv7KeypointAttribute(model_path, input_size, labels_path, num_class, num_points, bool(force_cuda));
+                tmpA = new TorchYOLOv7KeypointAttribute(model_path, input_size, labels, num_class, num_points, bool(force_cuda));
                 break;
             }
 #endif
@@ -628,6 +629,11 @@ namespace eod{
                     object_points[points_names[i]] = p;
                 }
                 tmpA = new KeypointPoseAttribute(object_points);
+                break;
+            }
+            case DUMMY_POSE_A:
+            {
+                tmpA = new DummyHumanPoseAttribute();
                 break;
             }
             default:

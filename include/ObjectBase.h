@@ -56,6 +56,7 @@ File: Class realises loading simple_simple_objects parameters from XML file
 #include "ROSSubscriberOpenPoseRaw.h"
 #endif
 #include "KeypointPoseDetector.h"
+#include "DummyHumanPoseDetector.h"
 
 #include "Filtering.h"
 
