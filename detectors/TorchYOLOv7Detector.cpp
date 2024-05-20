@@ -151,12 +151,13 @@ namespace eod{
     // YOLO v7 KeyPoint Attribute
     // =~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~=~
     
-    TorchYOLOv7KeypointAttribute::TorchYOLOv7KeypointAttribute(std::string model_path, int input_size, std::string lables_path, int num_class, int num_points){
+    TorchYOLOv7KeypointAttribute::TorchYOLOv7KeypointAttribute(std::string model_path, int input_size, std::vector<std::string> kpt_lables, int num_class, int num_points){
         Type = TORCH_YOLOV7_KPT_A;
         module = torch::jit::load(model_path);
         input_size_ = input_size;
         num_class_ = num_class;
         num_points_ = num_points;
+        kpt_lables_ = kpt_lables;
         
     }
     
@@ -240,7 +241,8 @@ namespace eod{
                     int y = (det_array[i][item_attr_size + num_class_ + j*3 + 1] - pad_info[1])/pad_info[2];
                     float kpt_score = det_array[i][item_attr_size + num_class_ + j*3 + 2];
                     
-                    tmp.keypoints.push_back(eod::KeyPoint(x, y, kpt_score));
+                    
+                    tmp.keypoints.push_back(eod::KeyPoint(x, y, kpt_score, kpt_lables_.size() > j ? kpt_lables_[j] : ""));
                 }
                                 
                 answer.push_back(tmp);

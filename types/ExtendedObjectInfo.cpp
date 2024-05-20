@@ -238,5 +238,15 @@ namespace eod{
         this->height = y_max - y_min + offset_y;
     }
     
+    int ExtendedObjectInfo::getKeypointByName(std::string name){
+        
+        for( size_t i = 0 ; i < keypoints.size() ; i++ ){
+            if( keypoints[i].label == name )
+                return i;
+        }
+        printf("No stuff %s in kpts!\n", name.c_str());
+        return -1;                
+    }
+    
 }
 
