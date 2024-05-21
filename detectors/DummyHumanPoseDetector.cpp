@@ -23,14 +23,20 @@ namespace eod{
     
     void DummyHumanPoseAttribute::Extract2(const InfoImage& image, ExtendedObjectInfo& rect){
         
-        if( isHandRaised(rect) )
-            set_extracted_info(rect, "pose_detected", "hand_raised");
+        bool raised_left, raised_right;
+        isHandsRaised(rect, raised_left, raised_right);
+        if (raised_left)
+            set_extracted_info(rect, "left_raised", "yes");
         else
-            set_extracted_info(rect, "pose_detected", "unk");
+            set_extracted_info(rect, "left_raised", "no");
+        if (raised_right)
+            set_extracted_info(rect, "right_raised", "yes");
+        else
+            set_extracted_info(rect, "right_raised", "no");
         
     }
     
-    bool DummyHumanPoseAttribute::isHandRaised(ExtendedObjectInfo& rect){
+    void DummyHumanPoseAttribute::isHandsRaised(ExtendedObjectInfo& rect, bool& left, bool& right){
         
         
         int left_shoulder_id = rect.getKeypointByName("shoulder_left");
@@ -46,12 +52,13 @@ namespace eod{
         
         // left
         if( rect.keypoints[left_elbow_id].y < rect.keypoints[left_shoulder_id].y && rect.keypoints[left_wrist_id].y < rect.keypoints[left_elbow_id].y && rect.keypoints[left_wrist_id].x > rect.keypoints[nose_id].x - distance_threshold)
-            return true;
+            left = true;
         
+        // right
         if( rect.keypoints[right_elbow_id].y < rect.keypoints[right_shoulder_id].y && rect.keypoints[right_wrist_id].y < rect.keypoints[right_elbow_id].y && rect.keypoints[right_wrist_id].x < rect.keypoints[nose_id].x + distance_threshold)
-            return true;
+            right = true;
         
-        return false;
+        
         
     }
 

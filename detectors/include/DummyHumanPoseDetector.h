@@ -21,7 +21,7 @@ namespace eod{
         
     private:        
         
-        bool isHandRaised(ExtendedObjectInfo& rect);
+        void isHandsRaised(ExtendedObjectInfo& rect, bool& left, bool& right);
         
     };
     
